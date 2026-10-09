@@ -19,7 +19,7 @@ from __future__ import annotations
 import argparse
 import re
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 if sys.stdout.encoding and sys.stdout.encoding.lower() not in ("utf-8", "utf8"):
@@ -28,7 +28,9 @@ if sys.stdout.encoding and sys.stdout.encoding.lower() not in ("utf-8", "utf8"):
 ROOT = Path(__file__).resolve().parent.parent
 CHECKLIST = ROOT / "CHECKLIST.md"
 
-TASK_RE = re.compile(r"^(?P<indent>\s*)- \[(?P<mark>[ x~!])\]\s*<!--\s*(?P<tid>[A-Z0-9._-]+)\s*-->\s*(?P<text>.*)$")
+TASK_RE = re.compile(
+    r"^(?P<indent>\s*)- \[(?P<mark>[ x~!])\]\s*<!--\s*(?P<tid>[A-Z0-9._-]+)\s*-->\s*(?P<text>.*)$"
+)
 HEADING_RE = re.compile(r"^##\s+(?P<name>.+?)\s*$")
 PROGRESS_START = "<!-- PROGRESS:START -->"
 PROGRESS_END = "<!-- PROGRESS:END -->"
@@ -60,8 +62,12 @@ def parse(lines: list[str]):
         t = TASK_RE.match(line)
         if t:
             tasks.append(
-                {"id": t.group("tid"), "mark": t.group("mark"),
-                 "section": current, "idx": i}
+                {
+                    "id": t.group("tid"),
+                    "mark": t.group("mark"),
+                    "section": current,
+                    "idx": i,
+                }
             )
     return tasks, sections
 
@@ -73,7 +79,7 @@ def bar(pct: float, width: int = 20) -> str:
 
 def refresh(lines: list[str]) -> list[str]:
     tasks, sections = parse(lines)
-    now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    now = datetime.now(tz=timezone.utc).strftime("%Y-%m-%d %H:%M")
 
     done = sum(1 for t in tasks if t["mark"] == "x")
     wip = sum(1 for t in tasks if t["mark"] == "~")
@@ -84,9 +90,11 @@ def refresh(lines: list[str]) -> list[str]:
     out = [
         PROGRESS_START,
         f"**Última actualización:** {now}  ",
-        f"**Global:** {done}/{total} hechas "
-        f"({pct:.0f}%) `{bar(pct)}` "
-        f"· en curso: {wip} · bloqueadas: {blocked}",
+        (
+            f"**Global:** {done}/{total} hechas "
+            f"({pct:.0f}%) `{bar(pct)}` "
+            f"· en curso: {wip} · bloqueadas: {blocked}"
+        ),
         "",
         "| Sección | Hecho | Total | % | Progreso |",
         "|---|---|---|---|---|",
@@ -105,10 +113,12 @@ def refresh(lines: list[str]) -> list[str]:
         end = lines.index(PROGRESS_END)
     except ValueError:
         sys.exit("No se encontraron los marcadores PROGRESS en CHECKLIST.md")
-    return lines[:start] + out + lines[end + 1:]
+    return lines[:start] + out + lines[end + 1 :]
 
 
-def set_mark(lines: list[str], task_id: str, mark: str, note: str | None = None) -> list[str]:
+def set_mark(
+    lines: list[str], task_id: str, mark: str, note: str | None = None
+) -> list[str]:
     for i, line in enumerate(lines):
         t = TASK_RE.match(line)
         if t and t.group("tid") == task_id:

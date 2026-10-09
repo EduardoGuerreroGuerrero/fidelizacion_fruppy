@@ -5,8 +5,8 @@
 > Usar: `python scripts/checklist.py status|done <ID>|undone <ID>|refresh`
 
 <!-- PROGRESS:START -->
-**Última actualización:** 2026-10-09 11:44  
-**Global:** 30/89 hechas (34%) `███████░░░░░░░░░░░░░` · en curso: 0 · bloqueadas: 1
+**Última actualización:** 2026-10-09 11:53  
+**Global:** 37/89 hechas (42%) `████████░░░░░░░░░░░░` · en curso: 0 · bloqueadas: 1
 
 | Sección | Hecho | Total | % | Progreso |
 |---|---|---|---|---|
@@ -15,7 +15,7 @@
 | Fase 1 — Base del proyecto y entorno | 7 | 8 | 88% | `█████████░` |
 | Fase 2 — Identidad, organizaciones y aislamiento | 6 | 6 | 100% | `██████████` |
 | Fase 3 — CRM básico | 0 | 6 | 0% | `░░░░░░░░░░` |
-| Fase 4 — Motor de fidelización | 0 | 7 | 0% | `░░░░░░░░░░` |
+| Fase 4 — Motor de fidelización | 7 | 7 | 100% | `██████████` |
 | Fase 5 — QR y flujo de empleado | 0 | 6 | 0% | `░░░░░░░░░░` |
 | Fase 6 — Tarjeta web y Wallet | 0 | 6 | 0% | `░░░░░░░░░░` |
 | Fase 7 — Dashboard y configuración del comercio | 0 | 9 | 0% | `░░░░░░░░░░` |
@@ -86,13 +86,13 @@
 
 ## Fase 4 — Motor de fidelización
 
-- [ ] <!-- F4-T1 --> Programa de sellos funcional primero; modelo extensible a puntos
-- [ ] <!-- F4-T2 --> Función SQL transaccional para añadir sellos/puntos
-- [ ] <!-- F4-T3 --> Canje atómico y registro de redención
-- [ ] <!-- F4-T4 --> Ledger inmutable + reversos compensatorios
-- [ ] <!-- F4-T5 --> Idempotencia en operaciones de escritura
-- [ ] <!-- F4-T6 --> Sin saldos negativos ni doble canje concurrente (pruebas)
-- [ ] <!-- F4-T7 --> Proyección de saldo actualizada en la misma transacción
+- [x] <!-- F4-T1 --> Programa de sellos funcional primero; modelo extensible a puntos
+- [x] <!-- F4-T2 --> Función SQL transaccional para añadir sellos/puntos
+- [x] <!-- F4-T3 --> Canje atómico y registro de redención
+- [x] <!-- F4-T4 --> Ledger inmutable + reversos compensatorios
+- [x] <!-- F4-T5 --> Idempotencia en operaciones de escritura
+- [x] <!-- F4-T6 --> Sin saldos negativos ni doble canje concurrente (pruebas)
+- [x] <!-- F4-T7 --> Proyección de saldo actualizada en la misma transacción
 
 ## Fase 5 — QR y flujo de empleado
 
