@@ -5,8 +5,8 @@
 > Usar: `python scripts/checklist.py status|done <ID>|undone <ID>|refresh`
 
 <!-- PROGRESS:START -->
-**Última actualización:** 2026-10-09 17:38  
-**Global:** 49/89 hechas (55%) `███████████░░░░░░░░░` · en curso: 0 · bloqueadas: 1
+**Última actualización:** 2026-10-09 17:46  
+**Global:** 55/89 hechas (62%) `████████████░░░░░░░░` · en curso: 0 · bloqueadas: 1
 
 | Sección | Hecho | Total | % | Progreso |
 |---|---|---|---|---|
@@ -17,7 +17,7 @@
 | Fase 3 — CRM básico | 6 | 6 | 100% | `██████████` |
 | Fase 4 — Motor de fidelización | 7 | 7 | 100% | `██████████` |
 | Fase 5 — QR y flujo de empleado | 6 | 6 | 100% | `██████████` |
-| Fase 6 — Tarjeta web y Wallet | 0 | 6 | 0% | `░░░░░░░░░░` |
+| Fase 6 — Tarjeta web y Wallet | 6 | 6 | 100% | `██████████` |
 | Fase 7 — Dashboard y configuración del comercio | 0 | 9 | 0% | `░░░░░░░░░░` |
 | Fase 8 — Analítica básica | 0 | 3 | 0% | `░░░░░░░░░░` |
 | Fase 9 — Piloto con comercios | 0 | 3 | 0% | `░░░░░░░░░░` |
@@ -105,12 +105,12 @@
 
 ## Fase 6 — Tarjeta web y Wallet
 
-- [ ] <!-- F6-T1 --> Tarjeta web responsive como alternativa sin Wallet
-- [ ] <!-- F6-T2 --> Interfaz `WalletProvider`: createPass/updatePass/revokePass/healthCheck
-- [ ] <!-- F6-T3 --> Primer proveedor implementado, luego el segundo
-- [ ] <!-- F6-T4 --> Credenciales Apple/Google fuera del repositorio
-- [ ] <!-- F6-T5 --> Reintentos idempotentes; fallos de Wallet no revierten puntos
-- [ ] <!-- F6-T6 --> `wallet_passes` solo con identificadores y estado técnico
+- [x] <!-- F6-T1 --> Tarjeta web responsive como alternativa sin Wallet
+- [x] <!-- F6-T2 --> Interfaz `WalletProvider`: createPass/updatePass/revokePass/healthCheck
+- [x] <!-- F6-T3 --> Primer proveedor implementado, luego el segundo
+- [x] <!-- F6-T4 --> Credenciales Apple/Google fuera del repositorio
+- [x] <!-- F6-T5 --> Reintentos idempotentes; fallos de Wallet no revierten puntos
+- [x] <!-- F6-T6 --> `wallet_passes` solo con identificadores y estado técnico
 
 ## Fase 7 — Dashboard y configuración del comercio
 

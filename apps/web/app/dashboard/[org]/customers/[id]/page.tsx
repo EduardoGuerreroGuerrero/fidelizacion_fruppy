@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { findDuplicates, setMarketingConsent, updateCustomer } from "@/lib/customers/actions";
 import { issueCard, revokeCard, rotateCardToken } from "@/lib/loyalty/actions";
+import { syncWalletFormAction } from "@/lib/wallet/sync";
 
 export const instant = false;
 
@@ -302,14 +303,24 @@ export default async function CustomerPage({
                           </button>
                         </form>
                         {card.status === "active" && (
-                          <form action={revokeCard.bind(null, slug, customer.id, card.id)}>
-                            <button
-                              type="submit"
-                              className="rounded border border-red-300 px-2 py-1 text-xs text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-950"
-                            >
-                              Revocar
-                            </button>
-                          </form>
+                          <>
+                            <form action={syncWalletFormAction.bind(null, slug, customer.id)}>
+                              <button
+                                type="submit"
+                                className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                              >
+                                Wallet
+                              </button>
+                            </form>
+                            <form action={revokeCard.bind(null, slug, customer.id, card.id)}>
+                              <button
+                                type="submit"
+                                className="rounded border border-red-300 px-2 py-1 text-xs text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-950"
+                              >
+                                Revocar
+                              </button>
+                            </form>
+                          </>
                         )}
                       </div>
                     ) : (
