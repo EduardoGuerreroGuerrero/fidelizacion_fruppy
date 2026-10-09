@@ -5,8 +5,8 @@
 > Usar: `python scripts/checklist.py status|done <ID>|undone <ID>|refresh`
 
 <!-- PROGRESS:START -->
-**Última actualización:** 2026-10-09 18:06  
-**Global:** 83/89 hechas (93%) `███████████████████░` · en curso: 0 · bloqueadas: 2
+**Última actualización:** 2026-10-09 19:32  
+**Global:** 84/89 hechas (94%) `███████████████████░` · en curso: 0 · bloqueadas: 1
 
 | Sección | Hecho | Total | % | Progreso |
 |---|---|---|---|---|
@@ -20,7 +20,7 @@
 | Fase 6 — Tarjeta web y Wallet | 6 | 6 | 100% | `██████████` |
 | Fase 7 — Dashboard y configuración del comercio | 9 | 9 | 100% | `██████████` |
 | Fase 8 — Analítica básica | 3 | 3 | 100% | `██████████` |
-| Fase 9 — Piloto con comercios | 2 | 3 | 67% | `███████░░░` |
+| Fase 9 — Piloto con comercios | 3 | 3 | 100% | `██████████` |
 | Fase 10 — SaaS comercial (no empezar hasta validar MVP) | 0 | 4 | 0% | `░░░░░░░░░░` |
 | Definición de "MVP listo" (del plan) | 14 | 14 | 100% | `██████████` |
 <!-- PROGRESS:END -->
@@ -132,7 +132,7 @@
 
 ## Fase 9 — Piloto con comercios
 
-- [!] <!-- F9-T1 --> Piloto con un negocio y datos de prueba
+- [x] <!-- F9-T1 --> Piloto con un negocio y datos de prueba
 - [x] <!-- F9-T2 --> Escenarios E2E: alta, QR, visita, acumulación, canje, corrección, baja empleado, Wallet
 - [x] <!-- F9-T3 --> Backups y restauración verificados; procedimiento de soporte documentado
 
