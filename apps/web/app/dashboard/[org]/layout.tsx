@@ -8,6 +8,7 @@ const NAV = [
   ["", "Inicio"],
   ["customers", "Clientes"],
   ["scan", "Escanear"],
+  ["analytics", "Analítica"],
   ["programs", "Programas"],
   ["rewards", "Recompensas"],
   ["team", "Equipo"],

@@ -189,6 +189,68 @@ def main() -> int:
             ),
         )
 
+    # ---- org_analytics (Fase 8) ----
+    # Datos semilla como superusuario (el owner de la tabla ignora RLS).
+    prog, cust_a, cust_b, acct = (uuid.uuid4() for _ in range(4))
+    conn.execute(
+        "insert into public.customers (id, organization_id, first_name)"
+        " values (%s, %s, 'A'), (%s, %s, 'B')",
+        (cust_a, org, cust_b, org),
+    )
+    conn.execute(
+        "insert into public.loyalty_programs"
+        " (id, organization_id, name, program_type, stamp_goal)"
+        " values (%s, %s, 'p', 'stamps', 8)",
+        (prog, org),
+    )
+    conn.execute(
+        "insert into public.loyalty_accounts (id, organization_id, customer_id, program_id)"
+        " values (%s, %s, %s, %s)",
+        (acct, org, cust_a, prog),
+    )
+    conn.execute(
+        "insert into public.loyalty_transactions"
+        " (organization_id, account_id, transaction_type, stamps_delta)"
+        " values (%s, %s, 'earn', 5)",
+        (org, acct),
+    )
+    # A visita ×2 (retorna), B visita ×1 → tasa de retorno 1/2 = 0.5
+    conn.execute(
+        "insert into public.customer_visits (organization_id, customer_id, source)"
+        " values (%s, %s, 'manual'), (%s, %s, 'manual'), (%s, %s, 'manual')",
+        (org, cust_a, org, cust_a, org, cust_b),
+    )
+
+    with Ctx(conn, owner) as c:
+        a = c.execute("select public.org_analytics(%s, 30)", (org,)).fetchone()[0]
+        checks = [
+            ("analytics: visits_total=3", a["visits_total"] == 3, a["visits_total"]),
+            (
+                "analytics: customers_active=2",
+                a["customers_active"] == 2,
+                a["customers_active"],
+            ),
+            ("analytics: stamps_earned=5", a["stamps_earned"] == 5, a["stamps_earned"]),
+            (
+                "analytics: return_rate=0.5",
+                float(a["return_rate"]) == 0.5,
+                a["return_rate"],
+            ),
+            (
+                "analytics: visits_daily tiene 30 días",
+                len(a["visits_daily"]) == 30,
+                len(a["visits_daily"]),
+            ),
+        ]
+        for name, ok, detail in checks:
+            check(name, ok, str(detail))
+
+    with Ctx(conn, outsider) as c:
+        check(
+            "externo no puede llamar org_analytics",
+            denied(lambda: c.execute("select public.org_analytics(%s, 30)", (org,))),
+        )
+
     conn.close()
     failed = [r for r in RESULTS if not r[1]]
     print(f"\n{len(RESULTS) - len(failed)}/{len(RESULTS)} OK")

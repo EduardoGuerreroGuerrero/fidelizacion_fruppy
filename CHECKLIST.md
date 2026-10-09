@@ -5,8 +5,8 @@
 > Usar: `python scripts/checklist.py status|done <ID>|undone <ID>|refresh`
 
 <!-- PROGRESS:START -->
-**Última actualización:** 2026-10-09 17:54  
-**Global:** 64/89 hechas (72%) `██████████████░░░░░░` · en curso: 0 · bloqueadas: 1
+**Última actualización:** 2026-10-09 18:00  
+**Global:** 67/89 hechas (75%) `███████████████░░░░░` · en curso: 0 · bloqueadas: 1
 
 | Sección | Hecho | Total | % | Progreso |
 |---|---|---|---|---|
@@ -19,7 +19,7 @@
 | Fase 5 — QR y flujo de empleado | 6 | 6 | 100% | `██████████` |
 | Fase 6 — Tarjeta web y Wallet | 6 | 6 | 100% | `██████████` |
 | Fase 7 — Dashboard y configuración del comercio | 9 | 9 | 100% | `██████████` |
-| Fase 8 — Analítica básica | 0 | 3 | 0% | `░░░░░░░░░░` |
+| Fase 8 — Analítica básica | 3 | 3 | 100% | `██████████` |
 | Fase 9 — Piloto con comercios | 0 | 3 | 0% | `░░░░░░░░░░` |
 | Fase 10 — SaaS comercial (no empezar hasta validar MVP) | 0 | 4 | 0% | `░░░░░░░░░░` |
 | Definición de "MVP listo" (del plan) | 0 | 14 | 0% | `░░░░░░░░░░` |
@@ -126,9 +126,9 @@
 
 ## Fase 8 — Analítica básica
 
-- [ ] <!-- F8-T1 --> Métricas: clientes, activos, visitas, canjes, puntos/sellos
-- [ ] <!-- F8-T2 --> Tasa de retorno con fórmula documentada
-- [ ] <!-- F8-T3 --> Definiciones documentadas; zona horaria consistente; reconciliables
+- [x] <!-- F8-T1 --> Métricas: clientes, activos, visitas, canjes, puntos/sellos
+- [x] <!-- F8-T2 --> Tasa de retorno con fórmula documentada
+- [x] <!-- F8-T3 --> Definiciones documentadas; zona horaria consistente; reconciliables
 
 ## Fase 9 — Piloto con comercios
 
