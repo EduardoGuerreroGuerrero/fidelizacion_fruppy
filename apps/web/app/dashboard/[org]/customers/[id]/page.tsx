@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { findDuplicates, setMarketingConsent, updateCustomer } from "@/lib/customers/actions";
+import { issueCard, revokeCard, rotateCardToken } from "@/lib/loyalty/actions";
 
 export const instant = false;
 
@@ -52,7 +53,7 @@ export default async function CustomerPage({
   // Cuentas del cliente (saldo proyectado — la verdad está en el ledger).
   const { data: accounts } = await supabase
     .from("loyalty_accounts")
-    .select("id, current_points, current_stamps, loyalty_programs(name, program_type)")
+    .select("id, program_id, current_points, current_stamps, loyalty_programs(name, program_type)")
     .eq("customer_id", customer.id)
     .eq("organization_id", org.id);
   const accountIds = (accounts ?? []).map((a) => a.id);
@@ -113,6 +114,21 @@ export default async function CustomerPage({
       };
     }),
   ].sort((a, b) => (a.at < b.at ? 1 : -1));
+
+  // Programas activos y tarjetas emitidas para este cliente.
+  const [{ data: programs }, { data: cards }] = await Promise.all([
+    supabase
+      .from("loyalty_programs")
+      .select("id, name, program_type")
+      .eq("organization_id", org.id)
+      .eq("status", "active"),
+    supabase
+      .from("customer_cards")
+      .select("id, token, status, account_id")
+      .eq("customer_id", customer.id)
+      .eq("organization_id", org.id),
+  ]);
+  const cardByAccount = new Map((cards ?? []).map((c) => [c.account_id, c]));
 
   // Aviso de duplicados (mismo teléfono/email en la org — sin fusión auto).
   const duplicates = await findDuplicates(slug, customer.phone, customer.email, customer.id);
@@ -247,6 +263,75 @@ export default async function CustomerPage({
               Guardar cambios
             </button>
           </form>
+
+          <h2 className="mb-3 mt-8 text-lg font-medium">Tarjetas</h2>
+          <ul className="mb-8 space-y-2">
+            {(programs ?? []).map((p) => {
+              const account = (accounts ?? []).find(
+                (a) => (a as { program_id?: string }).program_id === p.id,
+              );
+              const card = account ? cardByAccount.get(account.id) : undefined;
+              return (
+                <li
+                  key={p.id}
+                  className="rounded-md border border-neutral-200 px-4 py-3 text-sm dark:border-neutral-800"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">{p.name}</span>
+                    {card ? (
+                      <div className="flex items-center gap-2">
+                        {card.status === "active" ? (
+                          <Link
+                            href={`/t/${card.token}`}
+                            target="_blank"
+                            className="rounded bg-green-100 px-2 py-1 text-xs text-green-800 hover:bg-green-200 dark:bg-green-900/40 dark:text-green-300"
+                          >
+                            Ver tarjeta
+                          </Link>
+                        ) : (
+                          <span className="rounded bg-red-100 px-2 py-1 text-xs text-red-800 dark:bg-red-900/40 dark:text-red-300">
+                            revocada
+                          </span>
+                        )}
+                        <form action={rotateCardToken.bind(null, slug, customer.id, card.id)}>
+                          <button
+                            type="submit"
+                            className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                          >
+                            Rotar QR
+                          </button>
+                        </form>
+                        {card.status === "active" && (
+                          <form action={revokeCard.bind(null, slug, customer.id, card.id)}>
+                            <button
+                              type="submit"
+                              className="rounded border border-red-300 px-2 py-1 text-xs text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-950"
+                            >
+                              Revocar
+                            </button>
+                          </form>
+                        )}
+                      </div>
+                    ) : (
+                      <form action={issueCard.bind(null, slug, customer.id, p.id)}>
+                        <button
+                          type="submit"
+                          className="rounded-md bg-neutral-900 px-3 py-1 text-xs text-white hover:bg-neutral-700 dark:bg-neutral-100 dark:text-neutral-900"
+                        >
+                          Emitir tarjeta
+                        </button>
+                      </form>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+            {(programs ?? []).length === 0 && (
+              <li className="text-sm text-neutral-500">
+                Sin programas activos — crea uno en Programas.
+              </li>
+            )}
+          </ul>
 
           <h2 className="mb-3 mt-8 text-lg font-medium">Consentimiento</h2>
           <form

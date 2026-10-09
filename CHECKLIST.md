@@ -5,8 +5,8 @@
 > Usar: `python scripts/checklist.py status|done <ID>|undone <ID>|refresh`
 
 <!-- PROGRESS:START -->
-**Última actualización:** 2026-10-09 17:27  
-**Global:** 43/89 hechas (48%) `██████████░░░░░░░░░░` · en curso: 0 · bloqueadas: 1
+**Última actualización:** 2026-10-09 17:38  
+**Global:** 49/89 hechas (55%) `███████████░░░░░░░░░` · en curso: 0 · bloqueadas: 1
 
 | Sección | Hecho | Total | % | Progreso |
 |---|---|---|---|---|
@@ -16,7 +16,7 @@
 | Fase 2 — Identidad, organizaciones y aislamiento | 6 | 6 | 100% | `██████████` |
 | Fase 3 — CRM básico | 6 | 6 | 100% | `██████████` |
 | Fase 4 — Motor de fidelización | 7 | 7 | 100% | `██████████` |
-| Fase 5 — QR y flujo de empleado | 0 | 6 | 0% | `░░░░░░░░░░` |
+| Fase 5 — QR y flujo de empleado | 6 | 6 | 100% | `██████████` |
 | Fase 6 — Tarjeta web y Wallet | 0 | 6 | 0% | `░░░░░░░░░░` |
 | Fase 7 — Dashboard y configuración del comercio | 0 | 9 | 0% | `░░░░░░░░░░` |
 | Fase 8 — Analítica básica | 0 | 3 | 0% | `░░░░░░░░░░` |
@@ -96,12 +96,12 @@
 
 ## Fase 5 — QR y flujo de empleado
 
-- [ ] <!-- F5-T1 --> Token público aleatorio y revocable por tarjeta
-- [ ] <!-- F5-T2 --> QR sin datos personales ni privilegios
-- [ ] <!-- F5-T3 --> Página de cliente con estado y tarjeta
-- [ ] <!-- F5-T4 --> Flujo empleado: escanear/buscar, validar sesión/rol, registrar visita
-- [ ] <!-- F5-T5 --> Confirmación visual de éxito/error
-- [ ] <!-- F5-T6 --> Rate limiting y protección anti-abuso
+- [x] <!-- F5-T1 --> Token público aleatorio y revocable por tarjeta
+- [x] <!-- F5-T2 --> QR sin datos personales ni privilegios
+- [x] <!-- F5-T3 --> Página de cliente con estado y tarjeta
+- [x] <!-- F5-T4 --> Flujo empleado: escanear/buscar, validar sesión/rol, registrar visita
+- [x] <!-- F5-T5 --> Confirmación visual de éxito/error
+- [x] <!-- F5-T6 --> Rate limiting y protección anti-abuso
 
 ## Fase 6 — Tarjeta web y Wallet
 

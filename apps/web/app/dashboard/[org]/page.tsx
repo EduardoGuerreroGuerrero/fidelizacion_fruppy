@@ -44,9 +44,13 @@ export default async function OrgPage({ params }: { params: Promise<{ org: strin
           <p className="text-3xl font-semibold">{customerCount ?? 0}</p>
           <p className="mt-1 text-sm text-neutral-500">Clientes activos</p>
         </Link>
-        <div className="rounded-lg border border-dashed border-neutral-300 p-5 text-sm text-neutral-400 dark:border-neutral-700">
-          Programas, recompensas y QR — Fases 4–5 en el motor ya verificado, UI próximamente.
-        </div>
+        <Link
+          href={`/dashboard/${slug}/scan`}
+          className="rounded-lg border border-neutral-200 p-5 hover:border-neutral-400 dark:border-neutral-800"
+        >
+          <p className="text-lg font-semibold">Escanear tarjeta</p>
+          <p className="mt-1 text-sm text-neutral-500">Registrar visita y otorgar sellos</p>
+        </Link>
       </div>
     </div>
   );
