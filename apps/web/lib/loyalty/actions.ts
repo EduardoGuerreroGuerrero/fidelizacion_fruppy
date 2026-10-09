@@ -2,24 +2,26 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createClient, supabaseAdmin } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 
+// Auditoría vía RPC write_audit_log: actor = auth.uid(), membresía exigida
+// en la función. No requiere service_role.
 async function audit(
   orgId: string,
-  actorId: string,
+  _actorId: string,
   action: string,
   entityType: string,
   entityId: string,
   metadata: Record<string, unknown> = {},
 ) {
   try {
-    await supabaseAdmin().from("audit_logs").insert({
-      organization_id: orgId,
-      actor_user_id: actorId,
-      action,
-      entity_type: entityType,
-      entity_id: entityId,
-      metadata,
+    const supabase = await createClient();
+    await supabase.rpc("write_audit_log", {
+      p_org: orgId,
+      p_action: action,
+      p_entity_type: entityType,
+      p_entity_id: entityId,
+      p_metadata: metadata,
     });
   } catch (e) {
     console.error("[audit]", action, e instanceof Error ? e.message : e);

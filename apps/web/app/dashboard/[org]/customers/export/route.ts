@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient, supabaseAdmin } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 
 // Anti CSV-formula-injection: celdas que empiezan por =, +, -, @ o control
 // van prefijadas con comilla simple (OWASP CSV Injection).
@@ -67,20 +67,17 @@ export async function GET(_req: Request, ctx: { params: Promise<{ org: string }>
   );
   const csv = [header, ...rows].join("\r\n") + "\r\n";
 
-  // Auditoría de exportación (best-effort, no bloquea la descarga).
+  // Auditoría de exportación vía RPC (actor = auth.uid(), sin service_role).
   try {
-    await supabaseAdmin()
-      .from("audit_logs")
-      .insert({
-        organization_id: org.id,
-        actor_user_id: user.id,
-        action: "customers.exported",
-        entity_type: "customer",
-        entity_id: null,
-        metadata: { count: rows.length, role: membership?.role },
-      });
+    await supabase.rpc("write_audit_log", {
+      p_org: org.id,
+      p_action: "customers.exported",
+      p_entity_type: "customer",
+      p_entity_id: null,
+      p_metadata: { count: rows.length, role: membership?.role },
+    });
   } catch {
-    // sin service_role en dev — continuar
+    // auditoría best-effort — no bloquea la descarga
   }
 
   return new NextResponse(csv, {

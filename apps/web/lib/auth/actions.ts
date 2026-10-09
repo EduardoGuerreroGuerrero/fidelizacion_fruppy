@@ -18,8 +18,7 @@ export async function signIn(formData: FormData) {
   const next = String(formData.get("next") ?? "/dashboard");
 
   if (!EMAIL_RE.test(email)) fail("/login", "Email inválido.");
-  if (password.length < MIN_PASSWORD)
-    fail("/login", "Contraseña demasiado corta.");
+  if (password.length < MIN_PASSWORD) fail("/login", "Contraseña demasiado corta.");
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -36,10 +35,7 @@ export async function signUp(formData: FormData) {
 
   if (!EMAIL_RE.test(email)) fail("/signup", "Email inválido.");
   if (password.length < MIN_PASSWORD) {
-    fail(
-      "/signup",
-      `La contraseña debe tener al menos ${MIN_PASSWORD} caracteres.`,
-    );
+    fail("/signup", `La contraseña debe tener al menos ${MIN_PASSWORD} caracteres.`);
   }
 
   const supabase = await createClient();

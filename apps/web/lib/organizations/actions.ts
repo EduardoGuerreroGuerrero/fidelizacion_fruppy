@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createClient, supabaseAdmin } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 
 const SLUG_RE = /^[a-z0-9][a-z0-9-]{1,62}$/;
 
@@ -15,35 +15,35 @@ function slugify(name: string): string {
     .slice(0, 63);
 }
 
+// Auditoría vía RPC write_audit_log: actor = auth.uid(), membresía exigida
+// en la función. No requiere service_role.
 async function audit(
   orgId: string,
-  actorId: string,
+  _actorId: string,
   action: string,
   entityType: string,
   entityId: string,
   metadata: Record<string, unknown> = {},
 ) {
   try {
-    // audit_logs no tiene INSERT policy para authenticated: va por service_role.
-    await supabaseAdmin()
-      .from("audit_logs")
-      .insert({
-        organization_id: orgId,
-        actor_user_id: actorId,
-        action,
-        entity_type: entityType,
-        entity_id: entityId,
-        metadata,
-      });
+    const supabase = await createClient();
+    await supabase.rpc("write_audit_log", {
+      p_org: orgId,
+      p_action: action,
+      p_entity_type: entityType,
+      p_entity_id: entityId,
+      p_metadata: metadata,
+    });
   } catch (e) {
-    // Auditoría best-effort en dev si service_role no está configurada.
     console.error("[audit]", action, e instanceof Error ? e.message : e);
   }
 }
 
 export async function createOrganization(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
-  const slugInput = String(formData.get("slug") ?? "").trim().toLowerCase();
+  const slugInput = String(formData.get("slug") ?? "")
+    .trim()
+    .toLowerCase();
   const slug = slugInput || slugify(name);
 
   if (name.length < 2 || name.length > 120) {
