@@ -44,7 +44,23 @@ jobs:
           docker run -d --name pg -e POSTGRES_PASSWORD=ci -p 5432:5432 postgres:16
           until docker exec pg pg_isready -U postgres; do sleep 1; done
           # auth schema stub: organization_members/performed_by referencian auth.users
-          docker exec pg psql -U postgres -c "create schema auth; create table auth.users(id uuid primary key);"
+          # roles anon/authenticated: en Supabase existen; en Postgres plano hay
+          # que crearlos (mismo stub que scripts/db_apply.py --stub-auth).
+          docker exec -i pg psql -U postgres <<'SQL'
+          create schema auth;
+          create table auth.users(id uuid primary key);
+          do $$ begin
+            if not exists (select 1 from pg_roles where rolname='anon') then
+              create role anon nologin;
+            end if;
+            if not exists (select 1 from pg_roles where rolname='authenticated') then
+              create role authenticated nologin;
+            end if;
+          end $$;
+          create or replace function auth.uid() returns uuid
+          language sql stable as
+          $$ select nullif(current_setting('app.user_id', true),'')::uuid $$;
+          SQL
           for f in supabase/migrations/*.sql; do
             echo "== applying $f"
             docker exec -i pg psql -U postgres -v ON_ERROR_STOP=1 < "$f"
