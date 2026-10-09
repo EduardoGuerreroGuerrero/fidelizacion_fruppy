@@ -5,13 +5,13 @@
 > Usar: `python scripts/checklist.py status|done <ID>|undone <ID>|refresh`
 
 <!-- PROGRESS:START -->
-**Última actualización:** 2026-10-09 11:07  
-**Global:** 6/89 hechas (7%) `█░░░░░░░░░░░░░░░░░░░` · en curso: 0 · bloqueadas: 0
+**Última actualización:** 2026-10-09 11:15  
+**Global:** 16/89 hechas (18%) `████░░░░░░░░░░░░░░░░` · en curso: 0 · bloqueadas: 1
 
 | Sección | Hecho | Total | % | Progreso |
 |---|---|---|---|---|
-| SETUP — Infraestructura del workspace | 6 | 7 | 86% | `█████████░` |
-| Fase 0 — Auditoría y decisión de base | 0 | 10 | 0% | `░░░░░░░░░░` |
+| SETUP — Infraestructura del workspace | 7 | 7 | 100% | `██████████` |
+| Fase 0 — Auditoría y decisión de base | 9 | 10 | 90% | `█████████░` |
 | Fase 1 — Base del proyecto y entorno | 0 | 8 | 0% | `░░░░░░░░░░` |
 | Fase 2 — Identidad, organizaciones y aislamiento | 0 | 6 | 0% | `░░░░░░░░░░` |
 | Fase 3 — CRM básico | 0 | 6 | 0% | `░░░░░░░░░░` |
@@ -39,21 +39,21 @@
 - [x] <!-- SETUP-3 --> `.env.example` y `.env` local creados (sin secretos reales)
 - [x] <!-- SETUP-4 --> `.gitignore` con protección de secretos y artefactos
 - [x] <!-- SETUP-5 --> `CHECKLIST.md` + `scripts/checklist.py` de actualización automática
-- [ ] <!-- SETUP-6 --> Repositorio git inicializado
+- [x] <!-- SETUP-6 --> Repositorio git inicializado
 - [x] <!-- SETUP-7 --> `environment.yml` y `requirements.txt` del entorno
 
 ## Fase 0 — Auditoría y decisión de base
 
-- [ ] <!-- F0-T1 --> Inspeccionar `digital-loyalty-cards`: README, LICENSE, package.json, migraciones, RLS, SQL, APIs, middleware, auth, QR, Wallet, tests
-- [ ] <!-- F0-T2 --> Inspeccionar `passlet`: licencia, versión publicada, compatibilidad Node, APIs de actualización, tests
-- [ ] <!-- F0-T3 --> Inspeccionar `starfiniti-loyalty` solo como referencia arquitectónica (AGPL/GPL — no copiar código)
-- [ ] <!-- F0-T4 --> Inspeccionar `passkit-node-quickstart` como referencia de integración PassKit
-- [ ] <!-- F0-T5 --> Revisar issues y actividad reciente de los repos
-- [ ] <!-- F0-T6 --> Ejecutar instalación/verificaciones seguras en local y registrar resultados
-- [ ] <!-- F0-T7 --> Threat model corto: multi-tenant, saldo, canje, QR, secretos, Wallet
-- [ ] <!-- F0-T8 --> Matriz de decisión A/B/C (extender repo / proyecto limpio / PassKit)
-- [ ] <!-- F0-T9 --> Crear `docs/ARCHITECTURE.md`, `docs/SECURITY.md`, `docs/DECISIONS.md`, `docs/ROADMAP.md`
-- [ ] <!-- F0-T10 --> Presentar informe y **obtener aprobación del usuario** antes de Fase 1
+- [x] <!-- F0-T1 --> Inspeccionar `digital-loyalty-cards`: README, LICENSE, package.json, migraciones, RLS, SQL, APIs, middleware, auth, QR, Wallet, tests
+- [x] <!-- F0-T2 --> Inspeccionar `passlet`: licencia, versión publicada, compatibilidad Node, APIs de actualización, tests
+- [x] <!-- F0-T3 --> Inspeccionar `starfiniti-loyalty` solo como referencia arquitectónica (AGPL/GPL — no copiar código)
+- [x] <!-- F0-T4 --> Inspeccionar `passkit-node-quickstart` como referencia de integración PassKit
+- [x] <!-- F0-T5 --> Revisar issues y actividad reciente de los repos
+- [x] <!-- F0-T6 --> Ejecutar instalación/verificaciones seguras en local y registrar resultados
+- [x] <!-- F0-T7 --> Threat model corto: multi-tenant, saldo, canje, QR, secretos, Wallet
+- [x] <!-- F0-T8 --> Matriz de decisión A/B/C (extender repo / proyecto limpio / PassKit)
+- [x] <!-- F0-T9 --> Crear `docs/ARCHITECTURE.md`, `docs/SECURITY.md`, `docs/DECISIONS.md`, `docs/ROADMAP.md`
+- [!] <!-- F0-T10 --> Presentar informe y **obtener aprobación del usuario** antes de Fase 1
 
 ## Fase 1 — Base del proyecto y entorno
 
