@@ -17,7 +17,8 @@
 | F5 QR/empleado | ✅ Completo | Tokens revocables/rotables por tarjeta, `/t/[token]` público, escaneo + visita + earn/redeem por empleado, rate limit en DB. 11/11 en Postgres real |
 | F6 Wallet | ✅ Completo | `WalletProvider` + adapter passlet (API real inspeccionada), sync `wallet_passes`, tarjeta web con branding. 7/7 tests |
 | F7 Dashboard/config | ✅ Completo | Migración 0005: `organizations.brand` + `organization_invites` + `claim_invites`. Páginas: inicio con métricas, programas, recompensas, equipo (invitaciones+roles), sedes, configuración con vista previa de tarjeta, auditoría. 12/12 en Postgres real (`scripts/test_admin.py`) |
-| F8–F9 | ⬜ Pendientes | Según plan |
+| F8 Analítica | ✅ Completo | `org_analytics()` RPC único reconciliable (TZ de la org), página `/analytics` con visitas/día + tasa de retorno, `docs/ANALYTICS.md` con fórmulas. Ventas/LTV excluidos sin datos fiables |
+| F9 Piloto | 🟡 E2E verificado, falta comercio | `scripts/test_e2e.py` 14/14 en Postgres real (alta→QR→visita→acumulación→canje→corrección→baja empleado→rotación tarjeta). `docs/PILOTO.md`: runbook soporte + backup/restore. F9-T1 bloqueado: requiere comercio real + consentimiento |
 | F10 Comercial | ⬜ No iniciar hasta MVP validado | |
 
 ## Hitos
