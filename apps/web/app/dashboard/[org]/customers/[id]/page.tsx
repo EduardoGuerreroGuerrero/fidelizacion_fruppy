@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { findDuplicates, setMarketingConsent, updateCustomer } from "@/lib/customers/actions";
-import { issueCard, revokeCard, rotateCardToken } from "@/lib/loyalty/actions";
+import { issueCard, redeemReward, revokeCard, rotateCardToken } from "@/lib/loyalty/actions";
 import { syncWalletFormAction } from "@/lib/wallet/sync";
 
 export const instant = false;
@@ -116,8 +116,8 @@ export default async function CustomerPage({
     }),
   ].sort((a, b) => (a.at < b.at ? 1 : -1));
 
-  // Programas activos y tarjetas emitidas para este cliente.
-  const [{ data: programs }, { data: cards }] = await Promise.all([
+  // Programas activos, tarjetas emitidas y recompensas canjeables.
+  const [{ data: programs }, { data: cards }, { data: rewards }] = await Promise.all([
     supabase
       .from("loyalty_programs")
       .select("id, name, program_type")
@@ -128,6 +128,11 @@ export default async function CustomerPage({
       .select("id, token, status, account_id")
       .eq("customer_id", customer.id)
       .eq("organization_id", org.id),
+    supabase
+      .from("rewards")
+      .select("id, name, program_id, cost_points, cost_stamps")
+      .eq("organization_id", org.id)
+      .eq("status", "active"),
   ]);
   const cardByAccount = new Map((cards ?? []).map((c) => [c.account_id, c]));
 
@@ -378,6 +383,12 @@ export default async function CustomerPage({
                 const p = Array.isArray(a.loyalty_programs)
                   ? a.loyalty_programs[0]
                   : a.loyalty_programs;
+                const programRewards = (rewards ?? []).filter(
+                  (r) => r.program_id === a.program_id,
+                );
+                // Una clave de idempotencia por render: el mismo click/reintento
+                // no cobra dos veces, pero un nuevo render permite otro canje.
+                const idem = crypto.randomUUID();
                 return (
                   <li
                     key={a.id}
@@ -389,6 +400,42 @@ export default async function CustomerPage({
                         ? `${a.current_stamps} sellos`
                         : `${a.current_points} pts`}
                     </span>
+                    {programRewards.length > 0 && (
+                      <ul className="mt-2 space-y-1 border-t border-neutral-100 pt-2 dark:border-neutral-800">
+                        {programRewards.map((r) => {
+                          const cost =
+                            r.cost_stamps !== null
+                              ? `${r.cost_stamps} sellos`
+                              : `${r.cost_points} pts`;
+                          const affordable =
+                            r.cost_stamps !== null
+                              ? a.current_stamps >= r.cost_stamps
+                              : a.current_points >= (r.cost_points ?? 0);
+                          return (
+                            <li
+                              key={r.id}
+                              className="flex items-center justify-between gap-2 text-xs"
+                            >
+                              <span className="text-neutral-600 dark:text-neutral-400">
+                                {r.name} — {cost}
+                              </span>
+                              <form
+                                action={redeemReward.bind(null, slug, customer.id, r.id)}
+                              >
+                                <input type="hidden" name="idem" value={idem} />
+                                <button
+                                  type="submit"
+                                  disabled={!affordable}
+                                  className="rounded bg-green-700 px-2 py-1 text-white hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-neutral-300 dark:disabled:bg-neutral-700"
+                                >
+                                  Canjear
+                                </button>
+                              </form>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
                   </li>
                 );
               })}

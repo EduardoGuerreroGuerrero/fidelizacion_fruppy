@@ -167,3 +167,41 @@ export async function scanCard(orgSlug: string, formData: FormData): Promise<voi
       ),
   );
 }
+
+// Canje atómico: el RPC cobra el saldo y crea la redención en una sola tx.
+// La clave de idempotencia viaja en el formulario (una por render de página)
+// para que un doble submit/reintento no cobre dos veces.
+export async function redeemReward(
+  orgSlug: string,
+  customerId: string,
+  rewardId: string,
+  formData: FormData,
+) {
+  const { supabase, user, orgId } = await requireMembership(orgSlug);
+  const back = `/dashboard/${orgSlug}/customers/${customerId}`;
+  const idem = String(formData.get("idem") ?? "").trim() || crypto.randomUUID();
+
+  const { error } = await supabase.rpc("redeem_reward", {
+    p_reward_id: rewardId,
+    p_customer_id: customerId,
+    p_idempotency_key: `redeem:${customerId}:${rewardId}:${idem}`,
+  });
+
+  if (error) {
+    const m = error.message;
+    const friendly = m.includes("insufficient_balance")
+      ? "Saldo insuficiente para este canje."
+      : m.includes("forbidden")
+        ? "Sin permiso para canjear en esta organización."
+        : m.includes("reward_not_found") || m.includes("account_not_found")
+          ? "Recompensa o cuenta no encontrada."
+          : "No se pudo registrar el canje.";
+    redirect(back + "?error=" + encodeURIComponent(friendly));
+  }
+
+  await audit(orgId, user.id, "reward.redeemed", "customer", customerId, {
+    reward_id: rewardId,
+  });
+  revalidatePath(back);
+  redirect(back + "?ok=" + encodeURIComponent("Canje registrado."));
+}
