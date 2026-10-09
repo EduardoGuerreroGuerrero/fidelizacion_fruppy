@@ -17,7 +17,14 @@ de confianza, no exponer secretos, pruebas obligatorias). Decisiones en
   npm workspaces en raíz — `npm install` en raíz, node_modules hoisted.
 - Docker NO está instalado → `supabase start` no funciona en local. Las
   migraciones se validan sobre Postgres real vía Neon MCP (rama temporal) o
-  el job `sql` de CI (postgres:16 + stub de `auth.users`).
+  el job `sql` de CI (postgres:16 + stub de `auth.users`/roles/`auth.uid()`).
+- `main` está protegido: checks `build`+`sql` obligatorios, sin push directo,
+  sin force-push/delete, enforce_admins. Todo cambio va por rama + PR.
+- GitHub CLI portable en `%LOCALAPPDATA%\gh-cli\bin\gh.exe`; el token del
+  Credential Manager se usa vía `GH_TOKEN` (sin `gh auth login`).
+- Vercel: proyecto `fidelizacion-fruppy` con **Root Directory `apps/web`**
+  (sin esto el deploy sale verde pero vacío → 404 en todo). Commits que no
+  tocan `apps/web` se saltan el deploy automáticamente.
 
 ## Comandos de verificación
 
