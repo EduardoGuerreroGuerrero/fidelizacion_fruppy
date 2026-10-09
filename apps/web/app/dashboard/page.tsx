@@ -25,32 +25,31 @@ export default async function DashboardPage() {
       {memberships && memberships.length > 0 ? (
         <ul className="divide-y divide-neutral-200 rounded-lg border border-neutral-200 dark:divide-neutral-800 dark:border-neutral-800">
           {memberships.map((m) => {
-            const org = Array.isArray(m.organizations)
-              ? m.organizations[0]
-              : m.organizations;
+            const org = Array.isArray(m.organizations) ? m.organizations[0] : m.organizations;
             if (!org) return null;
             return (
-              <li
-                key={org.id}
-                className="flex items-center justify-between px-4 py-3"
-              >
-                <div>
-                  <p className="font-medium">{org.name}</p>
-                  <p className="text-sm text-neutral-500">
-                    {org.slug} · {org.status}
-                  </p>
-                </div>
-                <span className="rounded bg-neutral-100 px-2 py-1 text-xs dark:bg-neutral-800">
-                  {m.role}
-                </span>
+              <li key={org.id}>
+                <Link
+                  href={`/dashboard/${org.slug}`}
+                  className="flex items-center justify-between px-4 py-3 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+                >
+                  <div>
+                    <p className="font-medium">{org.name}</p>
+                    <p className="text-sm text-neutral-500">
+                      {org.slug} · {org.status}
+                    </p>
+                  </div>
+                  <span className="rounded bg-neutral-100 px-2 py-1 text-xs dark:bg-neutral-800">
+                    {m.role}
+                  </span>
+                </Link>
               </li>
             );
           })}
         </ul>
       ) : (
         <p className="rounded-lg border border-dashed border-neutral-300 p-8 text-center text-neutral-500 dark:border-neutral-700">
-          Aún no tienes organizaciones. Crea la primera para empezar tu programa
-          de fidelización.
+          Aún no tienes organizaciones. Crea la primera para empezar tu programa de fidelización.
         </p>
       )}
     </div>

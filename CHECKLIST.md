@@ -5,8 +5,8 @@
 > Usar: `python scripts/checklist.py status|done <ID>|undone <ID>|refresh`
 
 <!-- PROGRESS:START -->
-**Última actualización:** 2026-10-09 11:53  
-**Global:** 37/89 hechas (42%) `████████░░░░░░░░░░░░` · en curso: 0 · bloqueadas: 1
+**Última actualización:** 2026-10-09 17:27  
+**Global:** 43/89 hechas (48%) `██████████░░░░░░░░░░` · en curso: 0 · bloqueadas: 1
 
 | Sección | Hecho | Total | % | Progreso |
 |---|---|---|---|---|
@@ -14,7 +14,7 @@
 | Fase 0 — Auditoría y decisión de base | 10 | 10 | 100% | `██████████` |
 | Fase 1 — Base del proyecto y entorno | 7 | 8 | 88% | `█████████░` |
 | Fase 2 — Identidad, organizaciones y aislamiento | 6 | 6 | 100% | `██████████` |
-| Fase 3 — CRM básico | 0 | 6 | 0% | `░░░░░░░░░░` |
+| Fase 3 — CRM básico | 6 | 6 | 100% | `██████████` |
 | Fase 4 — Motor de fidelización | 7 | 7 | 100% | `██████████` |
 | Fase 5 — QR y flujo de empleado | 0 | 6 | 0% | `░░░░░░░░░░` |
 | Fase 6 — Tarjeta web y Wallet | 0 | 6 | 0% | `░░░░░░░░░░` |
@@ -77,12 +77,12 @@
 
 ## Fase 3 — CRM básico
 
-- [ ] <!-- F3-T1 --> Listado, búsqueda, filtros y ficha de cliente
-- [ ] <!-- F3-T2 --> Alta/edición con validación de servidor
-- [ ] <!-- F3-T3 --> Historial cronológico de visitas y transacciones
-- [ ] <!-- F3-T4 --> Detección de duplicados por teléfono/email (sin fusión automática)
-- [ ] <!-- F3-T5 --> Exportación CSV con controles anti-fórmula y autorización
-- [ ] <!-- F3-T6 --> Consentimiento de marketing registrado por separado
+- [x] <!-- F3-T1 --> Listado, búsqueda, filtros y ficha de cliente
+- [x] <!-- F3-T2 --> Alta/edición con validación de servidor
+- [x] <!-- F3-T3 --> Historial cronológico de visitas y transacciones
+- [x] <!-- F3-T4 --> Detección de duplicados por teléfono/email (sin fusión automática)
+- [x] <!-- F3-T5 --> Exportación CSV con controles anti-fórmula y autorización
+- [x] <!-- F3-T6 --> Consentimiento de marketing registrado por separado
 
 ## Fase 4 — Motor de fidelización
 

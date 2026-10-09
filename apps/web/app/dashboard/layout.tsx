@@ -7,11 +7,7 @@ import { signOut } from "@/lib/auth/actions";
 export const instant = false;
 
 // Autorización REAL en servidor: el proxy solo hace chequeo optimista.
-export default async function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
   const {
     data: { user },

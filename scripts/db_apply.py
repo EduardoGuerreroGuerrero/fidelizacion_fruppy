@@ -31,6 +31,9 @@ do $$ begin
     create role authenticated nologin;
   end if;
 end $$;
+-- SET ROLE requiere membresía (ADMIN OPTION de la creación no basta en
+-- PG16+). Los grants son idempotentes y los roles son globales al cluster.
+grant anon, authenticated to current_user;
 -- En Supabase, auth.uid() lee el JWT; en Postgres plano lee un GUC de test.
 create or replace function auth.uid() returns uuid
 language sql stable as
