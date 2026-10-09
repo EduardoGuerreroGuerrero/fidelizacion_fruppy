@@ -39,3 +39,15 @@ lib/supabase/client.ts    # cliente browser (anon key + RLS)
 lib/supabase/server.ts    # cliente server (sesión) + supabaseAdmin (service_role)
 tests/                    # tests unitarios (node:test via tsx)
 ```
+
+## Deploy (Vercel)
+
+- Proyecto `fidelizacion-fruppy` enlazado a `main` de
+  `EduardoGuerreroGuerrero/fidelizacion_fruppy`.
+- **Root Directory: `apps/web`** — obligatorio: el monorepo usa npm
+  workspaces; sin esta opción el build genera `.next` dentro de `apps/web`
+  pero Vercel busca el output en la raíz y despliega un sitio vacío (404 en
+  todas las rutas aunque el build aparezca verde).
+- Vercel omite ("skips") deploys de commits que no tocan `apps/web`.
+- Variables requeridas en Vercel: `NEXT_PUBLIC_SUPABASE_URL`,
+  `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
