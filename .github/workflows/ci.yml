@@ -57,6 +57,9 @@ jobs:
               create role authenticated nologin;
             end if;
           end $$;
+          create or replace function auth.uid() returns uuid
+          language sql stable as
+          $$ select nullif(current_setting('app.user_id', true),'')::uuid $$;
           SQL
           for f in supabase/migrations/*.sql; do
             echo "== applying $f"
