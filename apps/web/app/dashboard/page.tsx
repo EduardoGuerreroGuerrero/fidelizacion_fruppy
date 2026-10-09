@@ -3,12 +3,19 @@ import { createClient } from "@/lib/supabase/server";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  // RLS: solo devuelve membresías/orgs del usuario autenticado.
-  const { data: memberships } = await supabase
-    .from("organization_members")
-    .select("role, status, organizations(id, name, slug, status)")
-    .eq("status", "active");
+  // RLS permite ver a TODOS los miembros de mis orgs — hay que filtrar por
+  // user_id o cada tarjeta se repite por cada miembro de la organización.
+  const { data: memberships } = user
+    ? await supabase
+        .from("organization_members")
+        .select("role, status, organizations(id, name, slug, status)")
+        .eq("user_id", user.id)
+        .eq("status", "active")
+    : { data: [] };
 
   return (
     <div className="mx-auto max-w-3xl">
