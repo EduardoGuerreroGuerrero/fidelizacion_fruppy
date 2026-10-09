@@ -156,6 +156,7 @@ export async function createCustomer(orgSlug: string, formData: FormData) {
     }
   }
 
+  // external_ref es NOT NULL con DEFAULT: no insertar null explícito.
   const { data: customer, error } = await supabase
     .from("customers")
     .insert({
@@ -165,7 +166,7 @@ export async function createCustomer(orgSlug: string, formData: FormData) {
       email: values.email,
       phone: values.phone,
       birth_date: values.birth_date,
-      external_ref: values.external_ref,
+      ...(values.external_ref ? { external_ref: values.external_ref } : {}),
       // El consentimiento se registra como timestamp separado, no booleano.
       marketing_consent_at: values.marketing_consent ? new Date().toISOString() : null,
     })
@@ -173,6 +174,7 @@ export async function createCustomer(orgSlug: string, formData: FormData) {
     .single();
 
   if (error || !customer) {
+    console.error("[createCustomer]", error?.code, error?.message);
     const msg =
       error?.code === "23505"
         ? "Ya existe un cliente con esa referencia externa."
@@ -206,13 +208,14 @@ export async function updateCustomer(orgSlug: string, customerId: string, formDa
       email: values.email,
       phone: values.phone,
       birth_date: values.birth_date,
-      external_ref: values.external_ref,
+      ...(values.external_ref ? { external_ref: values.external_ref } : {}),
       updated_at: new Date().toISOString(),
     })
     .eq("id", customerId)
     .eq("organization_id", orgId);
 
   if (error) {
+    console.error("[updateCustomer]", error.code, error.message);
     const msg =
       error.code === "23505"
         ? "Ya existe un cliente con esa referencia externa."
