@@ -46,3 +46,6 @@ Thumbs.db
 *.log
 logs/
 coverage/
+
+# Artefactos de Playwright MCP (E2E manual)
+.playwright-mcp/
