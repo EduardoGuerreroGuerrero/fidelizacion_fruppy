@@ -1,0 +1,48 @@
+# ---- Secretos y entorno ----
+.env
+.env.local
+.env.*.local
+*.pem
+*.p12
+*.key
+secrets/
+!*.example
+
+# ---- Python / conda ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ---- Node / Next.js (Fase 1+) ----
+node_modules/
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# ---- Supabase local ----
+supabase/.branches/
+supabase/.temp/
+supabase/.env
+
+# ---- Auditoría: repos de terceros clonados ----
+audits/repos/
+
+# ---- IDE / SO ----
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ---- Logs y cobertura ----
+*.log
+logs/
+coverage/

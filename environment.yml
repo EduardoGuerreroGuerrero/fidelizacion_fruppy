@@ -1,0 +1,11 @@
+# Entorno conda del proyecto — SaaS Fidelización Fruppy
+# Crear/actualizar:  conda env update -f environment.yml --prune
+# Activar:           conda activate F_FRUPPY
+name: F_FRUPPY
+channels:
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - -r requirements.txt

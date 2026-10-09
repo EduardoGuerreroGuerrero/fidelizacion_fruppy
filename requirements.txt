@@ -1,0 +1,21 @@
+# ==========================================================================
+# Dependencias Python — tooling de DevOps/auditoría del proyecto.
+# La app principal (Fase 1+) es Node/Next.js; Python se usa para scripts,
+# automatización del checklist y utilidades de operación.
+# Instalar:  pip install -r requirements.txt   (dentro de conda F_FRUPPY)
+# ==========================================================================
+
+# Entorno y configuración
+python-dotenv>=1.0,<2.0
+
+# Utilidades de scripts y CLI
+rich>=13.7,<15.0
+
+# Lint/format de scripts Python
+ruff>=0.6,<1.0
+
+# Tests de scripts
+pytest>=8.0,<10.0
+
+# Cliente HTTP para auditorías y health checks
+httpx>=0.27,<1.0

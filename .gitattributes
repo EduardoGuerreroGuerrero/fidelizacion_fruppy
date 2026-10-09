@@ -1,0 +1,11 @@
+# Normalización de finales de línea
+* text=auto eol=lf
+
+# Binarios
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.pkpass binary
+*.p12 binary
+*.pem binary
