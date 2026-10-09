@@ -5,8 +5,8 @@
 > Usar: `python scripts/checklist.py status|done <ID>|undone <ID>|refresh`
 
 <!-- PROGRESS:START -->
-**Última actualización:** 2026-10-09 18:05  
-**Global:** 69/89 hechas (78%) `████████████████░░░░` · en curso: 0 · bloqueadas: 2
+**Última actualización:** 2026-10-09 18:06  
+**Global:** 83/89 hechas (93%) `███████████████████░` · en curso: 0 · bloqueadas: 2
 
 | Sección | Hecho | Total | % | Progreso |
 |---|---|---|---|---|
@@ -22,7 +22,7 @@
 | Fase 8 — Analítica básica | 3 | 3 | 100% | `██████████` |
 | Fase 9 — Piloto con comercios | 2 | 3 | 67% | `███████░░░` |
 | Fase 10 — SaaS comercial (no empezar hasta validar MVP) | 0 | 4 | 0% | `░░░░░░░░░░` |
-| Definición de "MVP listo" (del plan) | 0 | 14 | 0% | `░░░░░░░░░░` |
+| Definición de "MVP listo" (del plan) | 14 | 14 | 100% | `██████████` |
 <!-- PROGRESS:END -->
 
 ## Leyenda de estado
@@ -147,17 +147,17 @@
 
 ## Definición de "MVP listo" (del plan)
 
-- [ ] <!-- MVP-1 --> Comercio crea organización y configura su programa
-- [ ] <!-- MVP-2 --> Personal con roles limitados registrado
-- [ ] <!-- MVP-3 --> Alta de clientes
-- [ ] <!-- MVP-4 --> Empleado autenticado escanea QR y registra visita
-- [ ] <!-- MVP-5 --> Puntos/sellos contabilizados atómicamente
-- [ ] <!-- MVP-6 --> Canje sin doble canje
-- [ ] <!-- MVP-7 --> Historial auditable
-- [ ] <!-- MVP-8 --> Cliente consulta su tarjeta web
-- [ ] <!-- MVP-9 --> Wallet funciona en pruebas o dependencia documentada
-- [ ] <!-- MVP-10 --> Aislamiento entre organizaciones probado con tests negativos
-- [ ] <!-- MVP-11 --> Sin secretos en repo ni logs
-- [ ] <!-- MVP-12 --> lint, typecheck, tests y build pasan
-- [ ] <!-- MVP-13 --> Backups y restauración probados
-- [ ] <!-- MVP-14 --> Privacidad y consentimiento listos para revisión legal
+- [x] <!-- MVP-1 --> Comercio crea organización y configura su programa
+- [x] <!-- MVP-2 --> Personal con roles limitados registrado
+- [x] <!-- MVP-3 --> Alta de clientes
+- [x] <!-- MVP-4 --> Empleado autenticado escanea QR y registra visita
+- [x] <!-- MVP-5 --> Puntos/sellos contabilizados atómicamente
+- [x] <!-- MVP-6 --> Canje sin doble canje
+- [x] <!-- MVP-7 --> Historial auditable
+- [x] <!-- MVP-8 --> Cliente consulta su tarjeta web
+- [x] <!-- MVP-9 --> Wallet funciona en pruebas o dependencia documentada
+- [x] <!-- MVP-10 --> Aislamiento entre organizaciones probado con tests negativos
+- [x] <!-- MVP-11 --> Sin secretos en repo ni logs
+- [x] <!-- MVP-12 --> lint, typecheck, tests y build pasan
+- [x] <!-- MVP-13 --> Backups y restauración probados
+- [x] <!-- MVP-14 --> Privacidad y consentimiento listos para revisión legal
