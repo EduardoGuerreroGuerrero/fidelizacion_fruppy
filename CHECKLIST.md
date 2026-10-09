@@ -5,14 +5,14 @@
 > Usar: `python scripts/checklist.py status|done <ID>|undone <ID>|refresh`
 
 <!-- PROGRESS:START -->
-**Última actualización:** 2026-10-09 11:15  
-**Global:** 16/89 hechas (18%) `████░░░░░░░░░░░░░░░░` · en curso: 0 · bloqueadas: 1
+**Última actualización:** 2026-10-09 11:34  
+**Global:** 24/89 hechas (27%) `█████░░░░░░░░░░░░░░░` · en curso: 0 · bloqueadas: 1
 
 | Sección | Hecho | Total | % | Progreso |
 |---|---|---|---|---|
 | SETUP — Infraestructura del workspace | 7 | 7 | 100% | `██████████` |
-| Fase 0 — Auditoría y decisión de base | 9 | 10 | 90% | `█████████░` |
-| Fase 1 — Base del proyecto y entorno | 0 | 8 | 0% | `░░░░░░░░░░` |
+| Fase 0 — Auditoría y decisión de base | 10 | 10 | 100% | `██████████` |
+| Fase 1 — Base del proyecto y entorno | 7 | 8 | 88% | `█████████░` |
 | Fase 2 — Identidad, organizaciones y aislamiento | 0 | 6 | 0% | `░░░░░░░░░░` |
 | Fase 3 — CRM básico | 0 | 6 | 0% | `░░░░░░░░░░` |
 | Fase 4 — Motor de fidelización | 0 | 7 | 0% | `░░░░░░░░░░` |
@@ -53,18 +53,18 @@
 - [x] <!-- F0-T7 --> Threat model corto: multi-tenant, saldo, canje, QR, secretos, Wallet
 - [x] <!-- F0-T8 --> Matriz de decisión A/B/C (extender repo / proyecto limpio / PassKit)
 - [x] <!-- F0-T9 --> Crear `docs/ARCHITECTURE.md`, `docs/SECURITY.md`, `docs/DECISIONS.md`, `docs/ROADMAP.md`
-- [!] <!-- F0-T10 --> Presentar informe y **obtener aprobación del usuario** antes de Fase 1
+- [x] <!-- F0-T10 --> Presentar informe y **obtener aprobación del usuario** antes de Fase 1
 
 ## Fase 1 — Base del proyecto y entorno
 
-- [ ] <!-- F1-T1 --> Crear repo/fork según licencia y decisión de Fase 0
-- [ ] <!-- F1-T2 --> Ramas y protección de `main`
-- [ ] <!-- F1-T3 --> `.env.example` completo para la app Next.js
-- [ ] <!-- F1-T4 --> TypeScript estricto, lint, formato y scripts de test
-- [ ] <!-- F1-T5 --> Entornos local/preview/producción sin compartir credenciales
-- [ ] <!-- F1-T6 --> Supabase local + migraciones reproducibles
-- [ ] <!-- F1-T7 --> CI: lint, typecheck, tests, build
-- [ ] <!-- F1-T8 --> Página de salud no sensible y manejo de errores
+- [x] <!-- F1-T1 --> Crear repo/fork según licencia y decisión de Fase 0
+- [!] <!-- F1-T2 --> Ramas y protección de `main`
+- [x] <!-- F1-T3 --> `.env.example` completo para la app Next.js
+- [x] <!-- F1-T4 --> TypeScript estricto, lint, formato y scripts de test
+- [x] <!-- F1-T5 --> Entornos local/preview/producción sin compartir credenciales
+- [x] <!-- F1-T6 --> Supabase local + migraciones reproducibles
+- [x] <!-- F1-T7 --> CI: lint, typecheck, tests, build
+- [x] <!-- F1-T8 --> Página de salud no sensible y manejo de errores
 
 ## Fase 2 — Identidad, organizaciones y aislamiento
 

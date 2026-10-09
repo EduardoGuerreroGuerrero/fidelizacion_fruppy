@@ -9,9 +9,10 @@
 | Fase | Estado | Notas |
 |---|---|---|
 | SETUP | ✅ Completo | Workspace DevOps + checklist automático + git |
-| F0 Auditoría | ✅ Ejecutada | Informe en `docs/audits/fase0-repositorios.md`; decisión B propuesta — **pendiente aprobación del usuario** |
-| F1 Base proyecto | ⏸ Bloqueada | Requiere aprobación de ADR-001 |
-| F2–F9 | ⬜ Pendientes | Según plan |
+| F0 Auditoría | ✅ Aprobada | Opción B (proyecto limpio + passlet) aprobada por el usuario |
+| F1 Base proyecto | ✅ Completo | Next.js 16 en `apps/web` (workspaces), migración 0001 verificada en Postgres real (Neon, rama temporal), CI lint/typecheck/test/build/audit + job SQL. Pendiente: protección de `main` requiere remote GitHub; Supabase local requiere Docker (ausente) |
+| F2 Identidad/aislamiento | ⬜ Siguiente | Auth, orgs, RLS policies, tests negativos |
+| F3–F9 | ⬜ Pendientes | Según plan |
 | F10 Comercial | ⬜ No iniciar hasta MVP validado | |
 
 ## Hitos

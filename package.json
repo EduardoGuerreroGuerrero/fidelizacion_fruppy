@@ -1,0 +1,30 @@
+{
+  "name": "fruppy-loyalty",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SaaS multiempresa de fidelización, CRM y tarjetas digitales Wallet",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=web",
+    "build": "npm run build --workspace=web",
+    "start": "npm run start --workspace=web",
+    "lint": "npm run lint --workspace=web",
+    "typecheck": "npm run typecheck --workspace=web",
+    "test": "npm run test --workspace=web",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run lint && npm run typecheck && npm run test && npm run build",
+    "checklist": "python scripts/checklist.py"
+  },
+  "engines": {
+    "node": ">=20.15"
+  },
+  "overrides": {
+    "braces": "^3.0.3"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  }
+}

@@ -40,22 +40,34 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
+### Aplicación (apps/web)
+
+```bash
+npm install         # instala workspaces (node_modules en raíz)
+npm run dev         # Next.js dev en http://localhost:3000
+npm run check       # lint + typecheck + test + build
+```
+
+Variables: copiar `.env.example` a `apps/web/.env.local` con los valores locales.
+
 ### Estructura
 
 ```
 .
 ├── plan_saas_fidelizacion_crm_wallet.md   # Plan maestro de ejecución
 ├── CHECKLIST.md                           # Seguimiento (auto-actualizable)
-├── environment.yml                        # Entorno conda F_FRUPPY
-├── requirements.txt                       # Deps Python de tooling
+├── environment.yml / requirements.txt     # Entorno conda F_FRUPPY (tooling)
+├── package.json                           # Workspaces npm (apps/*)
 ├── .env.example                           # Plantilla de variables (sin secretos)
+├── apps/
+│   └── web/                               # App Next.js 16 + TS estricto + Tailwind
+├── supabase/
+│   ├── config.toml                        # Stack local (requiere Docker)
+│   └── migrations/                        # Migraciones SQL versionadas
 ├── scripts/
 │   └── checklist.py                       # Gestor del checklist
 ├── docs/
-│   ├── ARCHITECTURE.md                    # Arquitectura (Fase 0)
-│   ├── SECURITY.md                        # Seguridad y threat model (Fase 0)
-│   ├── DECISIONS.md                       # Decisiones técnicas ADR (Fase 0)
-│   ├── ROADMAP.md                         # Roadmap por fases (Fase 0)
+│   ├── ARCHITECTURE.md / SECURITY.md / DECISIONS.md / ROADMAP.md
 │   └── audits/                            # Informes de auditoría de repos
 └── audits/repos/                          # Clones de referencia (gitignored)
 ```
