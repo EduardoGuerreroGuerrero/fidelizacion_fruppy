@@ -5,8 +5,8 @@
 > Usar: `python scripts/checklist.py status|done <ID>|undone <ID>|refresh`
 
 <!-- PROGRESS:START -->
-**Última actualización:** 2026-10-09 17:46  
-**Global:** 55/89 hechas (62%) `████████████░░░░░░░░` · en curso: 0 · bloqueadas: 1
+**Última actualización:** 2026-10-09 17:54  
+**Global:** 64/89 hechas (72%) `██████████████░░░░░░` · en curso: 0 · bloqueadas: 1
 
 | Sección | Hecho | Total | % | Progreso |
 |---|---|---|---|---|
@@ -18,7 +18,7 @@
 | Fase 4 — Motor de fidelización | 7 | 7 | 100% | `██████████` |
 | Fase 5 — QR y flujo de empleado | 6 | 6 | 100% | `██████████` |
 | Fase 6 — Tarjeta web y Wallet | 6 | 6 | 100% | `██████████` |
-| Fase 7 — Dashboard y configuración del comercio | 0 | 9 | 0% | `░░░░░░░░░░` |
+| Fase 7 — Dashboard y configuración del comercio | 9 | 9 | 100% | `██████████` |
 | Fase 8 — Analítica básica | 0 | 3 | 0% | `░░░░░░░░░░` |
 | Fase 9 — Piloto con comercios | 0 | 3 | 0% | `░░░░░░░░░░` |
 | Fase 10 — SaaS comercial (no empezar hasta validar MVP) | 0 | 4 | 0% | `░░░░░░░░░░` |
@@ -114,15 +114,15 @@
 
 ## Fase 7 — Dashboard y configuración del comercio
 
-- [ ] <!-- F7-T1 --> Inicio: clientes, visitas, recompensas, actividad reciente
-- [ ] <!-- F7-T2 --> Clientes: tabla, búsqueda y perfil
-- [ ] <!-- F7-T3 --> Programas: crear/editar programa y reglas
-- [ ] <!-- F7-T4 --> Recompensas: catálogo y canjes
-- [ ] <!-- F7-T5 --> Personal: invitaciones y roles
-- [ ] <!-- F7-T6 --> Sedes: gestión básica
-- [ ] <!-- F7-T7 --> Tarjeta: branding y vista previa
-- [ ] <!-- F7-T8 --> Configuración: nombre, logo, colores, moneda, zona horaria
-- [ ] <!-- F7-T9 --> Auditoría: movimientos y acciones sensibles
+- [x] <!-- F7-T1 --> Inicio: clientes, visitas, recompensas, actividad reciente
+- [x] <!-- F7-T2 --> Clientes: tabla, búsqueda y perfil
+- [x] <!-- F7-T3 --> Programas: crear/editar programa y reglas
+- [x] <!-- F7-T4 --> Recompensas: catálogo y canjes
+- [x] <!-- F7-T5 --> Personal: invitaciones y roles
+- [x] <!-- F7-T6 --> Sedes: gestión básica
+- [x] <!-- F7-T7 --> Tarjeta: branding y vista previa
+- [x] <!-- F7-T8 --> Configuración: nombre, logo, colores, moneda, zona horaria
+- [x] <!-- F7-T9 --> Auditoría: movimientos y acciones sensibles
 
 ## Fase 8 — Analítica básica
 

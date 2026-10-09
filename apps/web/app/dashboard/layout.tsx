@@ -14,6 +14,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  // Reclama invitaciones pendientes del email del usuario (idempotente).
+  await supabase.rpc("claim_invites");
+
   return (
     <div className="flex min-h-screen flex-col">
       <header className="flex items-center justify-between border-b border-neutral-200 px-6 py-3 dark:border-neutral-800">

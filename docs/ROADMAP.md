@@ -14,7 +14,10 @@
 | F2 Identidad/aislamiento | ✅ Completo | Supabase Auth (login/signup/logout), proxy.ts, dashboard con check real, creación de org + owner, migración 0002 con policies RLS **verificadas adversarialmente en Postgres real** (usuario A no ve ni toca B; ledger rechaza INSERT directo) |
 | F3 CRM básico | ✅ Completo | `/dashboard/[org]/customers`: listado+búsqueda+filtros, alta/edición con validación server-side, ficha con historial cronológico (visitas+ledger+redenciones), aviso de duplicados sin fusión automática, export CSV con anti-formula-injection + auditoría, consentimiento como evento separado. Data-paths verificados en Postgres real (insert/update/select/consent/dup/or-isolation) |
 | F4 Motor fidelización | ✅ Completo | Migraciones 0002/0003: `earn`/`redeem_reward`/`reverse_transaction`/`record_visit` security-definer, ledger append-only, idempotencia por org, saldo proyectado en la misma tx. **21/21 pruebas en Postgres real** (`scripts/test_engine.py`): idempotencia, doble canje secuencial y **concurrente** (2 hilos, 1 gana), reversos, negativos bloqueados, aislamiento RLS, reconciliación saldo=Σledger |
-| F5–F9 | ⬜ Pendientes | Según plan |
+| F5 QR/empleado | ✅ Completo | Tokens revocables/rotables por tarjeta, `/t/[token]` público, escaneo + visita + earn/redeem por empleado, rate limit en DB. 11/11 en Postgres real |
+| F6 Wallet | ✅ Completo | `WalletProvider` + adapter passlet (API real inspeccionada), sync `wallet_passes`, tarjeta web con branding. 7/7 tests |
+| F7 Dashboard/config | ✅ Completo | Migración 0005: `organizations.brand` + `organization_invites` + `claim_invites`. Páginas: inicio con métricas, programas, recompensas, equipo (invitaciones+roles), sedes, configuración con vista previa de tarjeta, auditoría. 12/12 en Postgres real (`scripts/test_admin.py`) |
+| F8–F9 | ⬜ Pendientes | Según plan |
 | F10 Comercial | ⬜ No iniciar hasta MVP validado | |
 
 ## Hitos
