@@ -5,14 +5,14 @@
 > Usar: `python scripts/checklist.py status|done <ID>|undone <ID>|refresh`
 
 <!-- PROGRESS:START -->
-**Última actualización:** 2026-10-09 19:32  
-**Global:** 84/89 hechas (94%) `███████████████████░` · en curso: 0 · bloqueadas: 1
+**Última actualización:** 2026-10-09 22:01  
+**Global:** 85/89 hechas (96%) `███████████████████░` · en curso: 0 · bloqueadas: 0
 
 | Sección | Hecho | Total | % | Progreso |
 |---|---|---|---|---|
 | SETUP — Infraestructura del workspace | 7 | 7 | 100% | `██████████` |
 | Fase 0 — Auditoría y decisión de base | 10 | 10 | 100% | `██████████` |
-| Fase 1 — Base del proyecto y entorno | 7 | 8 | 88% | `█████████░` |
+| Fase 1 — Base del proyecto y entorno | 8 | 8 | 100% | `██████████` |
 | Fase 2 — Identidad, organizaciones y aislamiento | 6 | 6 | 100% | `██████████` |
 | Fase 3 — CRM básico | 6 | 6 | 100% | `██████████` |
 | Fase 4 — Motor de fidelización | 7 | 7 | 100% | `██████████` |
@@ -58,7 +58,7 @@
 ## Fase 1 — Base del proyecto y entorno
 
 - [x] <!-- F1-T1 --> Crear repo/fork según licencia y decisión de Fase 0
-- [!] <!-- F1-T2 --> Ramas y protección de `main`
+- [x] <!-- F1-T2 --> Ramas y protección de `main`
 - [x] <!-- F1-T3 --> `.env.example` completo para la app Next.js
 - [x] <!-- F1-T4 --> TypeScript estricto, lint, formato y scripts de test
 - [x] <!-- F1-T5 --> Entornos local/preview/producción sin compartir credenciales
