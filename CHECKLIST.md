@@ -5,15 +5,15 @@
 > Usar: `python scripts/checklist.py status|done <ID>|undone <ID>|refresh`
 
 <!-- PROGRESS:START -->
-**Última actualización:** 2026-10-09 11:34  
-**Global:** 24/89 hechas (27%) `█████░░░░░░░░░░░░░░░` · en curso: 0 · bloqueadas: 1
+**Última actualización:** 2026-10-09 11:44  
+**Global:** 30/89 hechas (34%) `███████░░░░░░░░░░░░░` · en curso: 0 · bloqueadas: 1
 
 | Sección | Hecho | Total | % | Progreso |
 |---|---|---|---|---|
 | SETUP — Infraestructura del workspace | 7 | 7 | 100% | `██████████` |
 | Fase 0 — Auditoría y decisión de base | 10 | 10 | 100% | `██████████` |
 | Fase 1 — Base del proyecto y entorno | 7 | 8 | 88% | `█████████░` |
-| Fase 2 — Identidad, organizaciones y aislamiento | 0 | 6 | 0% | `░░░░░░░░░░` |
+| Fase 2 — Identidad, organizaciones y aislamiento | 6 | 6 | 100% | `██████████` |
 | Fase 3 — CRM básico | 0 | 6 | 0% | `░░░░░░░░░░` |
 | Fase 4 — Motor de fidelización | 0 | 7 | 0% | `░░░░░░░░░░` |
 | Fase 5 — QR y flujo de empleado | 0 | 6 | 0% | `░░░░░░░░░░` |
@@ -68,12 +68,12 @@
 
 ## Fase 2 — Identidad, organizaciones y aislamiento
 
-- [ ] <!-- F2-T1 --> Registro/login/logout con Supabase Auth
-- [ ] <!-- F2-T2 --> Flujo de creación de organización + membresía owner
-- [ ] <!-- F2-T3 --> Sedes y roles básicos
-- [ ] <!-- F2-T4 --> RLS en todas las tablas iniciales
-- [ ] <!-- F2-T5 --> Middleware/guards de rutas privadas
-- [ ] <!-- F2-T6 --> Pruebas de acceso cruzado entre organizaciones (tests negativos)
+- [x] <!-- F2-T1 --> Registro/login/logout con Supabase Auth
+- [x] <!-- F2-T2 --> Flujo de creación de organización + membresía owner
+- [x] <!-- F2-T3 --> Sedes y roles básicos
+- [x] <!-- F2-T4 --> RLS en todas las tablas iniciales
+- [x] <!-- F2-T5 --> Middleware/guards de rutas privadas
+- [x] <!-- F2-T6 --> Pruebas de acceso cruzado entre organizaciones (tests negativos)
 
 ## Fase 3 — CRM básico
 
