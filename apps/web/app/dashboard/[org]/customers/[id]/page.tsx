@@ -1,8 +1,15 @@
 import Link from "next/link";
+import QRCode from "qrcode";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { findDuplicates, setMarketingConsent, updateCustomer } from "@/lib/customers/actions";
-import { issueCard, redeemReward, revokeCard, rotateCardToken } from "@/lib/loyalty/actions";
+import {
+  issueCard,
+  redeemReward,
+  revokeCard,
+  rotateCardToken,
+  sendCardEmail,
+} from "@/lib/loyalty/actions";
 import { syncWalletFormAction } from "@/lib/wallet/sync";
 
 export const instant = false;
@@ -135,6 +142,19 @@ export default async function CustomerPage({
       .eq("status", "active"),
   ]);
   const cardByAccount = new Map((cards ?? []).map((c) => [c.account_id, c]));
+
+  // QR de onboarding por tarjeta activa: la clienta lo escanea con su celular
+  // y su tarjeta se abre directo (sin teclear links).
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+  const cardQr = new Map<string, string>();
+  for (const c of cards ?? []) {
+    if (c.status === "active") {
+      cardQr.set(
+        c.id,
+        await QRCode.toDataURL(`${baseUrl}/t/${c.token}`, { width: 200, margin: 1 }),
+      );
+    }
+  }
 
   // Aviso de duplicados (mismo teléfono/email en la org — sin fusión auto).
   const duplicates = await findDuplicates(slug, customer.phone, customer.email, customer.id);
@@ -339,6 +359,43 @@ export default async function CustomerPage({
                       </form>
                     )}
                   </div>
+                  {card?.status === "active" && (
+                    <div className="mt-3 flex items-start gap-4 border-t border-neutral-100 pt-3 dark:border-neutral-800">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={cardQr.get(card.id)}
+                        alt="QR para abrir la tarjeta en el celular del cliente"
+                        className="size-24 shrink-0 rounded-md border border-neutral-200 dark:border-neutral-700"
+                      />
+                      <div className="text-xs text-neutral-600 dark:text-neutral-400">
+                        <p className="font-medium text-neutral-800 dark:text-neutral-200">
+                          Entregar tarjeta
+                        </p>
+                        <p className="mt-1">
+                          El cliente escanea este QR con la cámara de su celular y su
+                          tarjeta se abre al instante — puede guardarla en su pantalla
+                          de inicio.
+                        </p>
+                        {customer.email ? (
+                          <form
+                            action={sendCardEmail.bind(null, slug, customer.id, card.id)}
+                            className="mt-2"
+                          >
+                            <button
+                              type="submit"
+                              className="rounded-full border border-brand px-3 py-1 font-semibold text-brand transition hover:bg-brand hover:text-white"
+                            >
+                              Enviar por email a {customer.email}
+                            </button>
+                          </form>
+                        ) : (
+                          <p className="mt-2 text-neutral-400">
+                            Registra su email arriba para también enviarla por correo.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </li>
               );
             })}

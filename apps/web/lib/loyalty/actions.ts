@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { optionalEnv } from "@/lib/env";
 
 // Auditoría vía RPC write_audit_log: actor = auth.uid(), membresía exigida
 // en la función. No requiere service_role.
@@ -204,4 +205,94 @@ export async function redeemReward(
   });
   revalidatePath(back);
   redirect(back + "?ok=" + encodeURIComponent("Canje registrado."));
+}
+
+function cardPublicUrl(token: string): string {
+  const base = optionalEnv("NEXT_PUBLIC_BASE_URL") ?? "http://localhost:3000";
+  return `${base}/t/${token}`;
+}
+
+// Entrega de tarjeta por correo vía Resend. El QR va como <img> a la ruta
+// pública /t/<token>/qr (los clientes de correo bloquean data URIs).
+export async function sendCardEmail(orgSlug: string, customerId: string, cardId: string) {
+  const { supabase, user, orgId } = await requireMembership(orgSlug);
+  const back = `/dashboard/${orgSlug}/customers/${customerId}`;
+
+  const apiKey = optionalEnv("RESEND_API_KEY");
+  if (!apiKey) {
+    redirect(back + "?error=" + encodeURIComponent("Correo no configurado (falta RESEND_API_KEY)."));
+  }
+
+  const [{ data: customer }, { data: org }, { data: card }] = await Promise.all([
+    supabase
+      .from("customers")
+      .select("first_name, email")
+      .eq("id", customerId)
+      .eq("organization_id", orgId)
+      .maybeSingle(),
+    supabase.from("organizations").select("name").eq("id", orgId).maybeSingle(),
+    supabase
+      .from("customer_cards")
+      .select("token, status, account_id")
+      .eq("id", cardId)
+      .eq("customer_id", customerId)
+      .eq("organization_id", orgId)
+      .maybeSingle(),
+  ]);
+
+  if (!card || card.status !== "active") {
+    redirect(back + "?error=" + encodeURIComponent("Tarjeta no activa."));
+  }
+  if (!customer?.email) {
+    redirect(back + "?error=" + encodeURIComponent("El cliente no tiene email registrado."));
+  }
+
+  const { data: account } = await supabase
+    .from("loyalty_accounts")
+    .select("loyalty_programs(name)")
+    .eq("id", card.account_id)
+    .maybeSingle();
+  const lp = Array.isArray(account?.loyalty_programs)
+    ? account?.loyalty_programs[0]
+    : account?.loyalty_programs;
+  const programName = lp?.name ?? "tu programa de fidelización";
+  const orgName = org?.name ?? "el comercio";
+  const cardUrl = cardPublicUrl(card.token);
+  const qrUrl = `${cardUrl}/qr`;
+
+  const from = optionalEnv("EMAIL_FROM") ?? `${orgName} <info@fruppyhelados.com>`;
+  const html = `
+    <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;color:#262626">
+      <h2 style="color:#0d9488">Hola ${customer.first_name}, esta es tu tarjeta ${orgName}</h2>
+      <p>Guarda este correo: aquí está tu tarjeta digital de <strong>${programName}</strong>.</p>
+      <p style="text-align:center;margin:24px 0">
+        <a href="${cardUrl}" style="background:#0d9488;color:#fff;padding:12px 24px;border-radius:999px;text-decoration:none;font-weight:600">Abrir mi tarjeta</a>
+      </p>
+      <p style="text-align:center">
+        <img src="${qrUrl}" alt="QR de tu tarjeta" width="220" height="220" style="border-radius:16px"/>
+      </p>
+      <p style="font-size:13px;color:#737373">
+        En tu próxima visita muestra este código QR en caja para sumar sellos.
+        También puedes abrir tu tarjeta desde cualquier navegador con este enlace:
+        <a href="${cardUrl}">${cardUrl}</a>
+      </p>
+      <p style="font-size:12px;color:#a3a3a3">Powered by Fruppy — fidelización digital</p>
+    </div>`;
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from,
+      to: [customer.email],
+      subject: `Tu tarjeta ${orgName} — ${programName}`,
+      html,
+    }),
+  });
+  if (!res.ok) {
+    redirect(back + "?error=" + encodeURIComponent("No se pudo enviar el correo."));
+  }
+
+  await audit(orgId, user.id, "card.emailed", "customer", customerId, { card_id: cardId });
+  redirect(back + "?ok=" + encodeURIComponent(`Tarjeta enviada a ${customer.email}.`));
 }
