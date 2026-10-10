@@ -1,26 +1,36 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7f8fa;
+  --foreground: #2b2f33;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-poppins);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Identidad Fruppy */
+@theme {
+  --color-brand: #17b8a6;
+  --color-brand-dark: #0f9c8c;
+  --color-brand-soft: #d9f3ef;
+  --color-accent: #e91e63;
+  --color-accent-soft: #fce4ec;
+  --color-stamp: #ff6b7a;
+  --color-pastel-pink: #fde9f1;
+  --color-pastel-mint: #dcf5ec;
+  --color-pastel-cream: #fff1dc;
+  --color-pastel-lav: #efe7fd;
+  --color-pastel-sky: #e0f0fb;
+  --color-ink: #2b2f33;
+  --color-ink-soft: #8a9299;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-poppins), Arial, Helvetica, sans-serif;
 }

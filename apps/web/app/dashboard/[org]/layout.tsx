@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { OrgNav } from "./nav";
 
 export const instant = false;
 
@@ -55,19 +55,9 @@ export default async function OrgLayout({
   ];
 
   return (
-    <>
-      <nav className="mb-6 flex flex-wrap gap-1 border-b border-neutral-200 pb-3 text-sm dark:border-neutral-800">
-        {nav.map(([path, label]) => (
-          <Link
-            key={path}
-            href={`/dashboard/${org}${path ? `/${path}` : ""}`}
-            className="rounded-md px-3 py-1.5 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
-          >
-            {label}
-          </Link>
-        ))}
-      </nav>
+    <div className="mx-auto max-w-5xl">
+      <OrgNav base={`/dashboard/${org}`} items={nav} />
       {children}
-    </>
+    </div>
   );
 }

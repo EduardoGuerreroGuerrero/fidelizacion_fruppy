@@ -39,7 +39,7 @@ export default async function NewOrganizationPage({
         </label>
         <button
           type="submit"
-          className="rounded-md bg-neutral-900 py-2 text-sm font-medium text-white hover:bg-neutral-700 dark:bg-neutral-100 dark:text-neutral-900"
+          className="rounded-full bg-brand py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
         >
           Crear organización
         </button>

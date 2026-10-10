@@ -99,7 +99,7 @@ export default async function RewardsPage({
           />
           <button
             type="submit"
-            className="rounded-md bg-neutral-900 px-4 py-2 text-sm text-white hover:bg-neutral-700 dark:bg-neutral-100 dark:text-neutral-900 sm:col-span-2"
+            className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark sm:col-span-2"
           >
             Crear recompensa
           </button>

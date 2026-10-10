@@ -264,7 +264,7 @@ export default async function CustomerPage({
             </div>
             <button
               type="submit"
-              className="rounded-md bg-neutral-900 px-4 py-2 text-sm text-white hover:bg-neutral-700 dark:bg-neutral-100 dark:text-neutral-900"
+              className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
             >
               Guardar cambios
             </button>
@@ -332,7 +332,7 @@ export default async function CustomerPage({
                       <form action={issueCard.bind(null, slug, customer.id, p.id)}>
                         <button
                           type="submit"
-                          className="rounded-md bg-neutral-900 px-3 py-1 text-xs text-white hover:bg-neutral-700 dark:bg-neutral-100 dark:text-neutral-900"
+                          className="rounded-full bg-brand px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-dark"
                         >
                           Emitir tarjeta
                         </button>

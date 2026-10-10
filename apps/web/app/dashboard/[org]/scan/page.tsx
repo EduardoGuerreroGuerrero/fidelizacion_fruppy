@@ -43,18 +43,18 @@ export default async function ScanPage({
       <h1 className="mb-6 mt-1 text-2xl font-semibold">Registrar visita</h1>
 
       {error && (
-        <p className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm font-medium text-red-800 dark:bg-red-900/30 dark:text-red-300">
+        <p className="mb-4 rounded-xl bg-accent-soft px-4 py-3 text-sm font-medium text-accent">
           ✕ {error}
         </p>
       )}
       {ok && (
-        <p className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm font-medium text-green-800 dark:bg-green-900/30 dark:text-green-300">
+        <p className="mb-4 rounded-xl bg-pastel-mint px-4 py-3 text-sm font-medium text-brand-dark">
           ✓ {ok}
         </p>
       )}
 
       <ScanForm action={action} initialToken={token} />
-      <p className="mt-3 text-xs text-neutral-500">
+      <p className="mt-3 text-xs text-ink-soft">
         Usa la cámara, un lector USB que escriba el token, o pégalo manualmente.
       </p>
     </div>
