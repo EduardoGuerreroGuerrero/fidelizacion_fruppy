@@ -12,25 +12,25 @@ export default async function LoginPage({
 
   return (
     <>
-      <h2 className="mb-4 text-lg font-semibold">Iniciar sesión</h2>
+      <h2 className="mb-4 text-lg font-semibold text-ink">Iniciar sesión</h2>
       {error ? (
-        <p className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+        <p className="mb-4 rounded-xl bg-accent-soft p-3 text-sm text-accent">
           {error}
         </p>
       ) : null}
       <form action={signIn} className="flex flex-col gap-4">
         <input type="hidden" name="next" value={next ?? "/dashboard"} />
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1 text-sm text-ink">
           Email
           <input
             name="email"
             type="email"
             required
             autoComplete="email"
-            className="rounded-md border border-neutral-300 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-800"
+            className="rounded-xl bg-neutral-100 px-4 py-3 outline-none focus:ring-2 focus:ring-brand/50"
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1 text-sm text-ink">
           Contraseña
           <input
             name="password"
@@ -38,19 +38,19 @@ export default async function LoginPage({
             required
             minLength={8}
             autoComplete="current-password"
-            className="rounded-md border border-neutral-300 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-800"
+            className="rounded-xl bg-neutral-100 px-4 py-3 outline-none focus:ring-2 focus:ring-brand/50"
           />
         </label>
         <button
           type="submit"
-          className="rounded-md bg-neutral-900 py-2 text-sm font-medium text-white hover:bg-neutral-700 dark:bg-neutral-100 dark:text-neutral-900"
+          className="rounded-full bg-brand py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
         >
           Entrar
         </button>
       </form>
-      <p className="mt-4 text-center text-sm text-neutral-500">
+      <p className="mt-4 text-center text-sm text-ink-soft">
         ¿Sin cuenta?{" "}
-        <Link href="/signup" className="text-blue-600 underline">
+        <Link href="/signup" className="font-medium text-brand">
           Registra tu comercio
         </Link>
       </p>

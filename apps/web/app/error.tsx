@@ -20,7 +20,7 @@ export default function Error({
       <p className="text-sm text-neutral-500">Ocurrió un error inesperado. Inténtalo de nuevo.</p>
       <button
         onClick={() => retry()}
-        className="rounded-md bg-neutral-900 px-4 py-2 text-sm text-white hover:bg-neutral-700"
+        className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
       >
         Reintentar
       </button>

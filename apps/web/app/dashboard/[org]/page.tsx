@@ -59,43 +59,45 @@ export default async function OrgPage({ params }: { params: Promise<{ org: strin
     { label: "Canjes completados", value: redemptionCount ?? 0, href: `rewards` },
   ];
 
+  const tints = ["bg-brand-soft", "bg-pastel-pink", "bg-pastel-lav"];
+
   return (
     <div className="mx-auto max-w-3xl">
-      <h1 className="mb-6 text-2xl font-semibold">{org.name}</h1>
+      <h1 className="mb-6 text-2xl font-semibold text-ink">{org.name}</h1>
 
       <div className="mb-8 grid gap-4 sm:grid-cols-3">
-        {cards.map((c) => (
+        {cards.map((c, i) => (
           <Link
             key={c.label}
             href={`/dashboard/${slug}/${c.href}`}
-            className="rounded-lg border border-neutral-200 p-5 hover:border-neutral-400 dark:border-neutral-800"
+            className={`rounded-3xl p-5 shadow-sm transition hover:shadow-md ${tints[i % tints.length]}`}
           >
-            <p className="text-3xl font-semibold tabular-nums">{c.value}</p>
-            <p className="mt-1 text-sm text-neutral-500">{c.label}</p>
+            <p className="text-3xl font-bold tabular-nums text-ink">{c.value}</p>
+            <p className="mt-1 text-sm text-ink-soft">{c.label}</p>
           </Link>
         ))}
       </div>
 
-      <h2 className="mb-3 text-lg font-medium">Actividad reciente</h2>
+      <h2 className="mb-3 text-lg font-semibold text-ink">Actividad reciente</h2>
       <ul className="space-y-2">
         {(recentVisits ?? []).map((v) => {
           const c = Array.isArray(v.customers) ? v.customers[0] : v.customers;
           return (
             <li
               key={v.id}
-              className="flex items-center justify-between rounded-lg border border-neutral-200 px-4 py-2 text-sm dark:border-neutral-800"
+              className="flex items-center justify-between rounded-2xl bg-white px-4 py-3 text-sm shadow-sm ring-1 ring-neutral-100"
             >
-              <span>
+              <span className="font-medium text-ink">
                 Visita de {c?.first_name} {c?.last_name ?? ""}
               </span>
-              <span className="text-xs text-neutral-500">
+              <span className="text-xs text-ink-soft">
                 {new Date(v.created_at).toLocaleString("es-CO")} · {v.source}
               </span>
             </li>
           );
         })}
         {(recentVisits ?? []).length === 0 && (
-          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-neutral-500 dark:border-neutral-700">
+          <li className="rounded-2xl border border-dashed border-neutral-200 p-6 text-center text-sm text-ink-soft">
             Sin actividad todavía. Escanea la primera tarjeta.
           </li>
         )}

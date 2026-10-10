@@ -18,15 +18,23 @@ export default async function DashboardLayout({ children }: { children: React.Re
   await supabase.rpc("claim_invites");
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="flex items-center justify-between border-b border-neutral-200 px-6 py-3 dark:border-neutral-800">
-        <span className="font-semibold">Fruppy</span>
+    <div className="flex min-h-screen flex-col bg-[#f7f8fa]">
+      <header className="flex items-center justify-between border-b border-neutral-100 bg-white px-6 py-3">
+        <span className="flex items-center gap-2.5 font-semibold text-ink">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/brand/logo-circle.jpg"
+            alt=""
+            className="size-9 rounded-full shadow-sm"
+          />
+          Fruppy
+        </span>
         <div className="flex items-center gap-4 text-sm">
-          <span className="text-neutral-500">{user.email}</span>
+          <span className="text-ink-soft">{user.email}</span>
           <form action={signOut}>
             <button
               type="submit"
-              className="rounded-md border border-neutral-300 px-3 py-1 hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+              className="rounded-full bg-accent-soft px-4 py-1.5 font-medium text-accent transition hover:bg-accent/20"
             >
               Salir
             </button>

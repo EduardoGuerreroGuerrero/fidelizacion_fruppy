@@ -78,13 +78,13 @@ export function ScanForm({
     <form action={action} className="space-y-4">
       <input type="hidden" name="idem" value={idem} />
 
-      <div id={READER_ID} className="overflow-hidden rounded-md" />
+      <div id={READER_ID} className="overflow-hidden rounded-xl" />
 
       {scanning ? (
         <button
           type="button"
           onClick={() => void stopScanner()}
-          className="w-full rounded-md border border-neutral-300 px-4 py-2 text-sm font-medium hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-800"
+          className="w-full rounded-full bg-neutral-100 px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-neutral-200"
         >
           Detener cámara
         </button>
@@ -92,15 +92,15 @@ export function ScanForm({
         <button
           type="button"
           onClick={() => void startScanner()}
-          className="w-full rounded-md border border-neutral-300 px-4 py-2 text-sm font-medium hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-800"
+          className="w-full rounded-full bg-neutral-100 px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-neutral-200"
         >
           Escanear con cámara
         </button>
       )}
-      {camError && <p className="text-xs text-red-600 dark:text-red-400">{camError}</p>}
+      {camError && <p className="text-xs text-accent">{camError}</p>}
 
       <div>
-        <label htmlFor="token" className="mb-1 block text-sm font-medium">
+        <label htmlFor="token" className="mb-1 block text-sm font-medium text-ink">
           Token del QR
         </label>
         <input
@@ -112,11 +112,11 @@ export function ScanForm({
           autoFocus
           autoComplete="off"
           placeholder="Aparece al escanear, o pégalo aquí"
-          className="w-full rounded-md border border-neutral-300 px-3 py-2 font-mono text-sm dark:border-neutral-700 dark:bg-transparent"
+          className="w-full rounded-xl bg-neutral-100 px-4 py-3 font-mono text-sm outline-none focus:ring-2 focus:ring-brand/50"
         />
       </div>
       <div>
-        <label htmlFor="stamps" className="mb-1 block text-sm font-medium">
+        <label htmlFor="stamps" className="mb-1 block text-sm font-medium text-ink">
           Sellos a otorgar
         </label>
         <input
@@ -126,12 +126,12 @@ export function ScanForm({
           min={0}
           max={20}
           defaultValue={1}
-          className="w-24 rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-transparent"
+          className="w-24 rounded-xl bg-neutral-100 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-brand/50"
         />
       </div>
       <button
         type="submit"
-        className="w-full rounded-md bg-neutral-900 px-4 py-3 text-sm font-medium text-white hover:bg-neutral-700 dark:bg-neutral-100 dark:text-neutral-900"
+        className="w-full rounded-full bg-brand px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
       >
         Registrar visita
       </button>

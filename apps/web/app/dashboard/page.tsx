@@ -23,7 +23,7 @@ export default async function DashboardPage() {
         <h1 className="text-2xl font-semibold">Mis organizaciones</h1>
         <Link
           href="/dashboard/new"
-          className="rounded-md bg-neutral-900 px-4 py-2 text-sm text-white hover:bg-neutral-700 dark:bg-neutral-100 dark:text-neutral-900"
+          className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
         >
           Nueva organización
         </Link>
