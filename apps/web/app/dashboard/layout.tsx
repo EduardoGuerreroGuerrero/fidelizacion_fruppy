@@ -19,19 +19,19 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="flex min-h-screen flex-col bg-[#f7f8fa]">
-      <header className="flex items-center justify-between border-b border-neutral-100 bg-white px-6 py-3">
-        <span className="flex items-center gap-2.5 font-semibold text-ink">
+      <header className="flex items-center justify-between gap-3 border-b border-neutral-100 bg-white px-4 py-3 sm:px-6">
+        <span className="flex min-w-0 items-center gap-2.5 font-semibold text-ink">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/brand/logo-circle.jpg"
             alt=""
-            className="size-9 rounded-full shadow-sm"
+            className="size-9 shrink-0 rounded-full shadow-sm"
           />
           Fruppy
         </span>
-        <div className="flex items-center gap-4 text-sm">
-          <span className="text-ink-soft">{user.email}</span>
-          <form action={signOut}>
+        <div className="flex min-w-0 items-center gap-3 text-sm sm:gap-4">
+          <span className="hidden truncate text-ink-soft sm:inline">{user.email}</span>
+          <form action={signOut} className="shrink-0">
             <button
               type="submit"
               className="rounded-full bg-accent-soft px-4 py-1.5 font-medium text-accent transition hover:bg-accent/20"
@@ -41,7 +41,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </form>
         </div>
       </header>
-      <div className="flex-1 p-6">{children}</div>
+      <div className="flex-1 p-4 sm:p-6">{children}</div>
     </div>
   );
 }

@@ -5,17 +5,20 @@ export const instant = false;
 
 // Navegación por rol. La autorización real va server-side en cada página y
 // en las policies/RPCs — ocultar opciones aquí es solo UX (defensa ya existe).
+// Menú principal: máx. 4 tareas frecuentes. El resto va a la línea "Más".
 const NAV_BASE = [
   ["", "Inicio"],
+  ["scan", "Registrar visita"],
   ["customers", "Clientes"],
-  ["scan", "Escanear"],
-  ["analytics", "Analítica"],
 ] as const;
 
-const NAV_MANAGER = [["team", "Equipo"]] as const;
+const NAV_ADMIN_PRIMARY = [["programs", "Programa"]] as const;
 
-const NAV_ADMIN = [
-  ["programs", "Programas"],
+const NAV_SECONDARY_BASE = [["analytics", "Analítica"]] as const;
+
+const NAV_SECONDARY_MANAGER = [["team", "Equipo"]] as const;
+
+const NAV_SECONDARY_ADMIN = [
   ["rewards", "Recompensas"],
   ["locations", "Sedes"],
   ["audit", "Auditoría"],
@@ -48,15 +51,19 @@ export default async function OrgLayout({
     role = m?.role ?? null;
   }
 
-  const nav = [
-    ...NAV_BASE,
-    ...(role === "manager" || role === "admin" || role === "owner" ? NAV_MANAGER : []),
-    ...(role === "admin" || role === "owner" ? NAV_ADMIN : []),
+  const isManager = role === "manager" || role === "admin" || role === "owner";
+  const isAdmin = role === "admin" || role === "owner";
+
+  const nav = [...NAV_BASE, ...(isAdmin ? NAV_ADMIN_PRIMARY : [])];
+  const secondary = [
+    ...NAV_SECONDARY_BASE,
+    ...(isManager ? NAV_SECONDARY_MANAGER : []),
+    ...(isAdmin ? NAV_SECONDARY_ADMIN : []),
   ];
 
   return (
     <div className="mx-auto max-w-5xl">
-      <OrgNav base={`/dashboard/${org}`} items={nav} />
+      <OrgNav base={`/dashboard/${org}`} items={nav} secondary={secondary} />
       {children}
     </div>
   );
