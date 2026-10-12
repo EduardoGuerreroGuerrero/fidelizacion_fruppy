@@ -4,6 +4,10 @@
 export interface WalletPassData {
   /** serialNumber de Apple/Google = id estable de la tarjeta (card.id). */
   serialNumber: string;
+  /** Claves del espejo wallet_passes (registro de entrega / gating de pushes). */
+  orgId: string;
+  customerId: string;
+  programId: string | null;
   orgName: string;
   firstName: string;
   programName: string;
@@ -22,14 +26,15 @@ export interface WalletIssueResult {
   googleSaveUrl: string | null;
 }
 
-/** Re-lee el contenido actual del pase por serial (para updates push). */
-export type LoadPassFn = (serialNumber: string) => Promise<unknown | null>;
-
 export interface WalletProvider {
   readonly name: string;
   /** true si hay credenciales suficientes para operar. */
   configured(): boolean;
-  issuePass(data: WalletPassData, load: LoadPassFn): Promise<WalletIssueResult>;
+  /** true si Google Wallet está configurado (para mostrar el botón al cliente). */
+  googleEnabled(): boolean;
+  /** true si Apple Wallet está configurado (para mostrar el botón al cliente). */
+  appleEnabled(): boolean;
+  issuePass(data: WalletPassData): Promise<WalletIssueResult>;
   /** Push del estado actual leído vía load() — idempotente por naturaleza. */
   updatePass(serialNumber: string): Promise<void>;
   /** Revocación lógica: marca el pase como vacío/inactivo en la wallet. */

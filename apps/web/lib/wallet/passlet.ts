@@ -7,23 +7,22 @@ import {
   type PassContent,
   type WalletConfig,
 } from "passlet";
+import { passDataBySerial } from "./pass-data";
 import {
   WalletNotConfiguredError,
-  type LoadPassFn,
   type WalletIssueResult,
   type WalletPassData,
   type WalletProvider,
 } from "./provider";
-
-type PassletLoad = (serial: string) => Promise<LoadedPass | null>;
 
 // Adapter passlet: credenciales SOLO desde variables de entorno (paths a
 // certs fuera del repo o PEM inline desde gestor de secretos). Este módulo
 // solo se importa en server code — nada llega al bundle de cliente.
 //
 // Apple webService (push a dispositivos) requiere un storage de
-// registrations: queda pendiente para cuando haya credenciales reales.
-// Sin él, los pases Apple son estáticos tras emitirse — aceptable en MVP.
+// registrations: queda pendiente. Sin él, los pases Apple se actualizan
+// cuando el cliente los re-descarga — aceptable en MVP. Google sí recibe
+// updates vía wallet.update() → load() lee el estado real desde la DB.
 
 function env(name: string): string | undefined {
   const v = process.env[name];
@@ -40,10 +39,17 @@ function pem(pathVar: string, inlineVar: string): string | undefined {
 export class PassletWalletProvider implements WalletProvider {
   readonly name = "passlet";
   private wallet: Wallet | null = null;
-  private loadFn: PassletLoad | null = null;
 
   configured(): boolean {
     return this.appleConfigured() || this.googleConfigured();
+  }
+
+  googleEnabled(): boolean {
+    return this.googleConfigured();
+  }
+
+  appleEnabled(): boolean {
+    return this.appleConfigured();
   }
 
   private appleConfigured() {
@@ -84,12 +90,20 @@ export class PassletWalletProvider implements WalletProvider {
     return { clientEmail, privateKey: key };
   }
 
-  private getWallet(load: PassletLoad) {
+  private getWallet() {
     if (this.wallet) return this.wallet;
     if (!this.configured()) throw new WalletNotConfiguredError(this.name);
-    this.loadFn = load;
 
-    const config: WalletConfig = { load };
+    const config: WalletConfig = {
+      // load() alimenta wallet.update() y webService: re-lee el estado real
+      // desde la DB por serial — la proyección nunca persiste su propia verdad.
+      load: async (serial): Promise<LoadedPass | null> => {
+        const data = await passDataBySerial(serial);
+        if (!data) return null;
+        const { serialNumber: _serial, ...content } = this.contentOf(data);
+        return { content, template: this.templateOf(data), updatedAt: new Date() };
+      },
+    };
 
     if (this.appleConfigured()) {
       config.apple = {
@@ -116,12 +130,32 @@ export class PassletWalletProvider implements WalletProvider {
   }
 
   private templateOf(data: WalletPassData) {
-    const wallet = this.getWallet(this.loadFn ?? (async () => null));
+    const wallet = this.getWallet();
+    const baseUrl = env("NEXT_PUBLIC_BASE_URL");
     // Template estable: los campos se definen una vez; cada pase solo fija
     // `values`. changeMessage hace que Apple muestre aviso al actualizar.
     return wallet.loyalty({
       id: "fruppy-loyalty",
       name: data.programName,
+      color: "#0d9488",
+      apple: baseUrl
+        ? {
+            icon: {
+              base: `${baseUrl}/brand/wallet-icon.png`,
+              retina: `${baseUrl}/brand/wallet-icon@2x.png`,
+            },
+            logo: `${baseUrl}/brand/wallet-logo.png`,
+            logoText: data.orgName,
+            description: `${data.programName} — ${data.orgName}`,
+          }
+        : undefined,
+      google: baseUrl
+        ? {
+            issuerName: data.orgName,
+            logo: `${baseUrl}/brand/wallet-logo.png`,
+            hero: `${baseUrl}/brand/wallet-hero.png`,
+          }
+        : undefined,
       fields: [
         field.secondary("holder", "Cliente"),
         field.secondary("org", "Comercio"),
@@ -145,8 +179,7 @@ export class PassletWalletProvider implements WalletProvider {
     };
   }
 
-  async issuePass(data: WalletPassData, load: LoadPassFn): Promise<WalletIssueResult> {
-    this.getWallet(load as PassletLoad);
+  async issuePass(data: WalletPassData): Promise<WalletIssueResult> {
     const issued = await this.templateOf(data).create(this.contentOf(data));
     return {
       applePkpass: issued.apple ?? null,
@@ -156,8 +189,7 @@ export class PassletWalletProvider implements WalletProvider {
 
   async updatePass(serialNumber: string): Promise<void> {
     // update() re-lee el estado vía load() → idempotente, safe para retry.
-    if (!this.wallet || !this.loadFn) throw new WalletNotConfiguredError(this.name);
-    await this.wallet.update(serialNumber);
+    await this.getWallet().update(serialNumber);
   }
 
   async revokePass(serialNumber: string): Promise<void> {
