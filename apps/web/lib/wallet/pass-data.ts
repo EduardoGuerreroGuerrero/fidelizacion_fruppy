@@ -6,7 +6,7 @@ import type { WalletPassData } from "./provider";
 // updates por serial llegan desde callbacks internos de passlet.
 
 const SELECT =
-  "id, token, status, organization_id, customers(first_name), " +
+  "id, token, status, organization_id, customer_id, customers(first_name), " +
   "loyalty_accounts(program_id, current_stamps, current_points, loyalty_programs(name, program_type, stamp_goal)), " +
   "organizations(name)";
 
@@ -14,6 +14,8 @@ type CardRow = {
   id: string;
   token: string;
   status: string;
+  organization_id: string;
+  customer_id: string;
   customers: { first_name: string } | { first_name: string }[] | null;
   loyalty_accounts:
     | {
@@ -49,6 +51,9 @@ function toPassData(card: CardRow): WalletPassData {
   const org = first(card.organizations);
   return {
     serialNumber: card.id,
+    orgId: card.organization_id,
+    customerId: card.customer_id,
+    programId: acc?.program_id ?? null,
     orgName: org?.name ?? "Comercio",
     firstName: cust?.first_name ?? "Cliente",
     programName: prog?.name ?? "Fidelización",

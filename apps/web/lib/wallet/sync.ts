@@ -49,6 +49,9 @@ export async function syncWalletPass(orgSlug: string, customerId: string): Promi
 
   const passData: WalletPassData = {
     serialNumber: card.id,
+    orgId: org.id,
+    customerId,
+    programId: acc?.program_id ?? null,
     orgName: org.name,
     firstName: displayName(cust?.first_name) || "Cliente",
     programName: prog?.name ?? "Fidelización",

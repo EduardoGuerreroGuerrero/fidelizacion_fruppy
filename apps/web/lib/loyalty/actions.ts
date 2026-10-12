@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { optionalEnv } from "@/lib/env";
 import { displayName } from "@/lib/format";
+import { pushWalletUpdate } from "@/lib/wallet/push";
 
 // Auditoría vía RPC write_audit_log: actor = auth.uid(), membresía exigida
 // en la función. No requiere service_role.
@@ -98,6 +99,7 @@ export async function revokeCard(orgSlug: string, customerId: string, cardId: st
   await audit(orgId, user.id, "card.revoked", "customer", customerId, {
     card_id: cardId,
   });
+  await pushWalletUpdate(cardId);
   revalidatePath(back);
   redirect(back + "?ok=" + encodeURIComponent("Tarjeta revocada."));
 }
@@ -116,6 +118,7 @@ export async function rotateCardToken(orgSlug: string, customerId: string, cardI
   await audit(orgId, user.id, "card.token_rotated", "customer", customerId, {
     card_id: cardId,
   });
+  await pushWalletUpdate(cardId);
   revalidatePath(back);
   redirect(back + "?ok=" + encodeURIComponent("QR regenerado."));
 }
@@ -160,6 +163,14 @@ export async function scanCard(orgSlug: string, formData: FormData): Promise<voi
     current_stamps?: number;
     stamp_goal?: number;
   } | null;
+  // Push Wallet best-effort: la RPC no devuelve card_id; lo resolvemos por
+  // token con el cliente del miembro (RLS ya limita a su organización).
+  const { data: cardRow } = await supabase
+    .from("customer_cards")
+    .select("id")
+    .eq("token", token)
+    .maybeSingle();
+  if (cardRow) await pushWalletUpdate(cardRow.id);
   redirect(
     back +
       "?ok=" +
@@ -204,6 +215,15 @@ export async function redeemReward(
   await audit(orgId, user.id, "reward.redeemed", "customer", customerId, {
     reward_id: rewardId,
   });
+  const { data: cardRow } = await supabase
+    .from("customer_cards")
+    .select("id")
+    .eq("customer_id", customerId)
+    .eq("organization_id", orgId)
+    .eq("status", "active")
+    .limit(1)
+    .maybeSingle();
+  if (cardRow) await pushWalletUpdate(cardRow.id);
   revalidatePath(back);
   redirect(back + "?ok=" + encodeURIComponent("Canje registrado."));
 }

@@ -189,8 +189,7 @@ export class PassletWalletProvider implements WalletProvider {
 
   async updatePass(serialNumber: string): Promise<void> {
     // update() re-lee el estado vía load() → idempotente, safe para retry.
-    if (!this.wallet) throw new WalletNotConfiguredError(this.name);
-    await this.wallet.update(serialNumber);
+    await this.getWallet().update(serialNumber);
   }
 
   async revokePass(serialNumber: string): Promise<void> {

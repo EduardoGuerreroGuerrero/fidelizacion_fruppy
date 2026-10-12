@@ -57,6 +57,9 @@ test("issuePass lanza WalletNotConfiguredError sin credenciales", async () => {
       () =>
         p.issuePass({
           serialNumber: "s1",
+          orgId: "o1",
+          customerId: "c1",
+          programId: "p1",
           orgName: "Org",
           firstName: "Ana",
           programName: "Café",

@@ -1,6 +1,7 @@
 import { APPLE_PASS_CONTENT_TYPE } from "passlet";
 import { walletProvider } from "@/lib/wallet/passlet";
 import { passDataByToken } from "@/lib/wallet/pass-data";
+import { recordWalletDelivery } from "@/lib/wallet/push";
 
 // "Añadir a Apple Wallet": genera el .pkpass firmado al momento y lo sirve
 // como descarga. iOS lo abre directo en Wallet si el content type es correcto.
@@ -15,6 +16,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
 
   const { applePkpass } = await walletProvider.issuePass(data);
   if (!applePkpass) return new Response("not found", { status: 404 });
+  await recordWalletDelivery(data, "apple");
 
   return new Response(new Uint8Array(applePkpass), {
     headers: {

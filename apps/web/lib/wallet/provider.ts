@@ -4,6 +4,10 @@
 export interface WalletPassData {
   /** serialNumber de Apple/Google = id estable de la tarjeta (card.id). */
   serialNumber: string;
+  /** Claves del espejo wallet_passes (registro de entrega / gating de pushes). */
+  orgId: string;
+  customerId: string;
+  programId: string | null;
   orgName: string;
   firstName: string;
   programName: string;
