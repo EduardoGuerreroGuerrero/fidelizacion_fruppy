@@ -65,3 +65,10 @@ jobs:
             echo "== applying $f"
             docker exec -i pg psql -U postgres -v ON_ERROR_STOP=1 < "$f"
           done
+
+      - name: Loyalty engine E2E tests (scratch Postgres)
+        run: |
+          for f in supabase/tests/*.sql; do
+            echo "== running $f"
+            docker exec -i pg psql -U postgres -v ON_ERROR_STOP=1 < "$f"
+          done
