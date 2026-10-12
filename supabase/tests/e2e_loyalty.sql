@@ -89,6 +89,7 @@ declare
   r json;
   v1 uuid; v2 uuid;
   n int; nb bigint;
+  n_bool boolean; v_consent_ts timestamptz;
 begin
   perform set_config('app.user_id', U_STAFF::text, false);
 
@@ -236,13 +237,36 @@ begin
     'T16a anon no ejecuta RPCs del motor');
   perform pg_temp.t_ok(
     has_function_privilege('anon', 'public.get_card_public(text)', 'execute')
-    and has_function_privilege('anon', 'public.get_card_app_data(text)', 'execute'),
-    'T16b proyecciones públicas ejecutables por anon');
+    and has_function_privilege('anon', 'public.get_card_app_data(text)', 'execute')
+    and has_function_privilege('anon', 'public.record_card_consent(text,boolean)', 'execute'),
+    'T16b proyecciones públicas y consentimiento ejecutables por anon');
 
   -- --- T17 earn requiere delta positivo ---
   perform pg_temp.t_err(
     format('select public.earn(%L, 0, 0, null, null, %L)', v_acc_p, 'e2e-neg'),
     'delta positivo', 'T17 earn sin delta positivo rechazado');
+
+  -- --- T18 consentimiento desde la tarjeta pública ---
+  r := public.get_card_app_data(v_token_p);
+  perform pg_temp.t_ok((r->>'consent_pending')::boolean,
+                       'T18a cliente nuevo → consent_pending = true');
+  perform pg_temp.t_ok(public.record_card_consent('token-inexistente-e2e', true) = false,
+                       'T18b token inválido → false, sin escritura');
+  perform pg_temp.t_ok(public.record_card_consent(v_token_p, true),
+                       'T18c consentimiento registrado (datos + marketing)');
+  select cu.data_consent_at is not null and cu.marketing_consent_at is not null,
+         cu.data_consent_at
+    into strict n_bool, v_consent_ts
+    from public.customers cu where cu.id = CUST_P;
+  perform pg_temp.t_ok(n_bool, 'T18d ambos timestamps escritos');
+  r := public.get_card_app_data(v_token_p);
+  perform pg_temp.t_ok((r->>'consent_pending')::boolean = false,
+                       'T18e tras consentir, el formulario no vuelve a salir');
+  -- Idempotencia: una segunda llamada no mueve el timestamp original.
+  perform public.record_card_consent(v_token_p, false);
+  perform pg_temp.t_ok(
+    (select cu.data_consent_at = v_consent_ts from public.customers cu where cu.id = CUST_P),
+    'T18f segunda llamada no pisa el timestamp (coalesce)');
 end $e2e$;
 
 -- ---------- T09c/d · RLS a nivel tabla (necesita role no-superuser) ----------
