@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { IconBack, IconBell } from "./icons";
+import { IconBack } from "./icons";
 
 // Encabezado de pantalla interna: flecha atrás + título centrado.
 export function TitleBar({
@@ -26,8 +26,8 @@ export function TitleBar({
   );
 }
 
-// Encabezado del Inicio: avatar con iniciales, saludo y campana.
-export function HomeHeader({ firstName }: { firstName: string }) {
+// Encabezado del Inicio: avatar con iniciales, saludo y marca del comercio.
+export function HomeHeader({ firstName, orgName }: { firstName: string; orgName: string }) {
   const initials = firstName
     .split(" ")
     .map((w) => w[0])
@@ -41,12 +41,8 @@ export function HomeHeader({ firstName }: { firstName: string }) {
       </span>
       <div className="flex-1">
         <p className="text-[17px] font-semibold text-ink">¡Hola {firstName}!</p>
-        <p className="text-xs text-ink-soft">Qué bueno verte por aquí</p>
+        <p className="text-xs text-ink-soft">{orgName}</p>
       </div>
-      <span className="relative rounded-full p-2 text-ink">
-        <IconBell className="size-6" />
-        <span className="absolute right-2 top-2 size-2 rounded-full bg-accent" />
-      </span>
     </header>
   );
 }

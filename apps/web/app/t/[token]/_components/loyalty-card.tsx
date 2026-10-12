@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { IconQr } from "./icons";
 
-// La tarjeta de lealtad teal del mockup: logo Fruppy, foto de producto a la
-// derecha, nombre del cliente, badge "Cliente activo" y contador de sellos.
+// La tarjeta de lealtad teal del mockup, simplificada: marca, nombre del
+// cliente, badge y UN solo contador grande con su unidad. Sin foto de
+// producto ni decoraciones pesadas — el saldo se entiende en segundos.
 export function LoyaltyCard({
   firstName,
   current,
@@ -21,18 +22,9 @@ export function LoyaltyCard({
   qrLabel?: string;
 }) {
   return (
-    <div className="relative mx-5 overflow-hidden rounded-[28px] bg-brand shadow-lg shadow-brand/25">
-      {/* ondas decorativas */}
+    <div className="relative mx-5 overflow-hidden rounded-[28px] bg-brand shadow-md shadow-brand/20">
+      {/* onda decorativa sutil */}
       <span className="absolute -left-16 -top-20 size-56 rounded-full bg-white/10" />
-      <span className="absolute -left-8 -top-8 size-40 rounded-full bg-white/10" />
-      {/* foto del producto a la derecha */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/brand/card-photo.jpg"
-        alt=""
-        className="absolute inset-y-0 right-0 h-full w-[48%] object-cover"
-      />
-      <span className="absolute inset-y-0 right-[38%] w-16 bg-gradient-to-r from-brand to-transparent" />
 
       {cardHref ? (
         <Link href={cardHref} aria-label="Ver mi tarjeta" className="absolute inset-0 z-10" />
@@ -48,14 +40,12 @@ export function LoyaltyCard({
           />
           <Link
             href={qrHref}
-            className="relative z-20 flex w-[76px] flex-col items-center gap-1 rounded-2xl bg-white px-2.5 py-2.5 text-brand shadow-md"
+            className="relative z-20 flex w-[84px] flex-col items-center gap-1 rounded-2xl bg-white px-2.5 py-2.5 text-brand shadow-md"
           >
             <IconQr className="size-7" />
-            {qrLabel ? (
-              <span className="text-center text-[9px] font-semibold leading-tight">
-                {qrLabel}
-              </span>
-            ) : null}
+            <span className="text-center text-[10px] font-semibold leading-tight">
+              {qrLabel ?? "Mi QR"}
+            </span>
           </Link>
         </div>
         <p className="mt-5 text-lg font-semibold">{firstName}</p>

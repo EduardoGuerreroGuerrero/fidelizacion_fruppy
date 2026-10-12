@@ -5,8 +5,8 @@
 > Usar: `python scripts/checklist.py status|done <ID>|undone <ID>|refresh`
 
 <!-- PROGRESS:START -->
-**Última actualización:** 2026-10-09 22:01  
-**Global:** 85/89 hechas (96%) `███████████████████░` · en curso: 0 · bloqueadas: 0
+**Última actualización:** 2026-10-10 05:19  
+**Global:** 85/89 hechas (96%) `███████████████████░` · en curso: 1 · bloqueadas: 0
 
 | Sección | Hecho | Total | % | Progreso |
 |---|---|---|---|---|
@@ -139,7 +139,7 @@
 ## Fase 10 — SaaS comercial (no empezar hasta validar MVP)
 
 - [ ] <!-- F10-T1 --> Planes, límites, suscripciones y portal de facturación
-- [ ] <!-- F10-T2 --> Emails transaccionales, campañas y automatizaciones
+- [~] <!-- F10-T2 --> Emails transaccionales, campañas y automatizaciones
 - [ ] <!-- F10-T3 --> Importación CSV, privacidad/términos/acuerdo de tratamiento de datos
 - [ ] <!-- F10-T4 --> Backups, recuperación, monitoreo y alertas en producción
 

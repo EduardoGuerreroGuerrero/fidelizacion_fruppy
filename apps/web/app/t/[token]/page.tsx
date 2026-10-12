@@ -3,10 +3,8 @@ import { getCardAppData } from "./_components/data";
 import { HomeHeader, Section } from "./_components/chrome";
 import { LoyaltyCard } from "./_components/loyalty-card";
 import { StampRow } from "./_components/stamps";
-import {
-  NextRewardCard,
-  QuickActions,
-} from "./_components/cards";
+import { NextRewardCard } from "./_components/cards";
+import { IconQr } from "./_components/icons";
 
 export const instant = false;
 
@@ -39,7 +37,7 @@ export default async function CardHome({
 
   return (
     <>
-      <HomeHeader firstName={card.first_name} />
+      <HomeHeader firstName={card.first_name} orgName={card.org_name} />
 
       <div className="mt-5">
         <LoyaltyCard
@@ -60,10 +58,7 @@ export default async function CardHome({
 
       {isStamps ? (
         <>
-          <Section
-            title="Tu progreso"
-            actionText={`${Math.min(current, goal!)} de ${goal} sellos`}
-          />
+          <Section title="Tu progreso" />
           <StampRow current={current} goal={goal!} />
         </>
       ) : null}
@@ -79,17 +74,25 @@ export default async function CardHome({
         </>
       ) : null}
 
-      <Section title="Promociones para ti" actionHref={`${base}/promociones`} />
-      <Link href={`${base}/promociones`} className="mx-5 block">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/brand/promo-hero.jpg"
-          alt="2 Granizados = 1 Gratis"
-          className="w-full rounded-3xl"
-        />
-      </Link>
+      {/* Acción principal: presentar el QR en caja */}
+      {!revoked ? (
+        <Link
+          href={`${base}/escanear`}
+          className="mx-5 mt-6 flex items-center justify-center gap-2.5 rounded-2xl bg-brand py-4 text-[15px] font-semibold text-white shadow-md shadow-brand/25"
+        >
+          <IconQr className="size-6" />
+          Mostrar mi QR
+        </Link>
+      ) : null}
 
-      <QuickActions base={base} />
+      {card.rewards.length > 0 ? (
+        <Link
+          href={`${base}/bonos`}
+          className="mx-5 mt-3 block text-center text-sm font-medium text-brand"
+        >
+          Ver todas mis recompensas
+        </Link>
+      ) : null}
 
       <p className="mt-8 pb-2 text-center text-[11px] text-neutral-300">
         Powered by Fruppy — tarjeta digital de fidelización

@@ -106,15 +106,6 @@ export default async function MiTarjeta({
         </>
       ) : null}
 
-      <Section title="Promociones para ti" actionHref={`${base}/promociones`} />
-      <Link href={`${base}/promociones`} className="mx-5 block">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/brand/promo-hero.jpg"
-          alt="Promoción Fruppy"
-          className="w-full rounded-3xl"
-        />
-      </Link>
     </>
   );
 }

@@ -5,8 +5,6 @@ import {
   IconChevron,
   IconCone,
   IconGift,
-  IconPercent,
-  IconQr,
   IconStore,
 } from "./icons";
 import { StampMini } from "./stamps";
@@ -172,31 +170,6 @@ export function VisitRow({ visit }: { visit: CardVisit }) {
         </span>
       ) : null}
     </li>
-  );
-}
-
-// ---------- accesos rápidos del Inicio ----------------------------------------
-
-export function QuickActions({ base }: { base: string }) {
-  const items = [
-    { href: `${base}/bonos`, label: "Mis bonos", bg: "bg-[#fde3c8]", Icon: IconGift, fg: "text-[#e8862e]" },
-    { href: `${base}/escanear`, label: "Escanear", bg: "bg-brand-soft", Icon: IconQr, fg: "text-brand" },
-    { href: `${base}/promociones`, label: "Promociones", bg: "bg-pastel-lav", Icon: IconPercent, fg: "text-[#9b6ddf]" },
-    { href: `${base}/sedes`, label: "Nuestras sedes", bg: "bg-pastel-pink", Icon: IconStore, fg: "text-accent" },
-  ];
-  return (
-    <div className="mt-6 flex justify-between px-7">
-      {items.map(({ href, label, bg, Icon, fg }) => (
-        <Link key={label} href={href} className="flex w-16 flex-col items-center gap-1.5">
-          <span className={`flex size-14 items-center justify-center rounded-full ${bg}`}>
-            <Icon className={`size-6 ${fg}`} />
-          </span>
-          <span className="text-center text-[11px] font-medium leading-tight text-ink">
-            {label}
-          </span>
-        </Link>
-      ))}
-    </div>
   );
 }
 
