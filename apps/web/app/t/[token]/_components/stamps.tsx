@@ -35,7 +35,7 @@ export function StampMini({
   const total = Math.max(goal, 1);
   return (
     <span className={`flex items-center gap-1 ${className}`}>
-      {Array.from({ length: Math.min(total, 12) }, (_, i) => (
+      {Array.from({ length: Math.min(total, 10) }, (_, i) => (
         <StampStrawberry
           key={i}
           filled={i < current}

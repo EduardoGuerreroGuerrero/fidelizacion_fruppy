@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
+import { IconScan } from "@/app/t/[token]/_components/icons";
 
 const READER_ID = "qr-reader";
 
@@ -84,7 +85,7 @@ export function ScanForm({
         <button
           type="button"
           onClick={() => void stopScanner()}
-          className="w-full rounded-full bg-neutral-100 px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-neutral-200"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-neutral-100 px-4 py-3 text-sm font-semibold text-ink transition hover:bg-neutral-200"
         >
           Detener cámara
         </button>
@@ -92,8 +93,9 @@ export function ScanForm({
         <button
           type="button"
           onClick={() => void startScanner()}
-          className="w-full rounded-full bg-neutral-100 px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-neutral-200"
+          className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-brand px-4 py-4 text-base font-semibold text-white shadow-sm transition hover:bg-brand-dark"
         >
+          <IconScan className="size-6" />
           Escanear con cámara
         </button>
       )}
