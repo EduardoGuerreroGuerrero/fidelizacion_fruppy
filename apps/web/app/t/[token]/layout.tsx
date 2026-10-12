@@ -13,7 +13,7 @@ export default async function CardAppLayout({
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white">
-      <main className="flex-1 pb-20">{children}</main>
+      <main className="flex-1 pb-24">{children}</main>
       <TabBar base={base} />
     </div>
   );

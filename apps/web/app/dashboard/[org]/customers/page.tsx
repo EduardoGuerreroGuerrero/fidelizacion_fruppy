@@ -107,17 +107,17 @@ export default async function CustomersPage({
             <li key={c.id}>
               <Link
                 href={`/dashboard/${slug}/customers/${c.id}`}
-                className="flex items-center justify-between px-4 py-3 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+                className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-neutral-50 dark:hover:bg-neutral-900"
               >
-                <div>
+                <div className="min-w-0">
                   <p className="font-medium">
                     {c.first_name} {c.last_name ?? ""}
                   </p>
-                  <p className="text-sm text-neutral-500">
+                  <p className="break-all text-sm text-neutral-500">
                     {[c.email, c.phone].filter(Boolean).join(" · ") || "—"}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 text-xs">
+                <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 text-xs">
                   {c.marketing_consent_at && (
                     <span className="rounded bg-green-100 px-2 py-1 text-green-800 dark:bg-green-900/40 dark:text-green-300">
                       marketing
