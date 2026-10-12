@@ -10,6 +10,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-poppins);
   --font-mono: var(--font-geist-mono);
+  --font-script: var(--font-caveat);
 }
 
 /* Identidad Fruppy */
@@ -27,6 +28,11 @@
   --color-pastel-sky: #e0f0fb;
   --color-ink: #2b2f33;
   --color-ink-soft: #8a9299;
+  /* Panel admin Fruppy Helados (mockups) */
+  --color-navy: #1e2a52;
+  --color-wine: #a01755;
+  --color-chip-green: #d6f5e1;
+  --color-chip-green-ink: #159a55;
 }
 
 body {

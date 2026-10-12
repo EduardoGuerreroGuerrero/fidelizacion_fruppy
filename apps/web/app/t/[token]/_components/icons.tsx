@@ -196,6 +196,218 @@ export const IconHeart = (p: P) => (
   </svg>
 );
 
+// ---- Iconos del panel admin-owner (mockups Fruppy Helados) ----
+
+export const IconUsers = (p: P) => (
+  <svg {...base(p)}>
+    <circle cx="9" cy="8" r="3.5" />
+    <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
+    <path d="M16 4.5a3.5 3.5 0 0 1 0 7" />
+    <path d="M17.5 14.5a6.5 6.5 0 0 1 4 5.5" />
+  </svg>
+);
+
+export const IconUserPlus = (p: P) => (
+  <svg {...base(p)}>
+    <circle cx="10" cy="8" r="4" />
+    <path d="M3 20a7 7 0 0 1 14 0" />
+    <path d="M18 8v6M15 11h6" />
+  </svg>
+);
+
+export const IconCalendar = (p: P) => (
+  <svg {...base(p)}>
+    <rect x="3" y="5" width="18" height="16" rx="2" />
+    <path d="M3 10h18M8 3v4M16 3v4" />
+  </svg>
+);
+
+export const IconTarget = (p: P) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="9" />
+    <circle cx="12" cy="12" r="5" />
+    <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+export const IconCoins = (p: P) => (
+  <svg {...base(p)}>
+    <ellipse cx="12" cy="6" rx="7" ry="3" />
+    <path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6" />
+    <path d="M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6" />
+  </svg>
+);
+
+export const IconTag = (p: P) => (
+  <svg {...base(p)}>
+    <path d="m4 4 6.5-.5L20 13l-7 7-9.5-9.5L4 4Z" />
+    <circle cx="8.5" cy="8.5" r="1.5" />
+  </svg>
+);
+
+export const IconPencil = (p: P) => (
+  <svg {...base(p)}>
+    <path d="m14.5 5.5 4 4L8 20l-5 1 1-5L14.5 5.5Z" />
+    <path d="m13 7 4 4" />
+  </svg>
+);
+
+export const IconDownload = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5" />
+    <path d="M4 19h16" />
+  </svg>
+);
+
+export const IconUpload = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M12 15V4m0 0L7.5 8.5M12 4l4.5 4.5" />
+    <path d="M4 19h16" />
+  </svg>
+);
+
+export const IconCheckCircle = (p: P) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="m8.5 12.5 2.5 2.5 5-5.5" />
+  </svg>
+);
+
+export const IconExternal = (p: P) => (
+  <svg {...base(p)}>
+    <rect x="4" y="4" width="16" height="16" rx="3" />
+    <path d="M10 14 19 5m0 0h-5m5 0v5" />
+  </svg>
+);
+
+export const IconDotsV = (p: P) => (
+  <svg {...base(p)} fill="currentColor" stroke="none">
+    <circle cx="12" cy="5" r="1.7" />
+    <circle cx="12" cy="12" r="1.7" />
+    <circle cx="12" cy="19" r="1.7" />
+  </svg>
+);
+
+export const IconGrid = (p: P) => (
+  <svg {...base(p)}>
+    <rect x="4" y="4" width="7" height="7" rx="1.5" />
+    <rect x="13" y="4" width="7" height="7" rx="1.5" />
+    <rect x="4" y="13" width="7" height="7" rx="1.5" />
+    <rect x="13" y="13" width="7" height="7" rx="1.5" />
+  </svg>
+);
+
+export const IconPhone = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M5 4h4l1.5 4.5L8 10a12 12 0 0 0 6 6l1.5-2.5L20 15v4a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 3 6.2 2 2 0 0 1 5 4Z" />
+  </svg>
+);
+
+export const IconMail = (p: P) => (
+  <svg {...base(p)}>
+    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <path d="m4 7 8 6 8-6" />
+  </svg>
+);
+
+export const IconBulb = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M9 18h6M10 21h4" />
+    <path d="M12 3a6 6 0 0 1 3.5 10.9c-.8.6-1.5 1.4-1.5 2.6V17h-4v-.5c0-1.2-.7-2-1.5-2.6A6 6 0 0 1 12 3Z" />
+  </svg>
+);
+
+export const IconAward = (p: P) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="9" r="5" />
+    <path d="m8.5 13-1.5 8 5-2.5L17 21l-1.5-8" />
+    <path d="m12 6.5.9 1.8 2 .3-1.4 1.4.3 2-1.8-1-1.8 1 .3-2-1.4-1.4 2-.3L12 6.5Z" />
+  </svg>
+);
+
+export const IconTrendUp = (p: P) => (
+  <svg {...base(p)}>
+    <path d="m4 16 5-5 3.5 3.5L20 7" />
+    <path d="M15 7h5v5" />
+  </svg>
+);
+
+export const IconChartBar = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M4 20V4" />
+    <path d="M4 20h16" />
+    <path d="M8 16v-5M12 16V7M16 16v-3" />
+  </svg>
+);
+
+export const IconPlus = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M12 5v14M5 12h14" />
+  </svg>
+);
+
+export const IconPlusCircle = (p: P) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 8.5v7M8.5 12h7" />
+  </svg>
+);
+
+export const IconKeyboard = (p: P) => (
+  <svg {...base(p)}>
+    <rect x="3" y="6" width="18" height="12" rx="2" />
+    <path d="M7 10h.01M11 10h.01M15 10h.01M19 10h.01M7 14h10" />
+  </svg>
+);
+
+export const IconCamera = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M4 8h3l2-2.5h6L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z" />
+    <circle cx="12" cy="13" r="3.5" />
+  </svg>
+);
+
+export const IconMenu = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M4 7h16M4 12h16M4 17h16" />
+  </svg>
+);
+
+export const IconX = (p: P) => (
+  <svg {...base(p)}>
+    <path d="m6 6 12 12M18 6 6 18" />
+  </svg>
+);
+
+export const IconArchive = (p: P) => (
+  <svg {...base(p)}>
+    <rect x="3" y="4" width="18" height="5" rx="1" />
+    <path d="M5 9v11h14V9" />
+    <path d="M10 13h4" />
+  </svg>
+);
+
+export const IconSearch = (p: P) => (
+  <svg {...base(p)}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="m20 20-3.8-3.8" />
+  </svg>
+);
+
+export const IconChevronDown = (p: P) => (
+  <svg {...base(p)}>
+    <path d="m5 9 7 7 7-7" />
+  </svg>
+);
+
+export const IconStamp = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M12 3a4 4 0 0 1 4 4c0 2.5-1 3.5-1 5h-6c0-1.5-1-2.5-1-5a4 4 0 0 1 4-4Z" />
+    <path d="M9 12v3H7.5A2.5 2.5 0 0 0 5 17.5V19h14v-1.5a2.5 2.5 0 0 0-2.5-2.5H15v-3" />
+    <path d="M4 21h16" />
+  </svg>
+);
+
 // Fresa de los sellos: rellena o en contorno.
 export function StampStrawberry({
   filled,

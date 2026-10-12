@@ -232,6 +232,84 @@ export async function updateCustomer(orgSlug: string, customerId: string, formDa
   redirect(back + "?ok=" + encodeURIComponent("Cliente actualizado."));
 }
 
+// Fila de CSV ya parseada en el cliente (importación masiva).
+export type CsvRow = {
+  first_name: string;
+  last_name?: string;
+  email?: string;
+  phone?: string;
+};
+
+// Importación masiva desde CSV (botón "Importar CSV" del panel Fruppy).
+// Omite duplicados por email/teléfono ya registrados en la organización.
+export async function importCustomers(orgSlug: string, rows: CsvRow[]) {
+  const { supabase, user, orgId } = await requireMembership(orgSlug);
+
+  const clean = rows
+    .slice(0, 200)
+    .map((r) => ({
+      first_name: displayName(String(r.first_name ?? "").trim()).slice(0, 80),
+      last_name: r.last_name ? displayName(r.last_name.trim()).slice(0, 80) : null,
+      email: r.email?.trim() || null,
+      phone: r.phone?.trim().slice(0, 32) || null,
+    }))
+    .filter((r) => r.first_name.length > 0 && (!r.email || EMAIL_RE.test(r.email)));
+
+  if (clean.length === 0) return { created: 0, skipped: rows.length };
+
+  // Duplicados existentes por email o teléfono dentro de la org.
+  const emails = [...new Set(clean.map((r) => r.email).filter(Boolean))] as string[];
+  const phones = [...new Set(clean.map((r) => r.phone).filter(Boolean))] as string[];
+  const clauses: string[] = [];
+  const safe = (v: string) => v.replace(FILTER_BAD, "");
+  for (const v of emails) if (safe(v)) clauses.push(`email.eq.${safe(v)}`);
+  for (const v of phones) if (safe(v)) clauses.push(`phone.eq.${safe(v)}`);
+
+  const existing = new Set<string>();
+  if (clauses.length > 0) {
+    const { data: dups } = await supabase
+      .from("customers")
+      .select("email, phone")
+      .eq("organization_id", orgId)
+      .or(clauses.join(","))
+      .limit(500);
+    for (const d of dups ?? []) {
+      if (d.email) existing.add(`e:${d.email}`);
+      if (d.phone) existing.add(`p:${d.phone}`);
+    }
+  }
+
+  const seen = new Set<string>();
+  const toInsert = clean.filter((r) => {
+    const keys = [r.email && `e:${r.email}`, r.phone && `p:${r.phone}`].filter(
+      Boolean,
+    ) as string[];
+    if (keys.some((k) => existing.has(k) || seen.has(k))) return false;
+    keys.forEach((k) => seen.add(k));
+    return true;
+  });
+
+  let created = 0;
+  if (toInsert.length > 0) {
+    const { data: inserted, error } = await supabase
+      .from("customers")
+      .insert(toInsert.map((r) => ({ ...r, organization_id: orgId })))
+      .select("id");
+    if (error) {
+      console.error("[importCustomers]", error.code, error.message);
+      throw new Error("No se pudieron importar los clientes.");
+    }
+    created = inserted?.length ?? 0;
+  }
+
+  await audit(orgId, user.id, "customer.imported", "customer", orgId, {
+    created,
+    skipped: rows.length - created,
+  });
+  revalidatePath(`/dashboard/${orgSlug}/customers`);
+  return { created, skipped: rows.length - created };
+}
+
 // Consentimiento como evento separado con auditoría propia (F3-T6).
 export async function setMarketingConsent(orgSlug: string, customerId: string, consent: boolean) {
   const { supabase, user, orgId } = await requireMembership(orgSlug);

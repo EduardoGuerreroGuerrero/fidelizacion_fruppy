@@ -1,6 +1,9 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { saveProgram, setProgramStatus } from "@/lib/admin/actions";
+import { FruppyPrograms, type ProgramRow } from "../_fruppy/programs";
+import { PageHead } from "../_fruppy/ui";
+import { FRUPPY_SLUG } from "../_fruppy/config";
 
 export const instant = false;
 
@@ -34,6 +37,60 @@ export default async function ProgramsPage({
     .select("id, name, program_type, stamp_goal, points_per_currency_unit, status")
     .eq("organization_id", org.id)
     .order("created_at", { ascending: false });
+
+  if (slug === FRUPPY_SLUG) {
+    const [{ data: accounts }, { count: rewardsCount }] = await Promise.all([
+      supabase
+        .from("loyalty_accounts")
+        .select("program_id")
+        .eq("organization_id", org.id)
+        .limit(5000),
+      supabase
+        .from("rewards")
+        .select("id", { count: "exact", head: true })
+        .eq("organization_id", org.id)
+        .eq("status", "active"),
+    ]);
+
+    const participantsByProgram = new Map<string, number>();
+    for (const a of accounts ?? []) {
+      participantsByProgram.set(
+        a.program_id,
+        (participantsByProgram.get(a.program_id) ?? 0) + 1,
+      );
+    }
+
+    const rows: ProgramRow[] = (programs ?? []).map((p) => ({
+      id: p.id,
+      name: p.name,
+      program_type: p.program_type,
+      stamp_goal: p.stamp_goal,
+      points_per_currency_unit: p.points_per_currency_unit,
+      status: p.status,
+      participants: participantsByProgram.get(p.id) ?? 0,
+    }));
+
+    return (
+      <div>
+        <PageHead
+          orgName={org.name}
+          base={`/dashboard/${slug}`}
+          current="Programas"
+          title="Programas de fidelización"
+          subtitle="Crea y administra los programas con los que premias a tus clientes"
+          art="/brand/promo-3.jpg"
+        />
+        <FruppyPrograms
+          slug={slug}
+          programs={rows}
+          totalParticipants={accounts?.length ?? 0}
+          rewardsCount={rewardsCount ?? 0}
+          error={error}
+          ok={ok}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-3xl">
