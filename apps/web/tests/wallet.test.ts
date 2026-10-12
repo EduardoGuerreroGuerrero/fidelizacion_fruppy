@@ -55,19 +55,16 @@ test("issuePass lanza WalletNotConfiguredError sin credenciales", async () => {
     const p = new PassletWalletProvider();
     await assert.rejects(
       () =>
-        p.issuePass(
-          {
-            serialNumber: "s1",
-            orgName: "Org",
-            firstName: "Ana",
-            programName: "Café",
-            stamps: { current: 3, goal: 9 },
-            points: null,
-            cardUrl: "https://x/t/tok",
-            revoked: false,
-          },
-          async () => null,
-        ),
+        p.issuePass({
+          serialNumber: "s1",
+          orgName: "Org",
+          firstName: "Ana",
+          programName: "Café",
+          stamps: { current: 3, goal: 9 },
+          points: null,
+          cardUrl: "https://x/t/tok",
+          revoked: false,
+        }),
       WalletNotConfiguredError,
     );
   } finally {

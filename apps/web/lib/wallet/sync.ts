@@ -93,11 +93,7 @@ export async function syncWalletPass(orgSlug: string, customerId: string): Promi
   }
 
   try {
-    const result = await walletProvider.issuePass(passData, async (serial) => {
-      // load() para updates: reconstruye el contenido desde la DB.
-      if (serial !== card.id) return null;
-      return null; // TODO: re-render PassContent desde DB (Fase 6 con credenciales reales)
-    });
+    const result = await walletProvider.issuePass(passData);
     if (result.applePkpass) await record("apple", "active", null);
     if (result.googleSaveUrl) await record("google", "active", null);
     return { ok: true, detail: "synced" };
