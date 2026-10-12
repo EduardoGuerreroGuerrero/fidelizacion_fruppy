@@ -1,5 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
+import { signOut } from "@/lib/auth/actions";
 import { OrgNav } from "./nav";
+import { FruppyShell } from "./_fruppy/shell";
+import { FRUPPY_SLUG } from "./_fruppy/config";
+import { displayName } from "@/lib/format";
 
 export const instant = false;
 
@@ -24,6 +28,13 @@ const NAV_SECONDARY_ADMIN = [
   ["audit", "Auditoría"],
   ["settings", "Config"],
 ] as const;
+
+const ROLE_LABEL: Record<string, string> = {
+  owner: "Propietario",
+  admin: "Administrador",
+  manager: "Gerente",
+  staff: "Colaborador",
+};
 
 export default async function OrgLayout({
   children,
@@ -63,6 +74,30 @@ export default async function OrgLayout({
     ...(isManager ? NAV_SECONDARY_MANAGER : []),
     ...(isAdmin ? NAV_SECONDARY_ADMIN : []),
   ];
+
+  // UI de marca propia solo para Fruppy Helados (mockups "Panel admin-owner").
+  if (org === FRUPPY_SLUG) {
+    const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
+    const metaName = [meta.first_name, meta.last_name]
+      .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
+      .join(" ");
+    const userName = displayName(
+      metaName || String(user?.email ?? "usuario").split("@")[0],
+    );
+    return (
+      <FruppyShell
+        base={`/dashboard/${org}`}
+        orgName={orgName ?? org}
+        userName={userName}
+        roleLabel={ROLE_LABEL[role ?? ""] ?? "Equipo"}
+        nav={nav}
+        secondary={secondary}
+        signOut={signOut}
+      >
+        {children}
+      </FruppyShell>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-5xl">
