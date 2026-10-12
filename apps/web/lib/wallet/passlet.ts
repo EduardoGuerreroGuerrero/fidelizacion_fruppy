@@ -144,7 +144,8 @@ export class PassletWalletProvider implements WalletProvider {
               base: `${baseUrl}/brand/wallet-icon.png`,
               retina: `${baseUrl}/brand/wallet-icon@2x.png`,
             },
-            logo: `${baseUrl}/brand/wallet-logo.png`,
+            // ?v=2: Google cachea imágenes por URL; versionado para refresco.
+            logo: `${baseUrl}/brand/wallet-logo.png?v=2`,
             logoText: data.orgName,
             description: `${data.programName} — ${data.orgName}`,
           }
@@ -152,8 +153,8 @@ export class PassletWalletProvider implements WalletProvider {
       google: baseUrl
         ? {
             issuerName: data.orgName,
-            logo: `${baseUrl}/brand/wallet-logo.png`,
-            hero: `${baseUrl}/brand/wallet-hero.png`,
+            logo: `${baseUrl}/brand/wallet-logo.png?v=2`,
+            hero: `${baseUrl}/brand/wallet-hero.png?v=2`,
           }
         : undefined,
       fields: [
