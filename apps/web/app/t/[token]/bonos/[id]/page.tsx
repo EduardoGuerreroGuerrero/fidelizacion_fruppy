@@ -43,12 +43,6 @@ export default async function BonoDetalle({
       <div className={`relative mx-5 mt-2 overflow-hidden rounded-[28px] ${style.bg} p-6`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={`/brand/bono-photo-${n}.jpg`}
-          alt=""
-          className="absolute -top-5 right-0 h-24 w-28 object-cover"
-        />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
           src={`/brand/bono-icon-${n}.jpg`}
           alt=""
           className="size-24 rounded-full object-cover shadow-md"

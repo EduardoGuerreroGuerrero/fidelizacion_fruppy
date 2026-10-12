@@ -76,13 +76,6 @@ export function RewardCard({
     <div
       className={`relative mx-5 mb-4 overflow-hidden rounded-[26px] ${style.bg} p-4 pl-3`}
     >
-      {/* foto que sangra por la esquina superior derecha */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={`/brand/bono-photo-${n}.jpg`}
-        alt=""
-        className="absolute -top-5 right-0 h-24 w-28 object-cover"
-      />
       <div className="relative flex items-center gap-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -90,7 +83,7 @@ export function RewardCard({
           alt=""
           className="size-20 shrink-0 rounded-full object-cover shadow-sm"
         />
-        <div className="min-w-0 flex-1 pr-16">
+        <div className="min-w-0 flex-1">
           <p className="font-semibold leading-tight text-ink">{reward.name}</p>
           <p className="mt-1 text-[13px] leading-snug text-ink-soft">
             {missing > 0
@@ -99,7 +92,7 @@ export function RewardCard({
           </p>
         </div>
       </div>
-      <div className="relative mt-3 flex items-end justify-between">
+      <div className="relative mt-3 flex flex-wrap items-center gap-2">
         {isStamps ? (
           <StampMini current={current} goal={goal} />
         ) : (
@@ -109,7 +102,7 @@ export function RewardCard({
         )}
         <Link
           href={`${base}/bonos/${reward.id}`}
-          className={`shrink-0 whitespace-nowrap rounded-full px-5 py-2 text-[13px] font-semibold text-white shadow-sm ${style.btn}`}
+          className={`ml-auto shrink-0 whitespace-nowrap rounded-full px-5 py-2 text-[13px] font-semibold text-white shadow-sm ${style.btn}`}
         >
           Ver detalles
         </Link>
