@@ -66,9 +66,9 @@ export default async function MiPerfil({
         <div className="relative z-10 p-5 pb-14">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/brand/logo-circle.jpg"
+            src="/brand/logo.png"
             alt="Fruppy Helados"
-            className="size-20 rounded-full shadow-lg"
+            className="h-20 w-auto object-contain drop-shadow-lg"
           />
           <p className="mt-3 text-xl font-semibold text-white">
             {card.first_name}

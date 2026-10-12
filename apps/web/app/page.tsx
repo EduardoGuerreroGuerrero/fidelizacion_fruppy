@@ -3,15 +3,10 @@ import Link from "next/link";
 export default function Home() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-6 bg-pastel-mint/40 p-8 text-center">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/brand/logo-circle.jpg"
-        alt="Fruppy Helados"
-        className="size-24 rounded-full shadow-lg"
-      />
-      <h1 className="text-4xl font-bold tracking-tight text-ink">Fruppy</h1>
+      {/* Nivel SaaS: sin logo de ningún comercio. */}
+      <h1 className="text-4xl font-bold tracking-tight text-ink">Fidelización</h1>
       <p className="max-w-md text-lg text-ink-soft">
-        Fidelización, CRM y tarjetas digitales para comercios locales.
+        CRM y tarjetas digitales para comercios locales.
       </p>
       <div className="flex gap-3">
         <Link
