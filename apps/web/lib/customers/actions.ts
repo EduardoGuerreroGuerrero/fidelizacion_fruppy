@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { displayName } from "@/lib/format";
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -37,8 +38,9 @@ function validateCustomerInput(formData: FormData): {
 
   return {
     values: {
-      first_name: firstName,
-      last_name: lastName,
+      // Capitalización consistente al escribir, no solo al mostrar.
+      first_name: displayName(firstName),
+      last_name: lastName ? displayName(lastName) : lastName,
       email,
       phone,
       birth_date: birthDate,
@@ -149,7 +151,7 @@ export async function createCustomer(orgSlug: string, formData: FormData) {
           "&warn=" +
           encodeURIComponent(
             `Posible duplicado: coincide teléfono/email con ${dups
-              .map((d) => `${d.first_name} ${d.last_name ?? ""}`.trim())
+              .map((d) => displayName(`${d.first_name} ${d.last_name ?? ""}`))
               .join(", ")}. Marca "crear de todas formas" para continuar.`,
           ),
       );

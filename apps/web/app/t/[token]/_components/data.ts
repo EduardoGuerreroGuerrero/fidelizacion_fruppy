@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { displayName } from "@/lib/format";
 
 export type CardReward = {
   id: string;
@@ -45,7 +46,9 @@ export type CardAppData = {
 export async function getCardAppData(token: string): Promise<CardAppData | null> {
   const supabase = await createClient();
   const { data } = await supabase.rpc("get_card_app_data", { p_token: token });
-  return data as CardAppData | null;
+  if (!data) return null;
+  const card = data as CardAppData;
+  return { ...card, first_name: displayName(card.first_name) };
 }
 
 export function formatDateTime(iso: string) {

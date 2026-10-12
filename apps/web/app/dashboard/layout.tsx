@@ -20,14 +20,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <div className="flex min-h-screen flex-col bg-[#f7f8fa]">
       <header className="flex items-center justify-between gap-3 border-b border-neutral-100 bg-white px-4 py-3 sm:px-6">
+        {/* Nivel SaaS: la marca del comercio va en dashboard/[org]/layout,
+            donde sí hay organización seleccionada. */}
         <span className="flex min-w-0 items-center gap-2.5 font-semibold text-ink">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/brand/logo-sm.png"
-            alt=""
-            className="h-9 w-auto shrink-0 object-contain"
-          />
-          Fruppy
+          Fidelización
         </span>
         <div className="flex min-w-0 items-center gap-3 text-sm sm:gap-4">
           <span className="hidden truncate text-ink-soft sm:inline">{user.email}</span>

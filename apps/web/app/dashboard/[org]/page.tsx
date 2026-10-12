@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { displayName } from "@/lib/format";
 
 export const instant = false;
 
@@ -88,7 +89,7 @@ export default async function OrgPage({ params }: { params: Promise<{ org: strin
               className="flex items-center justify-between rounded-2xl bg-white px-4 py-3 text-sm shadow-sm ring-1 ring-neutral-100"
             >
               <span className="font-medium text-ink">
-                Visita de {c?.first_name} {c?.last_name ?? ""}
+                Visita de {displayName(`${c?.first_name ?? ""} ${c?.last_name ?? ""}`)}
               </span>
               <span className="text-xs text-ink-soft">
                 {new Date(v.created_at).toLocaleString("es-CO")} · {v.source}

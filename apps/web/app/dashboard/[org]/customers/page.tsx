@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { displayName } from "@/lib/format";
 
 export const instant = false;
 
@@ -111,7 +112,7 @@ export default async function CustomersPage({
               >
                 <div className="min-w-0">
                   <p className="font-medium">
-                    {c.first_name} {c.last_name ?? ""}
+                    {displayName(`${c.first_name} ${c.last_name ?? ""}`)}
                   </p>
                   <p className="break-all text-sm text-neutral-500">
                     {[c.email, c.phone].filter(Boolean).join(" · ") || "—"}

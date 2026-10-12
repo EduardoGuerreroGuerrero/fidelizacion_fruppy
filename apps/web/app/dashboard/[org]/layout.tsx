@@ -40,15 +40,18 @@ export default async function OrgLayout({
   } = await supabase.auth.getUser();
 
   let role: string | null = null;
+  let orgName: string | null = null;
   if (user) {
     const { data: m } = await supabase
       .from("organization_members")
-      .select("role, organizations!inner(slug)")
+      .select("role, organizations!inner(slug, name)")
       .eq("user_id", user.id)
       .eq("status", "active")
       .eq("organizations.slug", org)
       .maybeSingle();
     role = m?.role ?? null;
+    const o = m?.organizations as { name?: string } | { name?: string }[] | null;
+    orgName = (Array.isArray(o) ? o[0]?.name : o?.name) ?? null;
   }
 
   const isManager = role === "manager" || role === "admin" || role === "owner";
@@ -63,6 +66,12 @@ export default async function OrgLayout({
 
   return (
     <div className="mx-auto max-w-5xl">
+      {/* Marca de la organización seleccionada (logo + nombre registrado) */}
+      <div className="mb-3 flex items-center gap-2.5 px-1">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/brand/logo-sm.png" alt="" className="h-9 w-auto shrink-0 object-contain" />
+        <span className="font-semibold text-ink">{orgName ?? org}</span>
+      </div>
       <OrgNav base={`/dashboard/${org}`} items={nav} secondary={secondary} />
       {children}
     </div>
