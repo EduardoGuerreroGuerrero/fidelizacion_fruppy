@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient, supabaseAdmin } from "@/lib/supabase/server";
 import { walletProvider } from "./passlet";
 import { WalletNotConfiguredError, type WalletPassData } from "./provider";
+import { displayName } from "@/lib/format";
 
 // Sincronización Wallet: wallet_passes es ESPEJO técnico (serial, estado,
 // último error). Nunca toca el ledger — un fallo de Wallet no revierte
@@ -49,7 +50,7 @@ export async function syncWalletPass(orgSlug: string, customerId: string): Promi
   const passData: WalletPassData = {
     serialNumber: card.id,
     orgName: org.name,
-    firstName: cust?.first_name ?? "Cliente",
+    firstName: displayName(cust?.first_name) || "Cliente",
     programName: prog?.name ?? "Fidelización",
     stamps:
       prog?.program_type === "stamps"

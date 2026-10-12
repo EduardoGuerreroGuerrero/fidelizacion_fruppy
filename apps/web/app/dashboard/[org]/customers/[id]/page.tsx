@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { findDuplicates, setMarketingConsent, updateCustomer } from "@/lib/customers/actions";
+import { displayName } from "@/lib/format";
 import {
   issueCard,
   redeemReward,
@@ -173,10 +174,10 @@ export default async function CustomerPage({
         <Link href={`/dashboard/${slug}/customers`} className="hover:underline">
           Clientes
         </Link>{" "}
-        / {customer.first_name} {customer.last_name ?? ""}
+        / {displayName(`${customer.first_name} ${customer.last_name ?? ""}`)}
       </p>
       <h1 className="mb-6 mt-1 text-2xl font-semibold">
-        {customer.first_name} {customer.last_name ?? ""}
+        {displayName(`${customer.first_name} ${customer.last_name ?? ""}`)}
       </h1>
 
       {error && (
@@ -196,7 +197,7 @@ export default async function CustomerPage({
             <span key={d.id}>
               {i > 0 && ", "}
               <Link href={`/dashboard/${slug}/customers/${d.id}`} className="font-medium underline">
-                {d.first_name} {d.last_name ?? ""}
+                {displayName(`${d.first_name} ${d.last_name ?? ""}`)}
               </Link>
             </span>
           ))}

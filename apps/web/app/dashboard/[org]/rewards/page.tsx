@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { saveReward, setRewardStatus } from "@/lib/admin/actions";
+import { displayName } from "@/lib/format";
 
 export const instant = false;
 
@@ -161,7 +162,7 @@ export default async function RewardsPage({
               className="flex items-center justify-between rounded-lg border border-neutral-200 px-4 py-2 text-sm dark:border-neutral-800"
             >
               <span>
-                {rw?.name ?? "?"} — {cu?.first_name} {cu?.last_name ?? ""}
+                {rw?.name ?? "?"} — {displayName(`${cu?.first_name ?? ""} ${cu?.last_name ?? ""}`)}
               </span>
               <span className="text-neutral-500">
                 {new Date(r.created_at).toLocaleString("es-CO")} · {r.status}
