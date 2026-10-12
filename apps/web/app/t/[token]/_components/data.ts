@@ -35,6 +35,7 @@ export type CardAppData = {
   current_stamps: number;
   current_points: number;
   card_status: string;
+  consent_pending: boolean;
   rewards: CardReward[];
   locations: CardLocation[];
   visits: CardVisit[];
