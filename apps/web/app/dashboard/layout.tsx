@@ -23,9 +23,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <span className="flex min-w-0 items-center gap-2.5 font-semibold text-ink">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/brand/logo-circle.jpg"
+            src="/brand/logo-sm.png"
             alt=""
-            className="size-9 shrink-0 rounded-full shadow-sm"
+            className="h-9 w-auto shrink-0 object-contain"
           />
           Fruppy
         </span>

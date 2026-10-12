@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Fruppy — Fidelización y tarjetas digitales",
+  title: "Fidelización — CRM y tarjetas digitales",
   description: "SaaS de fidelización, CRM y tarjetas Wallet para comercios locales",
 };
 

@@ -34,9 +34,9 @@ export function LoyaltyCard({
         <div className="flex items-start justify-between">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/brand/logo-circle.jpg"
+            src="/brand/logo.png"
             alt="Fruppy Helados"
-            className="size-16 rounded-full shadow-md"
+            className="h-16 w-auto object-contain drop-shadow-md"
           />
           <Link
             href={qrHref}

@@ -52,9 +52,9 @@ export default async function Escanear({
           <div className="flex items-start justify-between">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/brand/logo-circle.jpg"
+              src="/brand/logo.png"
               alt="Fruppy Helados"
-              className="size-14 rounded-full shadow-md"
+              className="h-14 w-auto object-contain drop-shadow-md"
             />
             <span className="text-right">
               <p className="font-semibold">{card.first_name}</p>
