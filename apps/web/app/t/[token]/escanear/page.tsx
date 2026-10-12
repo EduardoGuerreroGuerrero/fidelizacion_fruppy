@@ -41,19 +41,12 @@ export default async function Escanear({
 
   return (
     <>
-      <TitleBar title="Escanear" href={base} />
+      <TitleBar title="Mostrar mi QR" href={base} />
 
       {/* Tarjeta con el QR */}
       <div className="relative mx-5 mt-2 overflow-hidden rounded-[28px] bg-brand shadow-lg shadow-brand/25">
         <span className="absolute -left-16 -top-20 size-56 rounded-full bg-white/10" />
         <span className="absolute -right-10 -bottom-24 size-64 rounded-full bg-white/10" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/brand/scan-photo.jpg"
-          alt=""
-          className="absolute inset-y-0 right-0 h-full w-[30%] object-cover opacity-90"
-        />
-        <span className="absolute inset-y-0 right-0 w-[30%] bg-gradient-to-r from-brand via-brand/60 to-transparent" />
 
         <div className="relative z-10 p-5 text-white">
           <div className="flex items-start justify-between">
