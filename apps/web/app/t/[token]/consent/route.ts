@@ -14,8 +14,9 @@ export async function POST(req: Request, ctx: { params: Promise<{ token: string 
     return NextResponse.redirect(back, 303);
   }
 
-  const form = await req.formData();
-  if (form.get("data_consent") !== "on") {
+  // POST vacío o sin content-type de formulario → no hay consentimiento.
+  const form = await req.formData().catch(() => null);
+  if (!form || form.get("data_consent") !== "on") {
     return NextResponse.redirect(back, 303);
   }
 
