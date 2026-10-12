@@ -27,6 +27,7 @@ export default async function CardHome({
   const current = isStamps ? card.current_stamps : card.current_points;
   const goal = card.stamp_goal;
   const revoked = card.card_status !== "active";
+  const consentPending = card.consent_pending === true;
 
   // Siguiente recompensa: la de menor costo que aún no alcanza; si ya alcanza
   // todas, la primera de la lista.
@@ -54,6 +55,49 @@ export default async function CardHome({
         <p className="mx-5 mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
           Tarjeta revocada — solicita una nueva en el comercio.
         </p>
+      ) : null}
+
+      {/* Consentimiento — solo la primera vez; al aceptar desaparece. */}
+      {consentPending ? (
+        <form
+          method="post"
+          action={`${base}/consent`}
+          className="mx-5 mt-4 rounded-2xl border border-brand/30 bg-brand/5 p-4"
+        >
+          <p className="text-sm font-semibold text-ink">Autorizaciones</p>
+          <label className="mt-3 flex items-start gap-2.5 text-[13px] leading-snug text-ink">
+            <input
+              type="checkbox"
+              name="data_consent"
+              required
+              className="mt-0.5 size-4 shrink-0 accent-brand"
+            />
+            <span>
+              Autorizo el tratamiento de mis datos personales conforme a la{" "}
+              <Link href={`${base}/perfil/privacidad`} className="font-medium text-brand underline">
+                política de privacidad
+              </Link>
+              . <span className="text-ink-soft">(obligatorio)</span>
+            </span>
+          </label>
+          <label className="mt-2.5 flex items-start gap-2.5 text-[13px] leading-snug text-ink">
+            <input
+              type="checkbox"
+              name="marketing_consent"
+              className="mt-0.5 size-4 shrink-0 accent-brand"
+            />
+            <span>
+              Acepto recibir publicidad y mensajes promocionales.{" "}
+              <span className="text-ink-soft">(opcional)</span>
+            </span>
+          </label>
+          <button
+            type="submit"
+            className="mt-3.5 w-full rounded-xl bg-brand py-2.5 text-sm font-semibold text-white"
+          >
+            Confirmar
+          </button>
+        </form>
       ) : null}
 
       {isStamps ? (
