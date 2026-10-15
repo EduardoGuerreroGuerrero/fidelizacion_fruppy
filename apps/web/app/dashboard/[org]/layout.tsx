@@ -111,6 +111,14 @@ export default async function OrgLayout({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/brand/logo-sm.png" alt="" className="h-9 w-auto shrink-0 object-contain" />
         <span className="font-semibold text-ink">{orgName ?? org}</span>
+        <form action={signOut} className="ml-auto">
+          <button
+            type="submit"
+            className="rounded-full bg-accent-soft px-4 py-1.5 text-sm font-medium text-accent transition hover:bg-accent/20"
+          >
+            Salir
+          </button>
+        </form>
       </div>
       <OrgNav base={`/dashboard/${org}`} items={nav} secondary={secondary} />
       {children}

@@ -46,6 +46,11 @@ ruff check scripts/                                                   # lint Pyt
   producción. Audit de prod: `npm audit --omit=dev`.
 - Supabase MCP: server `supabase-mcp-server` disponible. Neon MCP: proyecto
   `fruppy-agentkit` (usar solo ramas temporales para pruebas).
+- Marca SaaS: PineappleLoyalty. Assets en `apps/web/public/pineapple/`
+  (intro.mp4, logo.png horizontal, logo-vertical.png, brand-board.png);
+  paleta `pl-*` en `globals.css`. El intro de `/` salta a `/login` si el
+  video falla — Playwright headless no trae codec H.264 y emula
+  `prefers-reduced-motion`, así que ahí el intro se omite siempre.
 
 ## Checklist
 

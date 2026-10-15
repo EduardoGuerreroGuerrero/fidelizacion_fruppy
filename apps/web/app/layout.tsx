@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Fidelización — CRM y tarjetas digitales",
+  title: "PineappleLoyalty — Make every visit count.",
   description: "SaaS de fidelización, CRM y tarjetas Wallet para comercios locales",
 };
 
