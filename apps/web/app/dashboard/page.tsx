@@ -6,6 +6,7 @@ import {
   IconStore,
 } from "@/app/t/[token]/_components/icons";
 import { initials, FRUPPY_SLUG } from "./[org]/_fruppy/config";
+import { OrgLogo } from "./org-logo";
 
 const STATUS_BADGE: Record<string, { label: string; chip: string; dot: string }> =
   {
@@ -120,16 +121,12 @@ export default async function DashboardPage() {
                         : undefined
                     }
                   >
-                    {logoUrl ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img
-                        src={logoUrl}
-                        alt=""
-                        className="size-full object-cover"
-                      />
-                    ) : (
-                      initials(org.name) || "?"
-                    )}
+                    <OrgLogo
+                      src={logoUrl}
+                      className="size-full object-contain p-1.5"
+                    >
+                      {initials(org.name) || "?"}
+                    </OrgLogo>
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-lg font-bold text-ink">
