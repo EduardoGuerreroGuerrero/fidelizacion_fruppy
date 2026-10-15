@@ -38,9 +38,12 @@ Generar el par VAPID una vez: `npx web-push generate-vapid-keys`.
 
 ## 3. Cron de colas
 
-`apps/web/vercel.json` programa `GET /api/cron/drain` cada 10 min.
+`apps/web/vercel.json` programa `GET /api/cron/drain` a diario (13:00 UTC).
 Vercel envía `Authorization: Bearer $CRON_SECRET` automáticamente cuando la
-variable existe. El cron:
+variable existe. NOTA: el plan Hobby solo permite crons diarios — con plan
+Pro se puede subir a `*/10 * * * *` para drenar la cola cada 10 min, o usar
+un scheduler externo (GitHub Actions, pg_cron) que haga GET con el Bearer.
+El cron:
 
 - Drena `email_outbox` (bienvenida y reentrega de tarjeta; máx. 5 intentos).
 - Procesa `push_deliveries` (lotes de 50, 1 reintento, baja de endpoints
