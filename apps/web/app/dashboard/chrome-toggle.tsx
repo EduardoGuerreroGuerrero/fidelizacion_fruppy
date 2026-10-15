@@ -27,14 +27,14 @@ export function DashboardChrome({
 
   return (
     <div className="flex min-h-screen flex-col bg-pl-bg">
-      <header className="flex items-center justify-between gap-3 border-b border-black/[0.04] bg-white px-4 py-3 sm:px-8">
+      <header className="flex items-center justify-between gap-3 border-b border-black/[0.04] bg-white px-4 py-2.5 sm:px-8">
         {/* Nivel SaaS: marca PineappleLoyalty — la marca del comercio va en
             dashboard/[org]/layout, donde sí hay organización seleccionada. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/pineapple/logo.png"
           alt="PineappleLoyalty"
-          className="h-9 w-auto"
+          className="h-14 w-auto sm:h-12"
         />
         <div className="flex min-w-0 items-center gap-3 text-sm sm:gap-4">
           <span className="hidden truncate text-ink-soft sm:inline">

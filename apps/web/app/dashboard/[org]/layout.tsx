@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/lib/auth/actions";
 import { OrgNav } from "./nav";
+import { OrgLogo } from "../org-logo";
 import { FruppyShell } from "./_fruppy/shell";
 import { FRUPPY_SLUG, initials } from "./_fruppy/config";
 import { displayName } from "@/lib/format";
@@ -130,14 +131,11 @@ export default async function OrgLayout({
     >
       {/* Marca de la organización seleccionada (logo subido o iniciales) */}
       <div className="mb-3 flex items-center gap-2.5 px-1">
-        {logoUrl ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={logoUrl} alt="" className="h-9 w-auto shrink-0 object-contain" />
-        ) : (
+        <OrgLogo src={logoUrl} className="h-9 w-auto shrink-0 object-contain">
           <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-pl-cream text-sm font-bold text-pl-green">
             {initials(orgName ?? org) || "?"}
           </span>
-        )}
+        </OrgLogo>
         <span className="font-semibold text-ink">{orgName ?? org}</span>
         <form action={signOut} className="ml-auto">
           <button
