@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/lib/auth/actions";
 import { OrgNav } from "./nav";
 import { FruppyShell } from "./_fruppy/shell";
-import { FRUPPY_SLUG } from "./_fruppy/config";
+import { FRUPPY_SLUG, initials } from "./_fruppy/config";
 import { displayName } from "@/lib/format";
 
 export const instant = false;
@@ -57,17 +57,27 @@ export default async function OrgLayout({
 
   let role: string | null = null;
   let orgName: string | null = null;
+  let logoUrl: string | null = null;
   if (user) {
     const { data: m } = await supabase
       .from("organization_members")
-      .select("role, organizations!inner(slug, name)")
+      .select("role, organizations!inner(slug, name, brand)")
       .eq("user_id", user.id)
       .eq("status", "active")
       .eq("organizations.slug", org)
       .maybeSingle();
     role = m?.role ?? null;
-    const o = m?.organizations as { name?: string } | { name?: string }[] | null;
-    orgName = (Array.isArray(o) ? o[0]?.name : o?.name) ?? null;
+    const o = m?.organizations as
+      | { name?: string; brand?: { logo_url?: string } }
+      | { name?: string; brand?: { logo_url?: string } }[]
+      | null;
+    const orgRow = Array.isArray(o) ? o[0] : o;
+    orgName = orgRow?.name ?? null;
+    const raw = orgRow?.brand?.logo_url;
+    logoUrl =
+      raw && (!raw.startsWith("data:") || raw.startsWith("data:image/png"))
+        ? raw
+        : null;
   }
 
   const isManager = role === "manager" || role === "admin" || role === "owner";
@@ -105,11 +115,29 @@ export default async function OrgLayout({
   }
 
   return (
-    <div className="mx-auto max-w-5xl">
-      {/* Marca de la organización seleccionada (logo + nombre registrado) */}
+    // Las vars --color-brand se sobreescriben a la paleta PineappleLoyalty
+    // solo para el panel genérico: el shell Fruppy retorna antes y conserva
+    // su teal de marca. Así los utilities bg/text-brand internos se ven PL.
+    <div
+      className="mx-auto max-w-5xl"
+      style={
+        {
+          "--color-brand": "#0f5132",
+          "--color-brand-dark": "#0b3d25",
+          "--color-brand-soft": "#e2f5e9",
+        } as React.CSSProperties
+      }
+    >
+      {/* Marca de la organización seleccionada (logo subido o iniciales) */}
       <div className="mb-3 flex items-center gap-2.5 px-1">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/brand/logo-sm.png" alt="" className="h-9 w-auto shrink-0 object-contain" />
+        {logoUrl ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img src={logoUrl} alt="" className="h-9 w-auto shrink-0 object-contain" />
+        ) : (
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-pl-cream text-sm font-bold text-pl-green">
+            {initials(orgName ?? org) || "?"}
+          </span>
+        )}
         <span className="font-semibold text-ink">{orgName ?? org}</span>
         <form action={signOut} className="ml-auto">
           <button

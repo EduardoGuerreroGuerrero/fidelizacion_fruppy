@@ -219,8 +219,11 @@ export default async function JoinPage({
         </button>
       </form>
 
-      <p className="mt-6 text-center text-[11px] text-neutral-300">
-        Powered by Fruppy — fidelización digital
+      <p className="mt-6 flex items-center justify-center gap-1.5 text-[11px] text-neutral-300">
+        Powered by
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/pineapple/isotipo.png" alt="" className="h-3.5 w-auto" />
+        PineappleLoyalty — fidelización digital
       </p>
     </main>
   );

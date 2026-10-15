@@ -12,8 +12,11 @@ export default function JoinDone() {
           tu tarjeta. Si no lo ves en unos minutos, revisa la carpeta de spam.
         </p>
       </div>
-      <p className="mt-6 text-center text-[11px] text-neutral-300">
-        Powered by Fruppy — fidelización digital
+      <p className="mt-6 flex items-center justify-center gap-1.5 text-[11px] text-neutral-300">
+        Powered by
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/pineapple/isotipo.png" alt="" className="h-3.5 w-auto" />
+        PineappleLoyalty — fidelización digital
       </p>
     </main>
   );

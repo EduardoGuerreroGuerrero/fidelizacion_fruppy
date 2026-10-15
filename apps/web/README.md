@@ -1,7 +1,7 @@
 # apps/web — aplicación Next.js
 
-Aplicación principal del SaaS Fruppy (Next.js 16 App Router + TypeScript
-estricto + Tailwind v4 + Supabase).
+Aplicación principal del SaaS PineappleLoyalty (Next.js 16 App Router +
+TypeScript estricto + Tailwind v4 + Supabase).
 
 ## Comandos (desde la raíz del repo)
 

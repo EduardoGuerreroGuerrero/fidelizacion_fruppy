@@ -197,8 +197,11 @@ export default async function CardHome({
         </div>
       ) : null}
 
-      <p className="mt-8 pb-2 text-center text-[11px] text-neutral-300">
-        Powered by Fruppy — tarjeta digital de fidelización
+      <p className="mt-8 flex items-center justify-center gap-1.5 pb-2 text-[11px] text-neutral-300">
+        Powered by
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/pineapple/isotipo.png" alt="" className="h-3.5 w-auto" />
+        PineappleLoyalty — tarjeta digital de fidelización
       </p>
     </>
   );
