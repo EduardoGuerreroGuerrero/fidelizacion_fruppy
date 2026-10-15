@@ -5,6 +5,7 @@ import { LoyaltyCard } from "./_components/loyalty-card";
 import { StampRow } from "./_components/stamps";
 import { NextRewardCard } from "./_components/cards";
 import { IconQr } from "./_components/icons";
+import { walletProvider } from "@/lib/wallet/passlet";
 
 export const instant = false;
 
@@ -37,6 +38,10 @@ export default async function CardHome({
     isStamps ? (r.cost_stamps ?? Infinity) : (r.cost_points ?? Infinity);
   const next =
     card.rewards.find((r) => cost(r) > current) ?? card.rewards[0] ?? null;
+  const showWallet =
+    !revoked &&
+    card.wallet_enabled !== false &&
+    (walletProvider.googleEnabled() || walletProvider.appleEnabled());
 
   return (
     <>
@@ -147,6 +152,49 @@ export default async function CardHome({
         >
           Ver todas mis recompensas
         </Link>
+      ) : null}
+
+      {/* Guardar en wallet — visible en la home, no solo en /tarjeta */}
+      {showWallet ? (
+        <div className="mx-5 mt-4 flex gap-3">
+          {walletProvider.googleEnabled() ? (
+            <a
+              href={`${base}/wallet/google`}
+              className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-ink px-4 py-3 text-sm font-semibold text-white"
+            >
+              <svg viewBox="0 0 24 24" className="size-5" aria-hidden="true">
+                <path
+                  fill="#4285F4"
+                  d="M21.8 12.2c0-.7-.1-1.4-.2-2H12v3.9h5.5a4.7 4.7 0 0 1-2 3.1v2.6h3.3c1.9-1.8 3-4.4 3-7.6Z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 22c2.7 0 5-.9 6.7-2.4l-3.3-2.6c-.9.6-2.1 1-3.4 1a6 6 0 0 1-5.7-4.1H2.9v2.7A10 10 0 0 0 12 22Z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M6.3 13.9a6 6 0 0 1 0-3.8V7.4H2.9a10 10 0 0 0 0 9.2l3.4-2.7Z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 6c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 2.9 7.4l3.4 2.7A6 6 0 0 1 12 6Z"
+                />
+              </svg>
+              Google Wallet
+            </a>
+          ) : null}
+          {walletProvider.appleEnabled() ? (
+            <a
+              href={`${base}/wallet/apple`}
+              className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-ink px-4 py-3 text-sm font-semibold text-white"
+            >
+              <svg viewBox="0 0 24 24" className="size-5 fill-current" aria-hidden="true">
+                <path d="M17.05 12.54c-.03-2.89 2.36-4.27 2.47-4.34-1.35-1.97-3.44-2.24-4.18-2.27-1.78-.18-3.47 1.05-4.37 1.05-.9 0-2.28-1.02-3.75-1-1.93.03-3.71 1.12-4.7 2.85-2.01 3.48-.51 8.64 1.44 11.47.96 1.39 2.1 2.94 3.6 2.88 1.44-.06 1.99-.93 3.73-.93s2.23.93 3.76.9c1.55-.03 2.54-1.41 3.49-2.8 1.1-1.61 1.55-3.17 1.58-3.25-.04-.02-3.03-1.16-3.07-4.56ZM14.16 4.06c.79-.96 1.32-2.29 1.18-3.62-1.14.05-2.52.76-3.34 1.72-.73.85-1.38 2.21-1.2 3.51 1.27.1 2.57-.65 3.36-1.61Z" />
+              </svg>
+              Apple Wallet
+            </a>
+          ) : null}
+        </div>
       ) : null}
 
       <p className="mt-8 pb-2 text-center text-[11px] text-neutral-300">
