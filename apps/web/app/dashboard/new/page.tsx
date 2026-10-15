@@ -25,7 +25,7 @@ export default async function NewOrganizationPage({
             required
             minLength={2}
             maxLength={120}
-            className="rounded-md border border-neutral-300 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-800"
+            className="rounded-md border border-neutral-300 px-3 py-2 outline-none focus:ring-2 focus:ring-pl-green/50 dark:border-neutral-700 dark:bg-neutral-800"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
@@ -34,12 +34,12 @@ export default async function NewOrganizationPage({
             name="slug"
             pattern="[a-z0-9][a-z0-9-]{1,62}"
             placeholder="mi-comercio"
-            className="rounded-md border border-neutral-300 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-800"
+            className="rounded-md border border-neutral-300 px-3 py-2 outline-none focus:ring-2 focus:ring-pl-green/50 dark:border-neutral-700 dark:bg-neutral-800"
           />
         </label>
         <button
           type="submit"
-          className="rounded-full bg-brand py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
+          className="rounded-full bg-pl-green py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green/90"
         >
           Crear organización
         </button>
