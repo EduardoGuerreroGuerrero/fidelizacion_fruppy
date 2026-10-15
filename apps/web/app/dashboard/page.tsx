@@ -83,15 +83,19 @@ export default async function DashboardPage() {
               color?: string;
               logo_url?: string;
             };
-            // brand.logo_url puede contener assets de Wallet (data URIs), no
-            // el logo del comercio: solo URLs servibles, y para Fruppy el
-            // logo de /brand (convención ya usada por el shell del panel).
-            const logoUrl =
-              brand.logo_url && !brand.logo_url.startsWith("data:")
-                ? brand.logo_url
-                : org.slug === FRUPPY_SLUG
-                  ? "/brand/logo-sm.png"
-                  : null;
+            // brand.logo_url puede contener assets de Wallet (SVG en data
+            // URI), no el logo del comercio: se aceptan URLs y PNGs subidos
+            // (data:image/png); para Fruppy el logo de /brand (convención ya
+            // usada por el shell del panel).
+            const servable =
+              brand.logo_url &&
+              (!brand.logo_url.startsWith("data:") ||
+                brand.logo_url.startsWith("data:image/png"));
+            const logoUrl = servable
+              ? brand.logo_url!
+              : org.slug === FRUPPY_SLUG
+                ? "/brand/logo-sm.png"
+                : null;
             const badge = STATUS_BADGE[org.status] ?? STATUS_BADGE.active;
             return (
               <li key={org.id}>

@@ -1,4 +1,9 @@
 import { createOrganization } from "@/lib/organizations/actions";
+import {
+  IconPlus,
+  IconStore,
+  IconUpload,
+} from "@/app/t/[token]/_components/icons";
 
 export const instant = false;
 
@@ -10,37 +15,83 @@ export default async function NewOrganizationPage({
   const { error } = await searchParams;
 
   return (
-    <div className="mx-auto max-w-md">
-      <h1 className="mb-6 text-2xl font-semibold">Nueva organización</h1>
+    <div className="relative mx-auto max-w-md">
+      {/* Isotipos PineappleLoyalty decorativos */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/pineapple/isotipo.png"
+        alt=""
+        aria-hidden
+        className="pointer-events-none fixed -top-20 -right-24 w-72 rotate-12 select-none opacity-[0.07]"
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/pineapple/isotipo.png"
+        alt=""
+        aria-hidden
+        className="pointer-events-none fixed -bottom-28 -left-28 w-[440px] select-none opacity-[0.07]"
+      />
+
+      <h1 className="text-3xl font-bold tracking-tight text-ink">
+        Nueva organización
+      </h1>
+      <p className="mt-2 text-sm text-ink-soft">
+        Crea una nueva organización para gestionar tu programa de fidelización.
+      </p>
+
       {error ? (
-        <p className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+        <p className="mt-6 rounded-2xl bg-accent-soft px-4 py-3 text-sm text-accent">
           {error}
         </p>
       ) : null}
-      <form action={createOrganization} className="flex flex-col gap-4">
-        <label className="flex flex-col gap-1 text-sm">
-          Nombre del comercio
-          <input
-            name="name"
-            required
-            minLength={2}
-            maxLength={120}
-            className="rounded-md border border-neutral-300 px-3 py-2 outline-none focus:ring-2 focus:ring-pl-green/50 dark:border-neutral-700 dark:bg-neutral-800"
-          />
-        </label>
-        <label className="flex flex-col gap-1 text-sm">
-          Slug (URL interna, opcional)
-          <input
-            name="slug"
-            pattern="[a-z0-9][a-z0-9-]{1,62}"
-            placeholder="mi-comercio"
-            className="rounded-md border border-neutral-300 px-3 py-2 outline-none focus:ring-2 focus:ring-pl-green/50 dark:border-neutral-700 dark:bg-neutral-800"
-          />
-        </label>
+
+      <form
+        action={createOrganization}
+        className="mt-6 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/[0.04]"
+      >
+        <div className="flex items-center gap-3">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-pastel-mint text-brand-dark">
+            <IconStore className="size-5" />
+          </span>
+          <label htmlFor="name" className="font-semibold text-ink">
+            Nombre del comercio
+          </label>
+        </div>
+        <input
+          id="name"
+          name="name"
+          required
+          minLength={2}
+          maxLength={120}
+          placeholder="Ej. Fruppy Helados"
+          className="mt-3 w-full rounded-xl border border-neutral-300 px-4 py-3 text-sm outline-none transition focus:border-pl-green focus:ring-2 focus:ring-pl-green/30"
+        />
+
+        <div className="mt-6 flex items-center gap-3">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-pastel-mint text-brand-dark">
+            <IconUpload className="size-5" />
+          </span>
+          <label htmlFor="logo" className="font-semibold text-ink">
+            Logo (PNG sin fondo, opcional)
+          </label>
+        </div>
+        <input
+          id="logo"
+          name="logo"
+          type="file"
+          accept="image/png"
+          className="mt-3 w-full rounded-xl border border-neutral-300 px-4 py-3 text-sm text-ink-soft file:mr-3 file:rounded-full file:border-0 file:bg-pl-cream file:px-4 file:py-1.5 file:text-xs file:font-semibold file:text-pl-green"
+        />
+        <p className="mt-2 text-xs text-ink-soft">
+          Debe ser PNG sin fondo — es el logo que se mostrará en el panel de
+          organizaciones.
+        </p>
+
         <button
           type="submit"
-          className="rounded-full bg-pl-green py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green/90"
+          className="mt-7 flex w-full items-center justify-center gap-2 rounded-full bg-pl-green-2 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green"
         >
+          <IconPlus className="size-4" />
           Crear organización
         </button>
       </form>
