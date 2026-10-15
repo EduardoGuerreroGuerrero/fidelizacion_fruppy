@@ -203,12 +203,23 @@ export async function saveLocation(orgSlug: string, formData: FormData) {
   const id = String(formData.get("id") ?? "") || null;
   const name = String(formData.get("name") ?? "").trim();
   const address = String(formData.get("address") ?? "").trim() || null;
+  const latRaw = String(formData.get("lat") ?? "").trim();
+  const lngRaw = String(formData.get("lng") ?? "").trim();
+  const lat = latRaw === "" ? null : Number(latRaw);
+  const lng = lngRaw === "" ? null : Number(lngRaw);
 
   if (name.length < 1 || name.length > 120) fail(back, "Nombre inválido.");
+  if (lat !== null && (!Number.isFinite(lat) || lat < -90 || lat > 90))
+    fail(back, "Latitud inválida (-90 a 90).");
+  if (lng !== null && (!Number.isFinite(lng) || lng < -180 || lng > 180))
+    fail(back, "Longitud inválida (-180 a 180).");
+  if ((lat === null) !== (lng === null))
+    fail(back, "Indica latitud y longitud juntas o ninguna.");
 
+  const payload = { name, address, lat, lng };
   const q = id
-    ? supabase.from("locations").update({ name, address }).eq("id", id).eq("organization_id", orgId)
-    : supabase.from("locations").insert({ organization_id: orgId, name, address });
+    ? supabase.from("locations").update(payload).eq("id", id).eq("organization_id", orgId)
+    : supabase.from("locations").insert({ organization_id: orgId, ...payload });
 
   const { error } = await q;
   if (error) fail(back, "No se pudo guardar la sede.");
@@ -360,17 +371,20 @@ export async function updateOrgSettings(orgSlug: string, formData: FormData) {
     fail(back, "Color inválido (formato #RRGGBB).");
   if (logoUrl && !/^https:\/\//.test(logoUrl)) fail(back, "El logo debe ser una URL https.");
 
+  const { data: current } = await supabase
+    .from("organizations")
+    .select("brand")
+    .eq("id", orgId)
+    .single();
+  const brand = { ...((current?.brand ?? {}) as Record<string, unknown>) };
+  if (brandColor) brand.color = brandColor;
+  else delete brand.color;
+  if (logoUrl) brand.logo_url = logoUrl;
+  else delete brand.logo_url;
+
   const { error } = await supabase
     .from("organizations")
-    .update({
-      name,
-      currency,
-      timezone,
-      brand: {
-        ...(brandColor ? { color: brandColor } : {}),
-        ...(logoUrl ? { logo_url: logoUrl } : {}),
-      },
-    })
+    .update({ name, currency, timezone, brand })
     .eq("id", orgId);
   if (error) fail(back, "No se pudo guardar la configuración.");
 
@@ -381,4 +395,190 @@ export async function updateOrgSettings(orgSlug: string, formData: FormData) {
   });
   revalidatePath(`/dashboard/${orgSlug}`);
   redirect(back + "?ok=" + encodeURIComponent("Configuración guardada."));
+}
+
+// Privacidad + flags por comercio: responsable del tratamiento, correo de
+// privacidad, URL de la política y versión del texto de consentimiento
+// (evidencia legal). Los flags activan autorregistro QR, push y ubicación.
+export async function updateOrgPrivacy(orgSlug: string, formData: FormData) {
+  const { supabase, user, orgId, role } = await requireMembership(orgSlug);
+  const back = `/dashboard/${orgSlug}/settings`;
+  if (!["owner", "admin"].includes(role))
+    fail(back, "Solo owner/admin puede cambiar la configuración.");
+
+  const privacyEmail = String(formData.get("privacy_email") ?? "").trim().toLowerCase();
+  const policyUrl = String(formData.get("policy_url") ?? "").trim();
+  const controller = String(formData.get("data_controller") ?? "").trim();
+  const consentVersion = String(formData.get("consent_version") ?? "").trim() || "v1";
+
+  if (privacyEmail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(privacyEmail))
+    fail(back, "Correo de privacidad inválido.");
+  if (policyUrl && !/^https:\/\//.test(policyUrl))
+    fail(back, "La política debe ser una URL https.");
+  if (controller.length > 200) fail(back, "Responsable demasiado largo.");
+  if (consentVersion.length > 40) fail(back, "Versión inválida.");
+
+  const flag = (k: string) => formData.get(k) === "on";
+  const legal: Record<string, string> = { consent_version: consentVersion };
+  if (privacyEmail) legal.privacy_email = privacyEmail;
+  if (policyUrl) legal.policy_url = policyUrl;
+  if (controller) legal.data_controller = controller;
+
+  const features = {
+    self_registration: flag("feat_self_registration"),
+    push: flag("feat_push"),
+    location: flag("feat_location"),
+  };
+
+  const { error } = await supabase
+    .from("organizations")
+    .update({ legal, features })
+    .eq("id", orgId);
+  if (error) fail(back, "No se pudo guardar la configuración de privacidad.");
+
+  await audit(orgId, user.id, "org.privacy_updated", "organization", orgId, {
+    consent_version: consentVersion,
+    features,
+  });
+  revalidatePath(`/dashboard/${orgSlug}/settings`);
+  redirect(back + "?ok=" + encodeURIComponent("Privacidad y funciones guardadas."));
+}
+
+// Rotar el QR de autorregistro (join_token) ante abuso o fuga. Admin+,
+// respaldado además por la RPC (owner/admin en DB).
+export async function rotateJoinToken(orgSlug: string) {
+  const { supabase, user, orgId, role } = await requireMembership(orgSlug);
+  const back = `/dashboard/${orgSlug}/join`;
+  if (!["owner", "admin"].includes(role))
+    fail(back, "Solo owner/admin puede rotar el QR de registro.");
+
+  const { error } = await supabase.rpc("rotate_join_token", { p_org_id: orgId });
+  if (error) fail(back, "No se pudo rotar el QR.");
+
+  await audit(orgId, user.id, "org.join_token_rotated", "organization", orgId);
+  revalidatePath(back);
+  redirect(back + "?ok=" + encodeURIComponent("QR de registro rotado. Imprime el nuevo."));
+}
+
+// ---------- Campañas push ------------------------------------------------------
+
+export async function savePushCampaign(orgSlug: string, formData: FormData) {
+  const { supabase, user, orgId, role } = await requireMembership(orgSlug);
+  const back = `/dashboard/${orgSlug}/campaigns`;
+  if (!["owner", "admin", "manager"].includes(role))
+    fail(back, "Solo manager+ puede crear campañas.");
+
+  const title = String(formData.get("title") ?? "").trim();
+  const body = String(formData.get("body") ?? "").trim();
+  const url = String(formData.get("url") ?? "").trim() || null;
+  const schedule = String(formData.get("schedule") ?? "").trim();
+
+  if (title.length < 1 || title.length > 100) fail(back, "Título inválido (máx. 100).");
+  if (body.length < 1 || body.length > 300) fail(back, "Mensaje inválido (máx. 300).");
+  if (url && !/^https:\/\/|^\/[^/]/.test(url) && url !== "/")
+    fail(back, "URL inválida: interna (/ruta) o https://.");
+
+  const { data: campaign, error } = await supabase
+    .from("push_campaigns")
+    .insert({
+      organization_id: orgId,
+      created_by: user.id,
+      title,
+      body,
+      url,
+      status: "draft",
+    })
+    .select("id")
+    .single();
+  if (error || !campaign) fail(back, "No se pudo crear la campaña.");
+
+  // Programar para después → la cola la dispara al vencer la hora.
+  if (schedule) {
+    const at = new Date(schedule);
+    if (!Number.isFinite(at.getTime()) || at.getTime() < Date.now() + 60_000)
+      fail(back, "La fecha de envío debe ser futura (mínimo 1 minuto).");
+    const { error: e2 } = await supabase.rpc("schedule_push_campaign", {
+      p_campaign_id: campaign.id,
+      p_at: at.toISOString(),
+    });
+    if (e2) fail(back, "No se pudo programar la campaña.");
+  }
+
+  await audit(orgId, user.id, "campaign.created", "push_campaign", campaign.id, { title });
+  revalidatePath(back);
+  redirect(back + "?ok=" + encodeURIComponent("Campaña creada."));
+}
+
+export async function queuePushCampaign(orgSlug: string, campaignId: string) {
+  const { supabase, user, orgId, role } = await requireMembership(orgSlug);
+  const back = `/dashboard/${orgSlug}/campaigns`;
+  if (!["owner", "admin", "manager"].includes(role))
+    fail(back, "Solo manager+ puede enviar campañas.");
+
+  const { data: campaign } = await supabase
+    .from("push_campaigns")
+    .select("id")
+    .eq("id", campaignId)
+    .eq("organization_id", orgId)
+    .maybeSingle();
+  if (!campaign) fail(back, "Campaña no encontrada.");
+
+  const { data: count, error } = await supabase.rpc("queue_push_campaign", {
+    p_campaign_id: campaignId,
+  });
+  if (error) {
+    fail(
+      back,
+      error.message.includes("plan_limit")
+        ? "Límite mensual de campañas alcanzado para tu plan."
+        : "No se pudo encolar la campaña.",
+    );
+  }
+  await audit(orgId, user.id, "campaign.queued", "push_campaign", campaignId, {
+    recipients: count,
+  });
+  revalidatePath(back);
+  redirect(
+    back + "?ok=" + encodeURIComponent(`Enviando a ${count ?? 0} destinatario(s).`),
+  );
+}
+
+export async function cancelPushCampaign(orgSlug: string, campaignId: string) {
+  const { supabase, user, orgId, role } = await requireMembership(orgSlug);
+  const back = `/dashboard/${orgSlug}/campaigns`;
+  if (!["owner", "admin", "manager"].includes(role))
+    fail(back, "Solo manager+ puede cancelar campañas.");
+
+  const { error } = await supabase.rpc("cancel_push_campaign", {
+    p_campaign_id: campaignId,
+  });
+  if (error) fail(back, "No se pudo cancelar la campaña.");
+
+  await audit(orgId, user.id, "campaign.cancelled", "push_campaign", campaignId);
+  revalidatePath(back);
+  redirect(back + "?ok=" + encodeURIComponent("Campaña cancelada."));
+}
+
+// ---------- Derechos del titular ----------------------------------------------
+
+export async function updateRightsRequest(
+  orgSlug: string,
+  requestId: string,
+  status: "in_progress" | "resolved" | "rejected",
+) {
+  const { supabase, user, orgId, role } = await requireMembership(orgSlug);
+  const back = `/dashboard/${orgSlug}/rights`;
+  if (!["owner", "admin", "manager"].includes(role))
+    fail(back, "Solo manager+ puede gestionar solicitudes.");
+
+  const { error } = await supabase
+    .from("data_rights_requests")
+    .update({ status, resolved_at: new Date().toISOString() })
+    .eq("id", requestId)
+    .eq("organization_id", orgId)
+    .eq("status", "open");
+  if (error) fail(back, "No se pudo actualizar la solicitud.");
+
+  await audit(orgId, user.id, `rights_request.${status}`, "data_rights_request", requestId);
+  revalidatePath(back);
 }

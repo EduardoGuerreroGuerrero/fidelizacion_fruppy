@@ -10,7 +10,13 @@ export type CardReward = {
   terms: string | null;
 };
 
-export type CardLocation = { id: string; name: string; address: string | null };
+export type CardLocation = {
+  id: string;
+  name: string;
+  address: string | null;
+  lat: number | null;
+  lng: number | null;
+};
 
 export type CardVisit = {
   visited_at: string;
@@ -36,6 +42,8 @@ export type CardAppData = {
   current_points: number;
   card_status: string;
   consent_pending: boolean;
+  location_enabled?: boolean;
+  wallet_enabled?: boolean;
   rewards: CardReward[];
   locations: CardLocation[];
   visits: CardVisit[];

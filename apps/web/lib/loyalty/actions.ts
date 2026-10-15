@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { optionalEnv } from "@/lib/env";
 import { displayName } from "@/lib/format";
+import { senderFor, sendEmail } from "@/lib/email/send";
 import { pushWalletUpdate } from "@/lib/wallet/push";
 
 // Auditoría vía RPC write_audit_log: actor = auth.uid(), membresía exigida
@@ -239,8 +240,7 @@ export async function sendCardEmail(orgSlug: string, customerId: string, cardId:
   const { supabase, user, orgId } = await requireMembership(orgSlug);
   const back = `/dashboard/${orgSlug}/customers/${customerId}`;
 
-  const apiKey = optionalEnv("RESEND_API_KEY");
-  if (!apiKey) {
+  if (!optionalEnv("RESEND_API_KEY")) {
     redirect(back + "?error=" + encodeURIComponent("Correo no configurado (falta RESEND_API_KEY)."));
   }
 
@@ -281,7 +281,6 @@ export async function sendCardEmail(orgSlug: string, customerId: string, cardId:
   const cardUrl = cardPublicUrl(card.token);
   const qrUrl = `${cardUrl}/qr`;
 
-  const from = optionalEnv("EMAIL_FROM") ?? `${orgName} <info@fruppyhelados.com>`;
   const html = `
     <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;color:#262626">
       <h2 style="color:#0d9488">Hola ${displayName(customer.first_name)}, esta es tu tarjeta ${orgName}</h2>
@@ -300,15 +299,11 @@ export async function sendCardEmail(orgSlug: string, customerId: string, cardId:
       <p style="font-size:12px;color:#a3a3a3">Powered by Fruppy — fidelización digital</p>
     </div>`;
 
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      from,
-      to: [customer.email],
-      subject: `Tu tarjeta ${orgName} — ${programName}`,
-      html,
-    }),
+  const res = await sendEmail({
+    to: customer.email,
+    subject: `Tu tarjeta ${orgName} — ${programName}`,
+    html,
+    from: senderFor(orgName),
   });
   if (!res.ok) {
     redirect(back + "?error=" + encodeURIComponent("No se pudo enviar el correo."));

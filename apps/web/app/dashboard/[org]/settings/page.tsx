@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { updateOrgSettings } from "@/lib/admin/actions";
+import { updateOrgPrivacy, updateOrgSettings } from "@/lib/admin/actions";
 
 export const instant = false;
 
@@ -34,13 +34,20 @@ export default async function SettingsPage({
 
   const { data: org } = await supabase
     .from("organizations")
-    .select("id, name, currency, timezone, brand")
+    .select("id, name, currency, timezone, brand, legal, features")
     .eq("slug", slug)
     .maybeSingle();
   if (!org) notFound();
 
   const brand = (org.brand ?? {}) as { color?: string; logo_url?: string };
   const brandColor = brand.color ?? "#16a34a";
+  const legal = (org.legal ?? {}) as {
+    privacy_email?: string;
+    policy_url?: string;
+    data_controller?: string;
+    consent_version?: string;
+  };
+  const features = (org.features ?? {}) as Record<string, unknown>;
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -146,6 +153,120 @@ export default async function SettingsPage({
           </p>
         </div>
       </div>
+
+      {/* Privacidad y funciones por comercio (Ley 1581): responsable,
+          canal de derechos, política y versión del texto de consentimiento.
+          Los flags activan autorregistro QR, push y ubicación opcional. */}
+      <form
+        action={updateOrgPrivacy.bind(null, slug)}
+        className="mt-8 space-y-4 rounded-lg border border-neutral-200 p-5 dark:border-neutral-800"
+      >
+        <h2 className="font-medium">Privacidad y funciones</h2>
+        <div>
+          <label htmlFor="data_controller" className={label}>
+            Responsable del tratamiento
+          </label>
+          <input
+            id="data_controller"
+            name="data_controller"
+            defaultValue={legal.data_controller ?? ""}
+            placeholder={org.name}
+            className={input}
+          />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="privacy_email" className={label}>
+              Correo de privacidad
+            </label>
+            <input
+              id="privacy_email"
+              name="privacy_email"
+              type="email"
+              defaultValue={legal.privacy_email ?? ""}
+              placeholder="privacidad@tucomercio.com"
+              className={input}
+            />
+          </div>
+          <div>
+            <label htmlFor="consent_version" className={label}>
+              Versión del consentimiento
+            </label>
+            <input
+              id="consent_version"
+              name="consent_version"
+              defaultValue={legal.consent_version ?? "v1"}
+              maxLength={40}
+              className={input}
+            />
+          </div>
+        </div>
+        <div>
+          <label htmlFor="policy_url" className={label}>
+            URL de la política de tratamiento (https)
+          </label>
+          <input
+            id="policy_url"
+            name="policy_url"
+            type="url"
+            defaultValue={legal.policy_url ?? ""}
+            className={input}
+          />
+        </div>
+
+        <fieldset className="space-y-2">
+          <legend className="text-sm font-medium">Funciones del comercio</legend>
+          <label className="flex items-start gap-2.5 text-sm">
+            <input
+              type="checkbox"
+              name="feat_self_registration"
+              defaultChecked={features.self_registration !== false}
+              className="mt-0.5 size-4 accent-brand"
+            />
+            <span>
+              Autorregistro por QR{" "}
+              <span className="text-xs text-neutral-500">
+                (los clientes se dan de alta desde el QR del local)
+              </span>
+            </span>
+          </label>
+          <label className="flex items-start gap-2.5 text-sm">
+            <input
+              type="checkbox"
+              name="feat_push"
+              defaultChecked={features.push === true}
+              className="mt-0.5 size-4 accent-brand"
+            />
+            <span>
+              Notificaciones push{" "}
+              <span className="text-xs text-neutral-500">
+                (el cliente las activa por separado en su tarjeta)
+              </span>
+            </span>
+          </label>
+          <label className="flex items-start gap-2.5 text-sm">
+            <input
+              type="checkbox"
+              name="feat_location"
+              defaultChecked={features.location === true}
+              className="mt-0.5 size-4 accent-brand"
+            />
+            <span>
+              Sedes cercanas{" "}
+              <span className="text-xs text-neutral-500">
+                (ubicación opcional del cliente, nunca se guarda)
+              </span>
+            </span>
+          </label>
+        </fieldset>
+
+        <button
+          type="submit"
+          className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
+        >
+          Guardar privacidad y funciones
+        </button>
+      </form>
     </div>
   );
 }

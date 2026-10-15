@@ -26,6 +26,7 @@ export default async function CustomersPage({
     program?: string;
     page?: string;
     panel?: string;
+    consent?: string;
   }>;
 }) {
   const { org: slug } = await params;
@@ -35,6 +36,7 @@ export default async function CustomersPage({
     program = "",
     page: pageParam = "1",
     panel = "",
+    consent = "",
   } = await searchParams;
   const page = Math.max(1, parseInt(pageParam, 10) || 1);
 
@@ -56,13 +58,17 @@ export default async function CustomersPage({
   let query = supabase
     .from("customers")
     .select(
-      "id, first_name, last_name, email, phone, status, marketing_consent_at, created_at",
+      "id, first_name, last_name, email, phone, status, marketing_consent_at, push_consent_state, created_at",
       fruppy ? { count: "exact" } : undefined,
     )
     .eq("organization_id", org.id)
     .order("created_at", { ascending: false });
 
   if (status === "active" || status === "inactive") query = query.eq("status", status);
+
+  // Filtro por canal autorizado: marketing por correo o push del comercio.
+  if (consent === "marketing") query = query.not("marketing_consent_at", "is", null);
+  else if (consent === "push") query = query.eq("push_consent_state", "granted");
 
   const needle = escapeIlike(q.trim());
   if (needle) {
@@ -176,6 +182,15 @@ export default async function CustomersPage({
             <option value="inactive">Inactivos</option>
             <option value="all">Todos</option>
           </select>
+          <select
+            name="consent"
+            defaultValue={consent}
+            className="rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-transparent"
+          >
+            <option value="">Todos los canales</option>
+            <option value="marketing">Con marketing</option>
+            <option value="push">Con push</option>
+          </select>
           <button
             type="submit"
             className="rounded-md border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
@@ -204,6 +219,11 @@ export default async function CustomersPage({
                     {c.marketing_consent_at && (
                       <span className="rounded bg-green-100 px-2 py-1 text-green-800 dark:bg-green-900/40 dark:text-green-300">
                         marketing
+                      </span>
+                    )}
+                    {c.push_consent_state === "granted" && (
+                      <span className="rounded bg-sky-100 px-2 py-1 text-sky-800 dark:bg-sky-900/40 dark:text-sky-300">
+                        push
                       </span>
                     )}
                     <span

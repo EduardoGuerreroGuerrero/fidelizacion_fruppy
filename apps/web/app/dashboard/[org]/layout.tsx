@@ -20,7 +20,12 @@ const NAV_ADMIN_PRIMARY = [["programs", "Programa"]] as const;
 
 const NAV_SECONDARY_BASE = [["analytics", "Analítica"]] as const;
 
-const NAV_SECONDARY_MANAGER = [["team", "Equipo"]] as const;
+const NAV_SECONDARY_MANAGER = [
+  ["campaigns", "Campañas"],
+  ["join", "QR registro"],
+  ["rights", "Derechos"],
+  ["team", "Equipo"],
+] as const;
 
 const NAV_SECONDARY_ADMIN = [
   ["rewards", "Recompensas"],

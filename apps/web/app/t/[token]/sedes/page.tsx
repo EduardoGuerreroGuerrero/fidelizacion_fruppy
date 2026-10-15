@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getCardAppData } from "../_components/data";
 import { TitleBar } from "../_components/chrome";
 import { LocationRow } from "../_components/cards";
-import { IconPin } from "../_components/icons";
+import { NearbySort } from "../_components/nearby";
 
 export const instant = false;
 
@@ -55,30 +55,33 @@ export default async function NuestrasSedes({
         />
       </form>
 
-      <div className="mx-5 mt-3 flex items-center gap-2 text-sm font-medium text-brand">
-        <IconPin className="size-5" />
-        Mi ubicación
-      </div>
-
       {/* Mapa */}
       <div className="mx-5 mt-3 overflow-hidden rounded-3xl">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/brand/mapa-sedes.jpg" alt="Mapa de sedes" className="w-full" />
       </div>
 
-      {/* Lista de sedes */}
-      <ul className="mt-4">
-        {locations.map((l, i) => (
-          <LocationRow key={l.id} location={l} index={i} />
-        ))}
-        {locations.length === 0 ? (
-          <li className="mx-5 rounded-2xl border border-dashed border-neutral-200 p-6 text-center text-sm text-ink-soft">
-            {query
-              ? "No encontramos sedes con esa búsqueda."
-              : "Este comercio aún no ha publicado sus sedes."}
-          </li>
-        ) : null}
-      </ul>
+      {/* Lista de sedes — orden por cercanía opcional (geolocalización
+          en el dispositivo, sin persistir ni enviar la posición) */}
+      {card.location_enabled ? (
+        <NearbySort
+          locations={locations}
+          renderRow={(l, i) => <LocationRow key={l.id} location={l} index={i} distanceKm={l._km} />}
+        />
+      ) : (
+        <ul className="mt-4">
+          {locations.map((l, i) => (
+            <LocationRow key={l.id} location={l} index={i} />
+          ))}
+        </ul>
+      )}
+      {locations.length === 0 ? (
+        <p className="mx-5 mt-4 rounded-2xl border border-dashed border-neutral-200 p-6 text-center text-sm text-ink-soft">
+          {query
+            ? "No encontramos sedes con esa búsqueda."
+            : "Este comercio aún no ha publicado sus sedes."}
+        </p>
+      ) : null}
 
       <p className="pb-2 text-center text-xs text-ink-soft">
         ¿No ves tu sede?{" "}

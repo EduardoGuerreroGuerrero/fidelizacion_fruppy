@@ -48,8 +48,9 @@ export default async function MiTarjeta({
         />
       </div>
 
-      {/* Guardar en wallet nativo — solo si el proveedor está configurado */}
-      {(googleOn || appleOn) && card.card_status === "active" ? (
+      {/* Guardar en wallet nativo — solo si el proveedor está configurado
+          y el comercio tiene la función activa (features.wallet, default on) */}
+      {(googleOn || appleOn) && card.card_status === "active" && card.wallet_enabled !== false ? (
         <div className="mx-5 mt-4 flex gap-3">
           {googleOn ? (
             <a

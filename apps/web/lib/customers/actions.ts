@@ -41,7 +41,8 @@ function validateCustomerInput(formData: FormData): {
       // Capitalización consistente al escribir, no solo al mostrar.
       first_name: displayName(firstName),
       last_name: lastName ? displayName(lastName) : lastName,
-      email,
+      // Email normalizado a minúsculas: la unicidad por org es case-insensitive.
+      email: email?.toLowerCase() ?? null,
       phone,
       birth_date: birthDate,
       external_ref: text("external_ref"),
@@ -179,7 +180,9 @@ export async function createCustomer(orgSlug: string, formData: FormData) {
     console.error("[createCustomer]", error?.code, error?.message);
     const msg =
       error?.code === "23505"
-        ? "Ya existe un cliente con esa referencia externa."
+        ? error.message.includes("email")
+          ? "Ya existe un cliente con ese correo."
+          : "Ya existe un cliente con esa referencia externa."
         : "No se pudo crear el cliente.";
     redirect(back + "?error=" + encodeURIComponent(msg));
   }
@@ -220,7 +223,9 @@ export async function updateCustomer(orgSlug: string, customerId: string, formDa
     console.error("[updateCustomer]", error.code, error.message);
     const msg =
       error.code === "23505"
-        ? "Ya existe un cliente con esa referencia externa."
+        ? error.message.includes("email")
+          ? "Ya existe un cliente con ese correo."
+          : "Ya existe un cliente con esa referencia externa."
         : "No se pudo actualizar el cliente.";
     redirect(back + "?error=" + encodeURIComponent(msg));
   }
@@ -250,7 +255,7 @@ export async function importCustomers(orgSlug: string, rows: CsvRow[]) {
     .map((r) => ({
       first_name: displayName(String(r.first_name ?? "").trim()).slice(0, 80),
       last_name: r.last_name ? displayName(r.last_name.trim()).slice(0, 80) : null,
-      email: r.email?.trim() || null,
+      email: r.email?.trim().toLowerCase() || null,
       phone: r.phone?.trim().slice(0, 32) || null,
     }))
     .filter((r) => r.first_name.length > 0 && (!r.email || EMAIL_RE.test(r.email)));
@@ -274,7 +279,8 @@ export async function importCustomers(orgSlug: string, rows: CsvRow[]) {
       .or(clauses.join(","))
       .limit(500);
     for (const d of dups ?? []) {
-      if (d.email) existing.add(`e:${d.email}`);
+      // El índice único es sobre lower(email): comparar normalizado.
+      if (d.email) existing.add(`e:${d.email.toLowerCase()}`);
       if (d.phone) existing.add(`p:${d.phone}`);
     }
   }
@@ -310,18 +316,17 @@ export async function importCustomers(orgSlug: string, rows: CsvRow[]) {
   return { created, skipped: rows.length - created };
 }
 
-// Consentimiento como evento separado con auditoría propia (F3-T6).
+// Consentimiento como evento separado con auditoría propia (F3-T6): la RPC
+// deja evidencia en customer_consents (capture_method 'admin') además de
+// actualizar la proyección — el equipo no "edita" el historial del titular.
 export async function setMarketingConsent(orgSlug: string, customerId: string, consent: boolean) {
   const { supabase, user, orgId } = await requireMembership(orgSlug);
 
-  const { error } = await supabase
-    .from("customers")
-    .update({
-      marketing_consent_at: consent ? new Date().toISOString() : null,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", customerId)
-    .eq("organization_id", orgId);
+  const { error } = await supabase.rpc("admin_set_customer_consent", {
+    p_customer_id: customerId,
+    p_purpose: "marketing_email",
+    p_granted: consent,
+  });
 
   if (error) {
     redirect(

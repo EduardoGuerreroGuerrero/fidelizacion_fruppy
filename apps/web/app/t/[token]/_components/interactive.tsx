@@ -57,50 +57,6 @@ export function FavoriteButton({ storageKey }: { storageKey: string }) {
   );
 }
 
-// Interruptor de preferencias de notificación — localStorage por dispositivo.
-export function PrefToggle({
-  storageKey,
-  title,
-  subtitle,
-  defaultOn = true,
-}: {
-  storageKey: string;
-  title: string;
-  subtitle: string;
-  defaultOn?: boolean;
-}) {
-  const [on, setOn] = useState(defaultOn);
-  useEffect(() => {
-    const v = localStorage.getItem(storageKey);
-    // Preferencia por dispositivo: solo existe en el cliente → lectura en efecto.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (v !== null) setOn(v === "1");
-  }, [storageKey]);
-  return (
-    <li className="flex items-center gap-3 px-5 py-3.5">
-      <span className="min-w-0 flex-1">
-        <span className="block font-medium text-ink">{title}</span>
-        <span className="block text-xs text-ink-soft">{subtitle}</span>
-      </span>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={on}
-        onClick={() => {
-          const next = !on;
-          setOn(next);
-          localStorage.setItem(storageKey, next ? "1" : "0");
-        }}
-        className={`h-7 w-12 shrink-0 rounded-full p-1 transition ${
-          on ? "bg-brand" : "bg-neutral-200"
-        }`}
-      >
-        <span
-          className={`block size-5 rounded-full bg-white shadow transition ${
-            on ? "translate-x-5" : ""
-          }`}
-        />
-      </button>
-    </li>
-  );
-}
+// Las preferencias de notificación ya no son localStorage: viven en
+// customer_consents y se gestionan en perfil/notificaciones (PushToggle +
+// formularios clásicos contra las RPCs de consentimiento).

@@ -10,8 +10,10 @@ export const instant = false;
 
 export default async function CardHome({
   params,
+  searchParams,
 }: PageProps<"/t/[token]">) {
   const { token } = await params;
+  const { bienvenida } = await searchParams;
   const base = `/t/${token}`;
   const card = await getCardAppData(token);
 
@@ -39,6 +41,15 @@ export default async function CardHome({
   return (
     <>
       <HomeHeader firstName={card.first_name} orgName={card.org_name} />
+
+      {/* Llegada desde el autorregistro por QR: confirmación + aviso del
+          correo de bienvenida con el enlace permanente a la tarjeta. */}
+      {bienvenida === "1" ? (
+        <p className="mx-5 mt-4 rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+          ¡Bienvenida/o a {card.org_name}! Tu tarjeta está lista y te enviamos
+          el enlace a tu correo — guárdalo para volver cuando quieras.
+        </p>
+      ) : null}
 
       <div className="mt-5">
         <LoyaltyCard

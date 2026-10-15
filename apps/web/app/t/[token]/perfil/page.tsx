@@ -175,6 +175,13 @@ export default async function MiPerfil({
           title="Política de privacidad"
           subtitle="Protegemos tu información"
         />
+        <MenuRow
+          href={`${base}/perfil/derechos`}
+          Icon={IconShield}
+          tint="bg-pastel-cream text-[#e8862e]"
+          title="Tus derechos"
+          subtitle="Acceso, corrección y eliminación de datos"
+        />
       </ul>
 
       {/* Cerrar sesión */}
