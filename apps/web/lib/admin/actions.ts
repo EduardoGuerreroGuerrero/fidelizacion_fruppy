@@ -369,7 +369,10 @@ export async function updateOrgSettings(orgSlug: string, formData: FormData) {
   if (!/^[A-Z]{3}$/.test(currency)) fail(back, "Moneda inválida (ISO 4217).");
   if (brandColor && !/^#[0-9a-fA-F]{6}$/.test(brandColor))
     fail(back, "Color inválido (formato #RRGGBB).");
-  if (logoUrl && !/^https:\/\//.test(logoUrl)) fail(back, "El logo debe ser una URL https.");
+  // El logo puede venir de la URL manual o del PNG subido al crear la org
+  // (data:image/png;base64,...). Ambos formatos se sirven igual en <img>.
+  if (logoUrl && !/^https:\/\/|^data:image\/png;base64,/.test(logoUrl))
+    fail(back, "El logo debe ser una URL https o un PNG subido.");
 
   const { data: current } = await supabase
     .from("organizations")

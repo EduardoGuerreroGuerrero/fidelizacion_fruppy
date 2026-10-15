@@ -39,20 +39,38 @@ async function audit(
   }
 }
 
+// Logo del comercio: PNG con transparencia, guardado como data URI en
+// organizations.brand.logo_url (mismo formato que ya usan las orgs sembradas).
+// Sin bucket de Storage el data URI evita infra extra; el límite mantiene la
+// fila de la org razonablemente liviana.
+const MAX_LOGO_BYTES = 256 * 1024;
+const PNG_MAGIC = [0x89, 0x50, 0x4e, 0x47];
+
+async function logoToDataUri(file: File): Promise<string | null> {
+  if (file.size === 0) return null;
+  if (file.type !== "image/png" || file.size > MAX_LOGO_BYTES) return null;
+  const buf = Buffer.from(await file.arrayBuffer());
+  if (!PNG_MAGIC.every((b, i) => buf[i] === b)) return null;
+  return `data:image/png;base64,${buf.toString("base64")}`;
+}
+
 export async function createOrganization(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
-  const slugInput = String(formData.get("slug") ?? "")
-    .trim()
-    .toLowerCase();
-  const slug = slugInput || slugify(name);
+  const slug = slugify(name);
+  const logoFile = formData.get("logo");
 
-  if (name.length < 2 || name.length > 120) {
+  if (name.length < 2 || name.length > 120 || !SLUG_RE.test(slug)) {
     redirect("/dashboard/new?error=" + encodeURIComponent("Nombre inválido."));
   }
-  if (!SLUG_RE.test(slug)) {
+
+  const logoUrl =
+    logoFile instanceof File ? await logoToDataUri(logoFile) : null;
+  if (logoFile instanceof File && logoFile.size > 0 && !logoUrl) {
     redirect(
       "/dashboard/new?error=" +
-        encodeURIComponent("Slug inválido (minúsculas, números y guiones)."),
+        encodeURIComponent(
+          "El logo debe ser un PNG sin fondo de máximo 256 KB.",
+        ),
     );
   }
 
@@ -64,7 +82,11 @@ export async function createOrganization(formData: FormData) {
 
   const { data: org, error: orgError } = await supabase
     .from("organizations")
-    .insert({ name, slug })
+    .insert({
+      name,
+      slug,
+      ...(logoUrl ? { brand: { logo_url: logoUrl } } : {}),
+    })
     .select("id")
     .single();
 
@@ -73,7 +95,7 @@ export async function createOrganization(formData: FormData) {
       "/dashboard/new?error=" +
         encodeURIComponent(
           orgError?.code === "23505"
-            ? "Ese slug ya está en uso."
+            ? "Ya existe una organización con un nombre similar."
             : "No se pudo crear la organización.",
         ),
     );

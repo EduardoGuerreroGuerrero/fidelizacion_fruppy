@@ -112,12 +112,12 @@ export default async function SettingsPage({
           </div>
           <div>
             <label htmlFor="logo_url" className={label}>
-              Logo (URL https)
+              Logo (URL https o PNG subido)
             </label>
             <input
               id="logo_url"
               name="logo_url"
-              type="url"
+              type="text"
               defaultValue={brand.logo_url ?? ""}
               className={input}
             />
