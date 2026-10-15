@@ -33,6 +33,12 @@
   --color-wine: #a01755;
   --color-chip-green: #d6f5e1;
   --color-chip-green-ink: #159a55;
+  /* Identidad PineappleLoyalty (marca SaaS) */
+  --color-pl-green: #0f5132;
+  --color-pl-green-2: #22c55e;
+  --color-pl-yellow: #fbbf24;
+  --color-pl-cream: #fef3c7;
+  --color-pl-bg: #f8fafc;
 }
 
 body {

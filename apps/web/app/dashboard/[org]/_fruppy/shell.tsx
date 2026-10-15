@@ -64,6 +64,8 @@ export function FruppyShell({
   const [moreOpen, setMoreOpen] = useState(false);
   const [progOpen, setProgOpen] = useState(true);
   const [sideCollapsed, setSideCollapsed] = useState(false);
+  const [bellOpen, setBellOpen] = useState(false);
+  const [userOpen, setUserOpen] = useState(false);
 
   const hrefFor = (path: string) => `${base}${path ? `/${path}` : ""}`;
   const isOn = (path: string) =>
@@ -340,25 +342,95 @@ export function FruppyShell({
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <button
-                type="button"
-                aria-label="Notificaciones"
-                className="relative flex size-10 items-center justify-center rounded-full ring-1 ring-neutral-200 transition hover:bg-neutral-50"
-              >
-                <IconBell className="size-5 text-navy" />
-                <span className="absolute right-2 top-2 size-2 rounded-full bg-accent" />
-              </button>
-              <div className="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-3 ring-1 ring-neutral-200">
-                <span className="flex size-9 items-center justify-center rounded-full bg-pastel-lav text-xs font-bold text-[#7c5cd6]">
-                  {userInitials || "?"}
-                </span>
-                <span className="leading-tight">
-                  <span className="block max-w-[160px] truncate text-sm font-semibold text-navy">
-                    {userName}
+              <div className="relative">
+                <button
+                  type="button"
+                  aria-label="Notificaciones"
+                  aria-expanded={bellOpen}
+                  onClick={() => {
+                    setBellOpen((v) => !v);
+                    setUserOpen(false);
+                  }}
+                  className="flex size-10 items-center justify-center rounded-full ring-1 ring-neutral-200 transition hover:bg-neutral-50"
+                >
+                  <IconBell className="size-5 text-navy" />
+                </button>
+                {bellOpen && (
+                  <>
+                    <button
+                      type="button"
+                      aria-label="Cerrar"
+                      onClick={() => setBellOpen(false)}
+                      className="fixed inset-0 z-40 cursor-default"
+                    />
+                    <div className="absolute right-0 z-50 mt-2 w-64 rounded-2xl bg-white p-4 shadow-lg ring-1 ring-black/[0.06]">
+                      <p className="text-sm font-semibold text-navy">
+                        Notificaciones
+                      </p>
+                      <p className="mt-1 text-xs text-ink-soft">
+                        Sin notificaciones nuevas.
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
+              <div className="relative">
+                <button
+                  type="button"
+                  aria-haspopup="menu"
+                  aria-expanded={userOpen}
+                  onClick={() => {
+                    setUserOpen((v) => !v);
+                    setBellOpen(false);
+                  }}
+                  className="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-3 ring-1 ring-neutral-200 transition hover:bg-neutral-50"
+                >
+                  <span className="flex size-9 items-center justify-center rounded-full bg-pastel-lav text-xs font-bold text-[#7c5cd6]">
+                    {userInitials || "?"}
                   </span>
-                  <span className="block text-[11px] text-ink-soft">{roleLabel}</span>
-                </span>
-                <IconChevronDown className="size-4 text-ink-soft" />
+                  <span className="leading-tight">
+                    <span className="block max-w-[160px] truncate text-left text-sm font-semibold text-navy">
+                      {userName}
+                    </span>
+                    <span className="block text-[11px] text-ink-soft">
+                      {roleLabel}
+                    </span>
+                  </span>
+                  <IconChevronDown
+                    className={`size-4 text-ink-soft transition-transform ${userOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
+                {userOpen && (
+                  <>
+                    <button
+                      type="button"
+                      aria-label="Cerrar"
+                      onClick={() => setUserOpen(false)}
+                      className="fixed inset-0 z-40 cursor-default"
+                    />
+                    <div
+                      role="menu"
+                      className="absolute right-0 z-50 mt-2 w-56 rounded-2xl bg-white p-2 shadow-lg ring-1 ring-black/[0.06]"
+                    >
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setUserOpen(false)}
+                        className="block rounded-xl px-3 py-2 text-sm font-medium text-navy transition hover:bg-neutral-50"
+                      >
+                        Cambiar de organización
+                      </Link>
+                      <form action={signOut}>
+                        <button
+                          type="submit"
+                          className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-accent transition hover:bg-accent-soft"
+                        >
+                          <IconLogout className="size-4" />
+                          Cerrar sesión
+                        </button>
+                      </form>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

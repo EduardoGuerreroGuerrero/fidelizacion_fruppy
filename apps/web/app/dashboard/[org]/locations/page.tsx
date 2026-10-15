@@ -31,7 +31,7 @@ export default async function LocationsPage({
 
   const { data: locations } = await supabase
     .from("locations")
-    .select("id, name, address, status")
+    .select("id, name, address, status, lat, lng")
     .eq("organization_id", org.id)
     .order("created_at");
 
@@ -60,6 +60,18 @@ export default async function LocationsPage({
             className={input + " flex-1"}
           />
           <input name="address" placeholder="Dirección" className={input + " flex-1"} />
+          <input
+            name="lat"
+            placeholder="Lat (opcional)"
+            inputMode="decimal"
+            className={input + " w-28"}
+          />
+          <input
+            name="lng"
+            placeholder="Lng (opcional)"
+            inputMode="decimal"
+            className={input + " w-28"}
+          />
           <button
             type="submit"
             className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
@@ -67,6 +79,10 @@ export default async function LocationsPage({
             Crear
           </button>
         </form>
+        <p className="mt-2 text-xs text-neutral-500">
+          Con latitud/longitud el cliente puede ordenar las sedes por
+          cercanía (opcional, se calcula en su dispositivo).
+        </p>
       </section>
 
       <ul className="space-y-2">
@@ -103,10 +119,24 @@ export default async function LocationsPage({
                 </button>
               </form>
             </div>
-            <form action={saveLocation.bind(null, slug)} className="mt-2 flex gap-2">
+            <form action={saveLocation.bind(null, slug)} className="mt-2 flex flex-wrap gap-2">
               <input type="hidden" name="id" value={l.id} />
               <input name="name" defaultValue={l.name} className={input} />
               <input name="address" defaultValue={l.address ?? ""} className={input} />
+              <input
+                name="lat"
+                defaultValue={l.lat ?? ""}
+                placeholder="Lat"
+                inputMode="decimal"
+                className={input + " w-24"}
+              />
+              <input
+                name="lng"
+                defaultValue={l.lng ?? ""}
+                placeholder="Lng"
+                inputMode="decimal"
+                className={input + " w-24"}
+              />
               <button
                 type="submit"
                 className="shrink-0 rounded-md border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"

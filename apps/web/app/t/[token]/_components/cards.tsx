@@ -204,9 +204,11 @@ export function MenuRow({
 export function LocationRow({
   location,
   index,
+  distanceKm,
 }: {
   location: CardLocation;
   index: number;
+  distanceKm?: number;
 }) {
   const photo = `/brand/loc-${(index % 3) + 1}.jpg`;
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
@@ -221,7 +223,14 @@ export function LocationRow({
         className="size-24 shrink-0 rounded-2xl object-cover"
       />
       <div className="min-w-0 flex-1 py-0.5">
-        <p className="font-semibold leading-tight text-ink">{location.name}</p>
+        <p className="font-semibold leading-tight text-ink">
+          {location.name}
+          {distanceKm != null ? (
+            <span className="ml-1.5 align-middle text-xs font-medium text-brand">
+              {distanceKm < 1 ? `${Math.round(distanceKm * 1000)} m` : `${distanceKm.toFixed(1)} km`}
+            </span>
+          ) : null}
+        </p>
         <p className="mt-0.5 line-clamp-1 text-xs text-ink-soft">
           {location.address}
         </p>
