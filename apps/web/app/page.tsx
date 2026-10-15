@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
-const MAX_WAIT_MS = 15_000;
+const MAX_WAIT_MS = 10_000;
 const FADE_MS = 450;
 
 export default function Home() {
@@ -62,13 +62,6 @@ export default function Home() {
           Toca la pantalla para ver el intro
         </p>
       )}
-      <button
-        type="button"
-        onClick={finish}
-        className="absolute right-6 bottom-6 rounded-full bg-white/80 px-5 py-2 text-sm font-medium text-pl-green shadow-sm ring-1 ring-pl-green/20 backdrop-blur transition hover:bg-white"
-      >
-        Omitir
-      </button>
     </main>
   );
 }
