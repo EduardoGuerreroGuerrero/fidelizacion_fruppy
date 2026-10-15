@@ -27,7 +27,7 @@ export default async function LoginPage({
             type="email"
             required
             autoComplete="email"
-            className="rounded-xl bg-neutral-100 px-4 py-3 outline-none focus:ring-2 focus:ring-brand/50"
+            className="rounded-xl bg-neutral-100 px-4 py-3 outline-none focus:ring-2 focus:ring-pl-green/50"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm text-ink">
@@ -38,19 +38,19 @@ export default async function LoginPage({
             required
             minLength={8}
             autoComplete="current-password"
-            className="rounded-xl bg-neutral-100 px-4 py-3 outline-none focus:ring-2 focus:ring-brand/50"
+            className="rounded-xl bg-neutral-100 px-4 py-3 outline-none focus:ring-2 focus:ring-pl-green/50"
           />
         </label>
         <button
           type="submit"
-          className="rounded-full bg-brand py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
+          className="rounded-full bg-pl-green py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green/90"
         >
           Entrar
         </button>
       </form>
       <p className="mt-4 text-center text-sm text-ink-soft">
         ¿Sin cuenta?{" "}
-        <Link href="/signup" className="font-medium text-brand">
+        <Link href="/signup" className="font-medium text-pl-green">
           Registra tu comercio
         </Link>
       </p>
