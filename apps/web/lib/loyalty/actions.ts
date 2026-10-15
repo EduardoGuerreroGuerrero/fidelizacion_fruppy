@@ -296,7 +296,7 @@ export async function sendCardEmail(orgSlug: string, customerId: string, cardId:
         También puedes abrir tu tarjeta desde cualquier navegador con este enlace:
         <a href="${cardUrl}">${cardUrl}</a>
       </p>
-      <p style="font-size:12px;color:#a3a3a3">Powered by Fruppy — fidelización digital</p>
+      <p style="font-size:12px;color:#a3a3a3">Powered by PineappleLoyalty — fidelización digital</p>
     </div>`;
 
   const res = await sendEmail({
