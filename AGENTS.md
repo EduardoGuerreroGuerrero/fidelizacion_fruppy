@@ -48,9 +48,11 @@ ruff check scripts/                                                   # lint Pyt
   `fruppy-agentkit` (usar solo ramas temporales para pruebas).
 - Marca SaaS: PineappleLoyalty. Assets en `apps/web/public/pineapple/`
   (intro.mp4, logo.png horizontal, logo-vertical.png, brand-board.png);
-  paleta `pl-*` en `globals.css`. El intro de `/` salta a `/login` si el
-  video falla — Playwright headless no trae codec H.264 y emula
-  `prefers-reduced-motion`, así que ahí el intro se omite siempre.
+  paleta `pl-*` en `globals.css`. El intro de `/` usa `intro.mp4`
+  remuxed con `+faststart` (moov al inicio, sin audio); si se reemplaza el
+  video hay que remuxar igual o el browser espera el moov del final.
+  Salta a `/login` si el video falla — Playwright headless no trae codec
+  H.264, así que ahí el intro se omite siempre.
 
 ## Checklist
 
