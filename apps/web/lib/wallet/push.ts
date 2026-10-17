@@ -68,3 +68,27 @@ export async function pushWalletUpdate(serialNumber: string): Promise<void> {
     console.error("[wallet] push update failed:", e instanceof Error ? e.message : e);
   }
 }
+
+// Mensaje promocional al titular del pase (Google: TEXT_AND_NOTIFY — push
+// visible, máx. 3/pase/24h). Mismas reglas que pushWalletUpdate: solo pases
+// con entrega registrada, best-effort, nunca bloquea.
+export async function pushWalletMessage(
+  serialNumber: string,
+  header: string,
+  body: string,
+): Promise<void> {
+  if (!walletProvider.configured()) return;
+  try {
+    const admin = supabaseAdmin();
+    const { data: passes } = await admin
+      .from("wallet_passes")
+      .select("id")
+      .eq("serial_number", serialNumber)
+      .in("status", ["active", "pending"])
+      .limit(1);
+    if (!passes?.length) return;
+    await walletProvider.sendPassMessage(serialNumber, { header, body });
+  } catch (e) {
+    console.error("[wallet] push message failed:", e instanceof Error ? e.message : e);
+  }
+}

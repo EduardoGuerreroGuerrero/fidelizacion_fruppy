@@ -72,13 +72,6 @@ export default function IntroVideo() {
         onError={finish}
         onCanPlay={tryPlay}
       />
-      <button
-        type="button"
-        onClick={finish}
-        className="absolute bottom-6 right-6 rounded-full border border-neutral-300 bg-white/80 px-4 py-1.5 text-xs font-medium text-ink-soft backdrop-blur transition hover:bg-white"
-      >
-        Omitir intro
-      </button>
       {needsTap && (
         <p className="absolute inset-x-0 bottom-24 text-center text-sm font-medium text-pl-green/70">
           Toca la pantalla para ver el intro

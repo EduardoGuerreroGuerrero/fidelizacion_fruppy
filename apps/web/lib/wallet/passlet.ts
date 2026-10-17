@@ -193,7 +193,25 @@ export class PassletWalletProvider implements WalletProvider {
 
   async updatePass(serialNumber: string): Promise<void> {
     // update() re-lee el estado vía load() → idempotente, safe para retry.
-    await this.getWallet().update(serialNumber);
+    // notify: Google alerta al usuario de los campos con changeMessage (sin
+    // esto el pase se actualiza en silencio). En Apple no aplica: APNs
+    // siempre avisa cuando hay changeMessage.
+    await this.getWallet().update(serialNumber, { notify: true });
+  }
+
+  async sendPassMessage(
+    serialNumber: string,
+    message: { header: string; body: string },
+  ): Promise<void> {
+    // sendMessage vive en la plantilla; la reconstruimos desde la DB como en
+    // update() — la fuente de verdad no es el pase emitido sino la tarjeta.
+    const data = await passDataBySerial(serialNumber);
+    if (!data) return;
+    await this.templateOf(data).sendMessage(serialNumber, {
+      header: message.header,
+      body: message.body,
+      messageType: "TEXT_AND_NOTIFY",
+    });
   }
 
   async revokePass(serialNumber: string): Promise<void> {
