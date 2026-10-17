@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { signIn } from "@/lib/auth/actions";
+import { signIn, signInWithGoogle } from "@/lib/auth/actions";
+import { IconGoogle } from "../../_landing/icons";
 
 export const instant = false;
 
@@ -46,6 +47,22 @@ export default async function LoginPage({
           className="rounded-full bg-pl-green py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green/90"
         >
           Entrar
+        </button>
+      </form>
+      <div className="my-4 flex items-center gap-3">
+        <span className="h-px flex-1 bg-ink/10" />
+        <span className="text-xs text-ink-soft">o continúa con</span>
+        <span className="h-px flex-1 bg-ink/10" />
+      </div>
+      <form action={signInWithGoogle}>
+        <input type="hidden" name="next" value={next ?? "/dashboard"} />
+        <input type="hidden" name="from" value="/login" />
+        <button
+          type="submit"
+          className="flex w-full items-center justify-center gap-2 rounded-full border border-ink/15 bg-white py-3 text-sm font-semibold text-ink transition hover:bg-neutral-50"
+        >
+          <IconGoogle className="h-4 w-4" />
+          Continuar con Google
         </button>
       </form>
       <p className="mt-4 text-center text-sm text-ink-soft">
