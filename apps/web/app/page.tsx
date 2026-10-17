@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import IntroVideo from "./_landing/intro";
+import MobileMenu from "./_landing/mobile-menu";
 import {
   IconArrowRight,
   IconAward,
@@ -21,7 +22,6 @@ import {
   IconInstagram,
   IconLinkedIn,
   IconMail,
-  IconMenu,
   IconPin,
   IconPlay,
   IconQr,
@@ -69,19 +69,19 @@ function Chip({ children }: { children: ReactNode }) {
 function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-neutral-100 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-4 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
         <Link href="#inicio" className="flex items-center gap-2">
           <Image
-            src="/pineapple/isotipo.png"
+            src="/pineapple/isotipo-trans.png"
             alt="PineappleLoyalty"
             width={36}
             height={36}
             className="h-9 w-9 object-contain"
             priority
           />
-          <Wordmark />
+          <Wordmark className="text-base sm:text-xl" />
         </Link>
-        <nav className="ml-4 hidden items-center gap-6 text-sm font-medium text-ink lg:flex">
+        <nav className="hidden flex-1 items-center justify-center gap-6 text-sm font-medium text-ink lg:flex">
           {NAV.map((item) => (
             <a
               key={item.href}
@@ -121,39 +121,12 @@ function Header() {
           </Link>
           <button
             type="button"
-            className="flex items-center gap-1.5 rounded-full bg-pl-green-2 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green-2/90"
+            className="hidden items-center gap-1.5 rounded-full bg-pl-green-2 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green-2/90 sm:flex"
           >
             Probar gratis
             <IconArrowRight className="h-4 w-4" />
           </button>
-          <details className="relative lg:hidden">
-            <summary className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-lg text-ink [&::-webkit-details-marker]:hidden">
-              <IconMenu className="h-5 w-5" />
-            </summary>
-            <div className="absolute right-0 top-full mt-2 w-52 rounded-xl border border-neutral-100 bg-white p-2 shadow-lg">
-              {NAV.map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  className="block rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-neutral-50"
-                >
-                  {item.label}
-                </a>
-              ))}
-              <a
-                href="#faq"
-                className="block rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-neutral-50"
-              >
-                Preguntas frecuentes
-              </a>
-              <Link
-                href="/login"
-                className="block rounded-lg px-3 py-2 text-sm font-semibold text-pl-green hover:bg-neutral-50"
-              >
-                Iniciar sesión
-              </Link>
-            </div>
-          </details>
+          <MobileMenu items={NAV} />
         </div>
       </div>
     </header>
@@ -164,7 +137,7 @@ function Hero() {
   return (
     <section
       id="inicio"
-      className="relative overflow-hidden bg-gradient-to-b from-pl-cream/70 via-pl-cream/30 to-white"
+      className="relative scroll-mt-16 overflow-hidden bg-gradient-to-b from-pl-cream/70 via-pl-cream/30 to-white"
     >
       <div
         aria-hidden
@@ -172,7 +145,9 @@ function Hero() {
       />
       <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 sm:px-6 lg:grid-cols-2 lg:py-20">
         <div>
-          <Chip>Programa de fidelización para comercios</Chip>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-pl-green/20 bg-white/70 px-3.5 py-1.5 text-[11px] font-medium text-pl-green">
+            Programa de fidelización para comercios
+          </span>
           <h1 className="mt-4 text-4xl font-extrabold leading-[1.08] tracking-tight text-pl-green sm:text-5xl lg:text-[3.4rem]">
             Convierte clientes ocasionales en{" "}
             <span className="text-pl-green-2">clientes frecuentes</span>
@@ -213,11 +188,11 @@ function Hero() {
         </div>
         <div className="relative flex items-center justify-center py-6">
           <Confetti />
-          <div className="absolute -left-2 top-1/2 z-10 hidden -translate-y-1/2 sm:block">
+          <div className="absolute -left-2 top-1/2 hidden -translate-y-1/2 sm:block">
             <ScanCard />
           </div>
           <HeroPhone />
-          <div className="absolute -right-2 bottom-4 z-10 sm:right-0">
+          <div className="absolute -right-1 top-[55%] z-10 w-36 -translate-y-1/2 sm:-right-6 sm:w-auto">
             <SuccessCard />
           </div>
         </div>
@@ -248,7 +223,7 @@ function Steps() {
     },
   ];
   return (
-    <section id="como-funciona" className="bg-white py-16 lg:py-20">
+    <section id="como-funciona" className="scroll-mt-16 bg-white py-16 lg:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="text-center">
           <Chip>Así de simple</Chip>
@@ -275,9 +250,14 @@ function Steps() {
                 </div>
               </div>
               {i < steps.length - 1 && (
-                <div className="hidden items-center lg:flex">
-                  <IconArrowRight className="h-6 w-6 text-neutral-300" />
-                </div>
+                <>
+                  <div className="hidden items-center lg:flex">
+                    <IconArrowRight className="h-6 w-6 text-neutral-300" />
+                  </div>
+                  <div className="flex justify-center lg:hidden">
+                    <IconChevronDown className="h-6 w-6 text-pl-green-2/60" />
+                  </div>
+                </>
               )}
             </div>
           ))}
@@ -311,7 +291,7 @@ function Benefits() {
     },
   ];
   return (
-    <section id="beneficios" className="bg-[#f3faf3] py-16 lg:py-20">
+    <section id="beneficios" className="scroll-mt-16 bg-[#f3faf3] py-16 lg:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="text-center">
           <Chip>Beneficios para tu negocio</Chip>
@@ -391,7 +371,7 @@ function Features() {
     },
   ];
   return (
-    <section id="funciones" className="bg-white py-16 lg:py-20">
+    <section id="funciones" className="scroll-mt-16 bg-white py-16 lg:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="text-center">
           <Chip>Funciones principales</Chip>
@@ -432,7 +412,7 @@ function BusinessTypes() {
     { icon: IconScissors, label: "Barberías", bg: "from-neutral-900 to-neutral-700" },
   ];
   return (
-    <section id="negocios" className="bg-white pb-16 lg:pb-20">
+    <section id="negocios" className="scroll-mt-16 bg-white pb-16 lg:pb-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="text-center">
           <Chip>Comercios que ya confían</Chip>
@@ -448,7 +428,7 @@ function BusinessTypes() {
           {items.map(({ icon: Icon, label, bg }) => (
             <div
               key={label}
-              className={`group relative aspect-[4/5] overflow-hidden rounded-2xl bg-gradient-to-br ${bg}`}
+              className={`group relative aspect-[4/3] overflow-hidden rounded-2xl bg-gradient-to-br ${bg}`}
             >
               <div
                 aria-hidden
@@ -517,7 +497,7 @@ function Pricing() {
     },
   ];
   return (
-    <section id="precios" className="bg-white py-16 lg:py-20">
+    <section id="precios" className="scroll-mt-16 bg-white py-16 lg:py-20">
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
         <div className="text-center">
           <Chip>Planes y precios</Chip>
@@ -595,7 +575,7 @@ function Faq() {
     },
   ];
   return (
-    <section id="faq" className="bg-white pb-16 lg:pb-20">
+    <section id="faq" className="scroll-mt-16 bg-white pb-16 lg:pb-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -639,7 +619,7 @@ function CtaBanner() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="relative flex flex-col items-start gap-6 overflow-hidden rounded-3xl bg-gradient-to-r from-pl-green to-[#0b3d24] px-8 py-10 sm:flex-row sm:items-center sm:px-12">
           <Image
-            src="/pineapple/isotipo.png"
+            src="/pineapple/isotipo-trans.png"
             alt=""
             width={72}
             height={72}
@@ -672,7 +652,7 @@ function Footer() {
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 gap-y-4 px-4 py-6 sm:px-6">
         <Link href="#inicio" className="flex items-center gap-2">
           <Image
-            src="/pineapple/isotipo.png"
+            src="/pineapple/isotipo-trans.png"
             alt="PineappleLoyalty"
             width={30}
             height={30}
