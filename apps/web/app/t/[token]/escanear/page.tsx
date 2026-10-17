@@ -9,8 +9,8 @@ import {
   IconQr,
   IconScan,
   IconStore,
-  StampStrawberry,
 } from "../_components/icons";
+import { stampIconFor } from "../_components/stamp-icons";
 
 export const instant = false;
 
@@ -38,6 +38,7 @@ export default async function Escanear({
 
   const isStamps = card.program_type === "stamps" && card.stamp_goal;
   const current = isStamps ? card.current_stamps : card.current_points;
+  const StampIcon = stampIconFor(card.stamp_icon);
 
   return (
     <>
@@ -118,7 +119,7 @@ export default async function Escanear({
                 {Icon ? (
                   <Icon className="size-5 text-brand" />
                 ) : (
-                  <StampStrawberry filled className="size-6" />
+                  <StampIcon filled className="size-6" />
                 )}
               </span>
               <p className="mt-1.5 text-[11px] font-medium leading-tight text-ink">

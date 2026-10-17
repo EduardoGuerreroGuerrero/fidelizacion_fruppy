@@ -59,11 +59,13 @@ export function RewardCard({
   current,
   index,
   base,
+  stampIcon,
 }: {
   reward: CardReward;
   current: number;
   index: number;
   base: string;
+  stampIcon?: string | null;
 }) {
   const style = BONO_STYLES[index % BONO_STYLES.length];
   const n = (index % 5) + 1;
@@ -94,7 +96,7 @@ export function RewardCard({
       </div>
       <div className="relative mt-3 flex flex-wrap items-center gap-2">
         {isStamps ? (
-          <StampMini current={current} goal={goal} />
+          <StampMini current={current} goal={goal} icon={stampIcon} />
         ) : (
           <span className="text-xs font-semibold text-ink">
             {Math.min(current, goal)} / {goal} puntos

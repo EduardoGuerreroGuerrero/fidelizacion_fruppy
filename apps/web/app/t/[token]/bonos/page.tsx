@@ -65,6 +65,7 @@ export default async function MisBonos({
                   current={current}
                   index={i}
                   base={base}
+                  stampIcon={card.stamp_icon}
                 />
               ))
             ) : (

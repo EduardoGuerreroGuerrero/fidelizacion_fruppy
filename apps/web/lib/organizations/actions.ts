@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { logoToDataUri } from "./logo";
 
 const SLUG_RE = /^[a-z0-9][a-z0-9-]{1,62}$/;
 
@@ -37,21 +38,6 @@ async function audit(
   } catch (e) {
     console.error("[audit]", action, e instanceof Error ? e.message : e);
   }
-}
-
-// Logo del comercio: PNG con transparencia, guardado como data URI en
-// organizations.brand.logo_url (mismo formato que ya usan las orgs sembradas).
-// Sin bucket de Storage el data URI evita infra extra; el límite mantiene la
-// fila de la org razonablemente liviana.
-const MAX_LOGO_BYTES = 256 * 1024;
-const PNG_MAGIC = [0x89, 0x50, 0x4e, 0x47];
-
-async function logoToDataUri(file: File): Promise<string | null> {
-  if (file.size === 0) return null;
-  if (file.type !== "image/png" || file.size > MAX_LOGO_BYTES) return null;
-  const buf = Buffer.from(await file.arrayBuffer());
-  if (!PNG_MAGIC.every((b, i) => buf[i] === b)) return null;
-  return `data:image/png;base64,${buf.toString("base64")}`;
 }
 
 export async function createOrganization(formData: FormData) {

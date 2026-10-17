@@ -10,6 +10,7 @@ type Daily = { day: string; count: number };
 type Analytics = {
   timezone: string;
   days: number;
+  granularity: "day" | "week" | "month";
   customers_total: number;
   customers_new: number;
   customers_active: number;
@@ -27,6 +28,19 @@ type Analytics = {
   return_rate_denominator: number;
 };
 
+const PERIODS = [
+  { days: 7, label: "7 días" },
+  { days: 30, label: "30 días" },
+  { days: 90, label: "90 días" },
+  { days: 365, label: "1 año" },
+] as const;
+
+const GRANULARITIES = [
+  { value: "day", label: "Día" },
+  { value: "week", label: "Semana" },
+  { value: "month", label: "Mes" },
+] as const;
+
 function Card({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
     <div className="rounded-lg border border-neutral-200 p-5 dark:border-neutral-800">
@@ -37,8 +51,24 @@ function Card({ label, value, hint }: { label: string; value: string; hint?: str
   );
 }
 
-export default async function AnalyticsPage({ params }: { params: Promise<{ org: string }> }) {
+function bucketLabel(day: string, gran: string) {
+  const d = new Date(day + "T00:00:00");
+  if (gran === "month") return d.toLocaleDateString("es-CO", { month: "short", year: "2-digit" });
+  return d.toLocaleDateString("es-CO", { day: "numeric", month: "short" });
+}
+
+export default async function AnalyticsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ org: string }>;
+  searchParams: Promise<{ days?: string; gran?: string }>;
+}) {
   const { org: slug } = await params;
+  const { days: daysParam, gran: granParam } = await searchParams;
+  const days = PERIODS.some((p) => String(p.days) === daysParam) ? Number(daysParam) : 30;
+  const granularity = GRANULARITIES.some((g) => g.value === granParam) ? granParam! : "day";
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -52,22 +82,30 @@ export default async function AnalyticsPage({ params }: { params: Promise<{ org:
     .maybeSingle();
   if (!org) notFound();
 
-  const days = 30;
   const { data: a } = await supabase.rpc("org_analytics", {
     p_org: org.id,
     p_days: days,
+    p_granularity: granularity,
   });
   const m = a as unknown as Analytics | null;
   if (!m) notFound();
 
   const maxVisits = Math.max(1, ...m.visits_daily.map((d) => d.count));
+  const totalVisits = m.visits_daily.reduce((s, d) => s + d.count, 0);
+  const avgVisits = m.visits_daily.length
+    ? (totalVisits / m.visits_daily.length).toFixed(1)
+    : "0";
+  // Con muchas barras (365 días en granularidad diaria) solo se rotulan
+  // algunas para que el eje siga siendo legible.
+  const labelEvery = Math.max(1, Math.ceil(m.visits_daily.length / 10));
+
+  const filterLink = (d: number, g: string) => `?days=${d}&gran=${g}`;
 
   return (
     <div className="mx-auto max-w-4xl">
       <h1 className="mb-1 text-2xl font-semibold">Analítica</h1>
       <p className="mb-6 text-sm text-neutral-500">
-        Últimos {m.days} días · zona horaria {m.timezone} · definiciones en{" "}
-        <code>docs/ANALYTICS.md</code>
+        Zona horaria {m.timezone} · definiciones en <code>docs/ANALYTICS.md</code>
       </p>
 
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -101,22 +139,86 @@ export default async function AnalyticsPage({ params }: { params: Promise<{ org:
         />
       </div>
 
-      <h2 className="mb-3 text-lg font-medium">Visitas por día</h2>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-lg font-medium">Visitas por período</h2>
+        <div className="flex flex-wrap items-center gap-3 text-xs">
+          <div className="flex overflow-hidden rounded-md border border-neutral-200 dark:border-neutral-800">
+            {PERIODS.map((p) => (
+              <a
+                key={p.days}
+                href={filterLink(p.days, granularity)}
+                className={`px-3 py-1.5 font-medium transition ${
+                  p.days === days
+                    ? "bg-brand text-white"
+                    : "hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                }`}
+              >
+                {p.label}
+              </a>
+            ))}
+          </div>
+          <div className="flex overflow-hidden rounded-md border border-neutral-200 dark:border-neutral-800">
+            {GRANULARITIES.map((g) => (
+              <a
+                key={g.value}
+                href={filterLink(days, g.value)}
+                className={`px-3 py-1.5 font-medium transition ${
+                  g.value === granularity
+                    ? "bg-brand text-white"
+                    : "hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                }`}
+              >
+                {g.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div className="rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
-        <div className="flex h-36 items-end gap-[3px]">
-          {m.visits_daily.map((d) => (
-            <div
-              key={d.day}
-              title={`${d.day}: ${d.count} visitas`}
-              className="flex-1 rounded-t bg-green-500/80"
-              style={{ height: `${(d.count / maxVisits) * 100}%` }}
-            />
-          ))}
+        <div className="mb-3 flex items-center justify-between text-xs text-neutral-500">
+          <span>
+            Total del período: <strong className="text-neutral-700 dark:text-neutral-300">{totalVisits}</strong>
+          </span>
+          <span>
+            Promedio por {granularity === "month" ? "mes" : granularity === "week" ? "semana" : "día"}:{" "}
+            <strong className="text-neutral-700 dark:text-neutral-300">{avgVisits}</strong>
+          </span>
         </div>
-        <div className="mt-1 flex justify-between text-xs text-neutral-400">
-          <span>{m.visits_daily[0]?.day}</span>
-          <span>{m.visits_daily[m.visits_daily.length - 1]?.day}</span>
-        </div>
+        {m.visits_daily.length > 0 && totalVisits > 0 ? (
+          <>
+            <div className="flex h-44 items-end gap-[3px]">
+              {m.visits_daily.map((d) => (
+                <div
+                  key={d.day}
+                  title={`${bucketLabel(d.day, granularity)}: ${d.count} visitas`}
+                  className="group relative flex-1 rounded-t bg-gradient-to-t from-brand to-brand/70 transition hover:from-brand-dark hover:to-brand"
+                  style={{ height: `${Math.max(2, (d.count / maxVisits) * 100)}%` }}
+                >
+                  {d.count > 0 && (
+                    <span className="pointer-events-none absolute -top-5 left-1/2 hidden -translate-x-1/2 text-[10px] font-semibold text-neutral-600 group-hover:block dark:text-neutral-300">
+                      {d.count}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="mt-1.5 flex justify-between text-[10px] text-neutral-400">
+              {m.visits_daily.map((d, i) => (
+                <span
+                  key={d.day}
+                  className={i % labelEvery === 0 || i === m.visits_daily.length - 1 ? "" : "invisible"}
+                >
+                  {bucketLabel(d.day, granularity)}
+                </span>
+              ))}
+            </div>
+          </>
+        ) : (
+          <p className="py-10 text-center text-sm text-neutral-400">
+            Sin visitas registradas en este período.
+          </p>
+        )}
       </div>
     </div>
   );

@@ -37,14 +37,16 @@ export default async function AuditPage({ params }: { params: Promise<{ org: str
         {(logs ?? []).map((l) => (
           <li
             key={l.id}
-            className="rounded-lg border border-neutral-200 px-4 py-2 text-sm dark:border-neutral-800"
+            className="flex flex-col gap-1 rounded-lg border border-neutral-200 px-4 py-3 text-sm dark:border-neutral-800 sm:flex-row sm:items-start sm:justify-between sm:gap-3"
           >
-            <span className="font-medium">{l.action}</span>
-            <span className="ml-2 text-neutral-500">
-              {l.entity_type}
-              {l.entity_id ? ` · ${String(l.entity_id).slice(0, 8)}…` : ""}
-            </span>
-            <span className="float-right text-xs text-neutral-400">
+            <p className="min-w-0 break-words">
+              <span className="font-medium">{l.action}</span>
+              <span className="ml-2 break-all text-neutral-500">
+                {l.entity_type}
+                {l.entity_id ? ` · ${String(l.entity_id).slice(0, 8)}…` : ""}
+              </span>
+            </p>
+            <span className="shrink-0 text-xs text-neutral-400">
               {new Date(l.created_at).toLocaleString("es-CO")}
             </span>
           </li>

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { displayName } from "@/lib/format";
+import { pushWalletUpdate } from "@/lib/wallet/push";
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -314,6 +315,46 @@ export async function importCustomers(orgSlug: string, rows: CsvRow[]) {
   });
   revalidatePath(`/dashboard/${orgSlug}/customers`);
   return { created, skipped: rows.length - created };
+}
+
+// "Eliminar" cliente: no es un DELETE físico — el historial de visitas,
+// transacciones y consentimientos es evidencia auditable (ledger inmutable,
+// regla del plan) y no se puede perder porque el titular desaparezca de la
+// lista. Se marca inactivo, se revocan sus tarjetas activas (deja de poder
+// acumular/canjear) y queda registrado en auditoría. Para supresión real de
+// datos personales existe el flujo formal de derechos ARCO en "Derechos".
+export async function archiveCustomer(orgSlug: string, customerId: string) {
+  const { supabase, user, orgId } = await requireMembership(orgSlug);
+  const back = `/dashboard/${orgSlug}/customers`;
+
+  const { data: cards } = await supabase
+    .from("customer_cards")
+    .select("id")
+    .eq("customer_id", customerId)
+    .eq("organization_id", orgId)
+    .eq("status", "active");
+
+  const { error } = await supabase
+    .from("customers")
+    .update({ status: "inactive", updated_at: new Date().toISOString() })
+    .eq("id", customerId)
+    .eq("organization_id", orgId);
+  if (error) {
+    redirect(back + "?error=" + encodeURIComponent("No se pudo eliminar el cliente."));
+  }
+
+  for (const card of cards ?? []) {
+    await supabase.rpc("revoke_card", { p_card_id: card.id });
+    await pushWalletUpdate(card.id);
+  }
+
+  await audit(orgId, user.id, "customer.archived", "customer", customerId, {
+    cards_revoked: (cards ?? []).length,
+  });
+  revalidatePath(back);
+  redirect(
+    back + "?ok=" + encodeURIComponent("Cliente eliminado (archivado) y tarjetas revocadas."),
+  );
 }
 
 // Consentimiento como evento separado con auditoría propia (F3-T6): la RPC

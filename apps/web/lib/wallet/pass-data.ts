@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase/server";
+import { publicLogoUrl } from "@/lib/organizations/logo";
 import type { WalletPassData } from "./provider";
 
 // Carga del pase desde la DB (fuente de verdad) para emisión y updates.
@@ -8,7 +9,7 @@ import type { WalletPassData } from "./provider";
 const SELECT =
   "id, token, status, organization_id, customer_id, customers(first_name), " +
   "loyalty_accounts(program_id, current_stamps, current_points, loyalty_programs(name, program_type, stamp_goal)), " +
-  "organizations(name)";
+  "organizations(name, brand)";
 
 type CardRow = {
   id: string;
@@ -37,7 +38,10 @@ type CardRow = {
           | null;
       }[]
     | null;
-  organizations: { name: string } | { name: string }[] | null;
+  organizations:
+    | { name: string; brand: { logo_url?: string } | null }
+    | { name: string; brand: { logo_url?: string } | null }[]
+    | null;
 };
 
 const first = <T>(v: T | T[] | null | undefined): T | null =>
@@ -55,6 +59,7 @@ function toPassData(card: CardRow): WalletPassData {
     customerId: card.customer_id,
     programId: acc?.program_id ?? null,
     orgName: org?.name ?? "Comercio",
+    logoUrl: org?.brand?.logo_url ? publicLogoUrl(baseUrl, card.organization_id) : null,
     firstName: cust?.first_name ?? "Cliente",
     programName: prog?.name ?? "Fidelización",
     stamps:

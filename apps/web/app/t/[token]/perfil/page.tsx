@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { createElement } from "react";
 import { getCardAppData } from "../_components/data";
 import { TitleBar } from "../_components/chrome";
 import { MenuRow } from "../_components/cards";
@@ -13,9 +14,9 @@ import {
   IconPin,
   IconShield,
   IconUser,
-  StampStrawberry,
   IconGift,
 } from "../_components/icons";
+import { stampIconFor } from "../_components/stamp-icons";
 
 export const instant = false;
 
@@ -83,7 +84,10 @@ export default async function MiPerfil({
       {/* Stats: sellos + recompensas */}
       <div className="relative z-10 mx-8 -mt-8 flex rounded-2xl bg-white p-4 shadow-lg">
         <div className="flex flex-1 items-center justify-center gap-2.5 border-r border-neutral-100">
-          <StampStrawberry filled className="size-8" />
+          {createElement(stampIconFor(card.stamp_icon), {
+            filled: true,
+            className: "size-8",
+          })}
           <span>
             <span className="block text-lg font-bold leading-none tabular-nums text-ink">
               {current}
