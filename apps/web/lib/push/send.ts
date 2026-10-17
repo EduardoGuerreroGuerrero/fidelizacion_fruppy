@@ -132,9 +132,7 @@ export async function processPushQueue(limit = 50): Promise<{
     .order("created_at")
     .limit(limit);
 
-  const campaignIds = new Set<string>();
   for (const d of (deliveries ?? []) as unknown as QueuedDelivery[]) {
-    campaignIds.add(d.campaign_id);
     const sub = d.push_subscriptions;
     const cust = Array.isArray(sub?.customers) ? sub?.customers[0] : sub?.customers;
     // Re-chequeo en el envío: baja de consentimiento, cliente inactivo o
@@ -219,6 +217,12 @@ export async function processPushQueue(limit = 50): Promise<{
     }
   }
 
-  for (const id of campaignIds) await finishCampaignIfDone(admin, id);
+  // Cierra toda campaña en 'sending' sin entregas pendientes — incluidas las
+  // que se encolaron con 0 destinatarios (nunca generan lote propio).
+  const { data: sending } = await admin
+    .from("push_campaigns")
+    .select("id")
+    .eq("status", "sending");
+  for (const c of sending ?? []) await finishCampaignIfDone(admin, c.id);
   return out;
 }
