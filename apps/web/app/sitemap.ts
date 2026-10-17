@@ -9,6 +9,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 1,
     },
+    ...["/preguntas", "/contacto"].map((path) => ({
+      url: `${base}${path}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.5,
+    })),
     ...["/legal/terminos", "/legal/privacidad", "/legal/datos"].map((path) => ({
       url: `${base}${path}`,
       lastModified: new Date(),
