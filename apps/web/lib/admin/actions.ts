@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { logoToDataUri } from "@/lib/organizations/logo";
+import { processPushQueue, pushConfigured } from "@/lib/push/send";
 import { STAMP_ICON_KEYS } from "@/app/t/[token]/_components/stamp-icons";
 
 // Acciones de administración del comercio (Fase 7). Todas verifican sesión
@@ -571,19 +572,39 @@ export async function queuePushCampaign(orgSlug: string, campaignId: string) {
     p_campaign_id: campaignId,
   });
   if (error) {
+    const m = error.message;
     fail(
       back,
-      error.message.includes("plan_limit")
+      m.includes("plan_limit")
         ? "Límite mensual de campañas alcanzado para tu plan."
-        : "No se pudo encolar la campaña.",
+        : m.includes("invalid_status")
+          ? "La campaña ya está en envío o fue enviada."
+          : "No se pudo encolar la campaña.",
     );
   }
   await audit(orgId, user.id, "campaign.queued", "push_campaign", campaignId, {
     recipients: count,
   });
+
+  // "Enviar ahora" envía de verdad: drena la cola al instante en vez de
+  // esperar al cron diario. Si el servidor no tiene push configurado la
+  // campaña queda encolada igual (el cron la recogerá después).
+  const drain = pushConfigured()
+    ? await processPushQueue(50).catch(() => null)
+    : null;
   revalidatePath(back);
   redirect(
-    back + "?ok=" + encodeURIComponent(`Enviando a ${count ?? 0} destinatario(s).`),
+    back +
+      "?ok=" +
+      encodeURIComponent(
+        drain
+          ? `Campaña enviada: ${drain.sent} entregada(s)` +
+              (drain.failed ? `, ${drain.failed} fallida(s)` : "") +
+              (drain.expired ? `, ${drain.expired} expirada(s)` : "") +
+              (drain.skipped ? `, ${drain.skipped} omitida(s)` : "") +
+              "."
+          : `Enviando a ${count ?? 0} destinatario(s).`,
+      ),
   );
 }
 
