@@ -199,6 +199,21 @@ export class PassletWalletProvider implements WalletProvider {
     await this.getWallet().update(serialNumber, { notify: true });
   }
 
+  async sendPassMessage(
+    serialNumber: string,
+    message: { header: string; body: string },
+  ): Promise<void> {
+    // sendMessage vive en la plantilla; la reconstruimos desde la DB como en
+    // update() — la fuente de verdad no es el pase emitido sino la tarjeta.
+    const data = await passDataBySerial(serialNumber);
+    if (!data) return;
+    await this.templateOf(data).sendMessage(serialNumber, {
+      header: message.header,
+      body: message.body,
+      messageType: "TEXT_AND_NOTIFY",
+    });
+  }
+
   async revokePass(serialNumber: string): Promise<void> {
     // Las wallets no tienen "revoke": el push re-renderiza vía load() y la
     // tarjeta web /t/{token} ya muestra el estado revocado.
