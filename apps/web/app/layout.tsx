@@ -21,6 +21,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_BASE_URL ?? "https://www.pineappleloyalty.com",
+  ),
   title: "PineappleLoyalty — Make every visit count.",
   description: "SaaS de fidelización, CRM y tarjetas Wallet para comercios locales",
 };
