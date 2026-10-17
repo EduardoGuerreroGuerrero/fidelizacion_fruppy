@@ -201,7 +201,7 @@ export class PassletWalletProvider implements WalletProvider {
 
   async sendPassMessage(
     serialNumber: string,
-    message: { header: string; body: string },
+    message: { header: string; body: string; notify?: boolean },
   ): Promise<void> {
     // sendMessage vive en la plantilla; la reconstruimos desde la DB como en
     // update() — la fuente de verdad no es el pase emitido sino la tarjeta.
@@ -210,7 +210,7 @@ export class PassletWalletProvider implements WalletProvider {
     await this.templateOf(data).sendMessage(serialNumber, {
       header: message.header,
       body: message.body,
-      messageType: "TEXT_AND_NOTIFY",
+      messageType: message.notify === false ? "TEXT" : "TEXT_AND_NOTIFY",
     });
   }
 

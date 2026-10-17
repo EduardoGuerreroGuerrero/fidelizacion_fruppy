@@ -40,12 +40,12 @@ export interface WalletProvider {
   issuePass(data: WalletPassData): Promise<WalletIssueResult>;
   /** Push del estado actual leído vía load() — idempotente por naturaleza. */
   updatePass(serialNumber: string): Promise<void>;
-  /** Mensaje al titular del pase. Google: TEXT_AND_NOTIFY (push real, máx.
-   *  3 por pase cada 24h — usar solo para avisos puntuales). Apple no tiene
-   *  equivalente por pase; ahí no hace nada. */
+  /** Mensaje al titular del pase. Google: con notify=true es TEXT_AND_NOTIFY
+   *  (push real, máx. 3 por pase cada 24h); con notify=false es TEXT (queda
+   *  dentro del pase, sin alerta). Apple no tiene equivalente por pase. */
   sendPassMessage(
     serialNumber: string,
-    message: { header: string; body: string },
+    message: { header: string; body: string; notify?: boolean },
   ): Promise<void>;
   /** Revocación lógica: marca el pase como vacío/inactivo en la wallet. */
   revokePass(serialNumber: string): Promise<void>;
