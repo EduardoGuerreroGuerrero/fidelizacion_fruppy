@@ -32,14 +32,36 @@ export async function signUp(formData: FormData) {
     .trim()
     .toLowerCase();
   const password = String(formData.get("password") ?? "");
+  const terms = formData.get("terms");
 
   if (!EMAIL_RE.test(email)) fail("/signup", "Email inválido.");
   if (password.length < MIN_PASSWORD) {
     fail("/signup", `La contraseña debe tener al menos ${MIN_PASSWORD} caracteres.`);
   }
+  if (terms !== "on") {
+    fail("/signup", "Debes aceptar los términos y la política de privacidad.");
+  }
+
+  const metadata = Object.fromEntries(
+    (
+      [
+        ["full_name", formData.get("full_name")],
+        ["business", formData.get("business")],
+        ["business_type", formData.get("business_type")],
+        ["country", formData.get("country")],
+        ["city", formData.get("city")],
+      ] as const
+    )
+      .map(([k, v]) => [k, String(v ?? "").trim()] as const)
+      .filter(([, v]) => v !== ""),
+  );
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({ email, password });
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: metadata },
+  });
   if (error) fail("/signup", "No se pudo crear la cuenta. Intenta con otro email.");
 
   redirect("/dashboard");
