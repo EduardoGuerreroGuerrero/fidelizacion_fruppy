@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -65,6 +66,36 @@ export async function signUp(formData: FormData) {
   if (error) fail("/signup", "No se pudo crear la cuenta. Intenta con otro email.");
 
   redirect("/dashboard");
+}
+
+// OAuth con Google: Supabase redirige a Google y luego a /auth/callback.
+// Requiere el provider habilitado en Supabase + las Redirect URLs
+// registradas (…/auth/callback en prod y localhost).
+export async function signInWithGoogle(formData: FormData) {
+  const next = String(formData.get("next") ?? "/dashboard");
+  const from = String(formData.get("from") ?? "/login");
+  const safeNext =
+    next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
+  const safeFrom = from === "/signup" ? "/signup" : "/login";
+
+  const h = await headers();
+  const origin =
+    h.get("origin") ??
+    process.env.NEXT_PUBLIC_BASE_URL ??
+    `${h.get("x-forwarded-proto") ?? "https"}://${h.get("x-forwarded-host") ?? h.get("host")}`;
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(safeNext)}`,
+    },
+  });
+  if (error || !data.url) {
+    fail(safeFrom, "No se pudo iniciar con Google. Intenta de nuevo.");
+  }
+
+  redirect(data.url);
 }
 
 export async function signOut() {

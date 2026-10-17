@@ -3,13 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { signUp } from "@/lib/auth/actions";
+import { signUp, signInWithGoogle } from "@/lib/auth/actions";
 import {
   IconArrowRight,
   IconBars,
   IconBolt,
   IconCheckCircle,
   IconGear,
+  IconGoogle,
   IconLock,
   IconQr,
   IconUser,
@@ -282,6 +283,23 @@ export default async function SignupPage({
             >
               Crear cuenta gratis
               <IconArrowRight className="h-4 w-4" />
+            </button>
+          </form>
+
+          <div className="my-5 flex items-center gap-3">
+            <span className="h-px flex-1 bg-ink/10" />
+            <span className="text-xs text-ink-soft">o continúa con</span>
+            <span className="h-px flex-1 bg-ink/10" />
+          </div>
+          <form action={signInWithGoogle}>
+            <input type="hidden" name="next" value="/dashboard" />
+            <input type="hidden" name="from" value="/signup" />
+            <button
+              type="submit"
+              className="flex w-full items-center justify-center gap-2 rounded-full border border-ink/15 bg-white py-3.5 text-sm font-semibold text-ink transition hover:bg-neutral-50"
+            >
+              <IconGoogle className="h-4.5 w-4.5" />
+              Continuar con Google
             </button>
           </form>
 
