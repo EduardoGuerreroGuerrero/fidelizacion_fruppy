@@ -48,7 +48,7 @@ export function HeroPhone() {
           <div className="bg-gradient-to-br from-pl-green to-[#0b3d24] px-4 pb-5 pt-9">
             <div className="flex items-center gap-1.5">
               <Image
-                src="/pineapple/isotipo.png"
+                src="/pineapple/isotipo-trans.png"
                 alt=""
                 width={18}
                 height={18}
@@ -126,7 +126,7 @@ export function ScanCard() {
       </div>
       <div className="mt-2 flex items-center justify-center gap-1">
         <Image
-          src="/pineapple/isotipo.png"
+          src="/pineapple/isotipo-trans.png"
           alt=""
           width={12}
           height={12}
@@ -243,7 +243,7 @@ export function LaptopMockup() {
               {/* Vista previa de tarjeta */}
               <div className="flex w-20 items-center justify-center rounded-md bg-pl-cream">
                 <Image
-                  src="/pineapple/isotipo.png"
+                  src="/pineapple/isotipo-trans.png"
                   alt=""
                   width={36}
                   height={36}
@@ -272,7 +272,7 @@ export function FormPhone() {
         <div className="rounded-[1.6rem] px-3 pb-4 pt-6">
           <div className="mx-auto mb-1 h-1 w-8 rounded bg-neutral-200" />
           <Image
-            src="/pineapple/isotipo.png"
+            src="/pineapple/isotipo-trans.png"
             alt=""
             width={28}
             height={28}

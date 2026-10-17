@@ -29,7 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="es"
-      className={`${poppins.variable} ${geistMono.variable} ${caveat.variable} h-full antialiased`}
+      className={`${poppins.variable} ${geistMono.variable} ${caveat.variable} h-full scroll-smooth antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
