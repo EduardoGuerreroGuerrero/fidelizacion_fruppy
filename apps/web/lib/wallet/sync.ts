@@ -3,9 +3,8 @@
 import { redirect } from "next/navigation";
 import { createClient, supabaseAdmin } from "@/lib/supabase/server";
 import { walletProvider } from "./passlet";
-import { WalletNotConfiguredError, type WalletPassData } from "./provider";
-import { displayName } from "@/lib/format";
-import { publicLogoUrl } from "@/lib/organizations/logo";
+import { passDataByToken } from "./pass-data";
+import { WalletNotConfiguredError } from "./provider";
 
 // Sincronización Wallet: wallet_passes es ESPEJO técnico (serial, estado,
 // último error). Nunca toca el ledger — un fallo de Wallet no revierte
@@ -29,9 +28,7 @@ export async function syncWalletPass(orgSlug: string, customerId: string): Promi
 
   const { data: card } = await supabase
     .from("customer_cards")
-    .select(
-      "id, token, status, customers(first_name), loyalty_accounts(program_id, current_stamps, current_points, loyalty_programs(name, program_type, stamp_goal))",
-    )
+    .select("id, token, loyalty_accounts(program_id)")
     .eq("customer_id", customerId)
     .eq("organization_id", org.id)
     .eq("status", "active")
@@ -39,34 +36,13 @@ export async function syncWalletPass(orgSlug: string, customerId: string): Promi
     .maybeSingle();
   if (!card) return { ok: false, detail: "no_active_card" };
 
-  const cust = Array.isArray(card.customers) ? card.customers[0] : card.customers;
-  const acc = Array.isArray(card.loyalty_accounts)
+  // Misma construcción que load()/emisión: pass-data es la única fuente —
+  // incluye color de marca, logo validado y último mensaje del pase.
+  const passData = await passDataByToken(card.token);
+  if (!passData) return { ok: false, detail: "no_active_card" };
+  const accRow = Array.isArray(card.loyalty_accounts)
     ? card.loyalty_accounts[0]
     : card.loyalty_accounts;
-  const prog =
-    acc && (Array.isArray(acc.loyalty_programs) ? acc.loyalty_programs[0] : acc.loyalty_programs);
-
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
-
-  const passData: WalletPassData = {
-    serialNumber: card.id,
-    orgId: org.id,
-    customerId,
-    programId: acc?.program_id ?? null,
-    orgName: org.name,
-    logoUrl: (org.brand as { logo_url?: string } | null)?.logo_url
-      ? publicLogoUrl(baseUrl, org.id)
-      : null,
-    firstName: displayName(cust?.first_name) || "Cliente",
-    programName: prog?.name ?? "Fidelización",
-    stamps:
-      prog?.program_type === "stamps"
-        ? { current: acc?.current_stamps ?? 0, goal: prog?.stamp_goal ?? null }
-        : null,
-    points: prog?.program_type === "points" ? (acc?.current_points ?? 0) : null,
-    cardUrl: `${baseUrl}/t/${card.token}`,
-    revoked: card.status !== "active",
-  };
 
   let admin;
   try {
@@ -84,7 +60,7 @@ export async function syncWalletPass(orgSlug: string, customerId: string): Promi
       {
         organization_id: org.id,
         customer_id: customerId,
-        program_id: acc?.program_id,
+        program_id: accRow?.program_id ?? null,
         provider,
         serial_number: card.id,
         status,

@@ -12,6 +12,11 @@ export interface WalletPassData {
   /** URL https pública del logo del comercio (servida por /logo/{orgId}), o
    *  null si no subió uno — Wallet exige una URL real, nunca data: URIs. */
   logoUrl: string | null;
+  /** organizations.brand.color — color de fondo de la clase del pase. */
+  brandColor: string | null;
+  /** Último mensaje enviado al pase. Google acumula messages[] en el objeto;
+   *  el update reescribe el array solo con este para no mostrar historial. */
+  lastMessage: { header: string; body: string } | null;
   firstName: string;
   programName: string;
   /** null si el programa es de puntos. */

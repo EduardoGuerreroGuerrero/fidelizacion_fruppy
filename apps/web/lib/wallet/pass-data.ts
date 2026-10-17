@@ -39,27 +39,50 @@ type CardRow = {
       }[]
     | null;
   organizations:
-    | { name: string; brand: { logo_url?: string } | null }
-    | { name: string; brand: { logo_url?: string } | null }[]
+    | { name: string; brand: { logo_url?: string; color?: string } | null }
+    | { name: string; brand: { logo_url?: string; color?: string } | null }[]
     | null;
 };
 
 const first = <T>(v: T | T[] | null | undefined): T | null =>
   Array.isArray(v) ? (v[0] ?? null) : (v ?? null);
 
-function toPassData(card: CardRow): WalletPassData {
+async function lastMessageBySerial(
+  serial: string,
+): Promise<{ header: string; body: string } | null> {
+  const { data } = await supabaseAdmin()
+    .from("wallet_passes")
+    .select("last_message")
+    .eq("serial_number", serial)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const m = data?.last_message as { header?: string; body?: string } | null;
+  return m && m.header && m.body ? { header: m.header, body: m.body } : null;
+}
+
+async function toPassData(card: CardRow): Promise<WalletPassData> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
   const cust = first(card.customers);
   const acc = first(card.loyalty_accounts);
   const prog = acc ? first(acc.loyalty_programs) : null;
   const org = first(card.organizations);
+  // Solo vale como logo un data: URI (PNG subido por Settings). Cualquier
+  // otra cosa — p. ej. la URL del sitio web del comercio — no es una imagen
+  // y Google rechaza la clase si la recibe como logo.
+  const hasLogo = !!org?.brand?.logo_url?.startsWith("data:");
   return {
     serialNumber: card.id,
     orgId: card.organization_id,
     customerId: card.customer_id,
     programId: acc?.program_id ?? null,
     orgName: org?.name ?? "Comercio",
-    logoUrl: org?.brand?.logo_url ? publicLogoUrl(baseUrl, card.organization_id) : null,
+    logoUrl: hasLogo ? publicLogoUrl(baseUrl, card.organization_id) : null,
+    brandColor:
+      typeof org?.brand?.color === "string" && /^#[0-9a-fA-F]{6}$/.test(org.brand.color)
+        ? org.brand.color
+        : null,
+    lastMessage: await lastMessageBySerial(card.id),
     firstName: cust?.first_name ?? "Cliente",
     programName: prog?.name ?? "Fidelización",
     stamps:
@@ -78,7 +101,7 @@ export async function passDataByToken(token: string): Promise<WalletPassData | n
     .select(SELECT)
     .eq("token", token)
     .maybeSingle();
-  return data ? toPassData(data as unknown as CardRow) : null;
+  return data ? await toPassData(data as unknown as CardRow) : null;
 }
 
 export async function passDataBySerial(serialNumber: string): Promise<WalletPassData | null> {
@@ -87,5 +110,5 @@ export async function passDataBySerial(serialNumber: string): Promise<WalletPass
     .select(SELECT)
     .eq("id", serialNumber)
     .maybeSingle();
-  return data ? toPassData(data as unknown as CardRow) : null;
+  return data ? await toPassData(data as unknown as CardRow) : null;
 }

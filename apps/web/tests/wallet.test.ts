@@ -62,6 +62,8 @@ test("issuePass lanza WalletNotConfiguredError sin credenciales", async () => {
           programId: "p1",
           orgName: "Org",
           logoUrl: null,
+          brandColor: null,
+          lastMessage: null,
           firstName: "Ana",
           programName: "Café",
           stamps: { current: 3, goal: 9 },
