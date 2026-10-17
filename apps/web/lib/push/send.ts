@@ -1,6 +1,7 @@
 import webpush from "web-push";
 import { optionalEnv } from "@/lib/env";
 import { supabaseAdmin } from "@/lib/supabase/server";
+import { pushCampaignToWallets } from "@/lib/wallet/push";
 
 // Envío Web Push por comercio. Solo servidor: la clave privada VAPID nunca
 // sale del entorno. La elegibilidad se re-evalúa en el momento del envío:
@@ -48,7 +49,7 @@ type CampaignRow = { id: string; status: string; title: string; body: string; ur
 async function queueDueCampaigns(admin: ReturnType<typeof supabaseAdmin>): Promise<number> {
   const { data: due } = await admin
     .from("push_campaigns")
-    .select("id, organization_id")
+    .select("id, organization_id, title, body")
     .eq("status", "scheduled")
     .lte("scheduled_at", new Date().toISOString())
     .limit(5);
@@ -79,6 +80,12 @@ async function queueDueCampaigns(admin: ReturnType<typeof supabaseAdmin>): Promi
       .update({ status: "sending" })
       .eq("id", c.id)
       .eq("status", "scheduled");
+
+    // Mismo mensaje hacia los pases Google entregados (con cuota 3/24h;
+    // degradado a TEXT al agotarse). Best-effort: no bloquea el drenaje.
+    await pushCampaignToWallets(c.organization_id, c.title, c.body).catch((e) => {
+      console.error("[push] wallet campaign failed:", e instanceof Error ? e.message : e);
+    });
   }
   return due?.length ?? 0;
 }
