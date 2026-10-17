@@ -16,12 +16,9 @@ import {
   IconChevronDown,
   IconCoffee,
   IconDumbbell,
-  IconFacebook,
   IconFood,
   IconGrid,
   IconIceCream,
-  IconInstagram,
-  IconLinkedIn,
   IconMail,
   IconPin,
   IconPlay,
@@ -31,7 +28,6 @@ import {
   IconStar,
   IconUsers,
   IconWallet,
-  IconYoutube,
 } from "./_landing/icons";
 import {
   Confetti,
@@ -98,18 +94,18 @@ function Header() {
               <IconChevronDown className="h-3.5 w-3.5 transition group-open:rotate-180" />
             </summary>
             <div className="absolute left-0 top-full mt-2 w-48 rounded-xl border border-neutral-100 bg-white p-2 shadow-lg">
-              <a
-                href="#faq"
+              <Link
+                href="/preguntas"
                 className="block rounded-lg px-3 py-2 text-sm text-ink hover:bg-neutral-50"
               >
                 Preguntas frecuentes
-              </a>
-              <button
-                type="button"
-                className="block w-full rounded-lg px-3 py-2 text-left text-sm text-ink hover:bg-neutral-50"
+              </Link>
+              <Link
+                href="/contacto"
+                className="block rounded-lg px-3 py-2 text-sm text-ink hover:bg-neutral-50"
               >
-                Blog
-              </button>
+                Contacto
+              </Link>
             </div>
           </details>
         </nav>
@@ -120,13 +116,13 @@ function Header() {
           >
             Iniciar sesión
           </Link>
-          <button
-            type="button"
+          <Link
+            href="/signup"
             className="hidden items-center gap-1.5 rounded-full bg-pl-green-2 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green-2/90 sm:flex"
           >
             Probar gratis
             <IconArrowRight className="h-4 w-4" />
-          </button>
+          </Link>
           <MobileMenu items={NAV} />
         </div>
       </div>
@@ -159,13 +155,13 @@ function Hero() {
             vuelven por más.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
-            <button
-              type="button"
+            <Link
+              href="/signup"
               className="flex items-center gap-2 rounded-full bg-pl-green-2 px-6 py-3 text-sm font-semibold text-white shadow-md shadow-pl-green-2/30 transition hover:bg-pl-green-2/90"
             >
               Probar gratis
               <IconArrowRight className="h-4 w-4" />
-            </button>
+            </Link>
             <a
               href="#como-funciona"
               className="flex items-center gap-2 rounded-full border border-pl-green/25 bg-white px-6 py-3 text-sm font-semibold text-pl-green transition hover:border-pl-green/50"
@@ -465,6 +461,7 @@ function Pricing() {
         "Reportes básicos",
       ],
       cta: "Crear cuenta gratis",
+      href: "/signup",
       highlight: false,
     },
     {
@@ -480,6 +477,7 @@ function Pricing() {
         "Soporte prioritario",
       ],
       cta: "Probar 30 días gratis",
+      href: "/signup",
       highlight: true,
     },
     {
@@ -494,6 +492,7 @@ function Pricing() {
         "Acompañamiento en implementación",
       ],
       cta: "Contactar un asesor",
+      href: "/contacto",
       highlight: false,
     },
   ];
@@ -538,16 +537,16 @@ function Pricing() {
                   </li>
                 ))}
               </ul>
-              <button
-                type="button"
-                className={`mt-6 rounded-full py-2.5 text-sm font-semibold transition ${
+              <Link
+                href={p.href}
+                className={`mt-6 rounded-full py-2.5 text-center text-sm font-semibold transition ${
                   p.highlight
                     ? "bg-pl-green-2 text-white shadow-md shadow-pl-green-2/30 hover:bg-pl-green-2/90"
                     : "border border-neutral-300 text-ink hover:border-pl-green/50 hover:text-pl-green"
                 }`}
               >
                 {p.cta}
-              </button>
+              </Link>
             </div>
           ))}
         </div>
@@ -585,13 +584,13 @@ function Faq() {
               Resolvemos tus dudas
             </h2>
           </div>
-          <button
-            type="button"
+          <Link
+            href="/preguntas"
             className="flex items-center gap-1.5 rounded-full border border-pl-green/30 px-4 py-2 text-xs font-semibold text-pl-green transition hover:border-pl-green/60"
           >
             Ver todas las preguntas
             <IconArrowRight className="h-3.5 w-3.5" />
-          </button>
+          </Link>
         </div>
         <div className="mt-8 grid gap-3 sm:grid-cols-2">
           {items.map((item) => (
@@ -634,13 +633,13 @@ function CtaBanner() {
               Crea tu programa en minutos y comienza a ver resultados.
             </p>
           </div>
-          <button
-            type="button"
+          <Link
+            href="/signup"
             className="flex items-center gap-2 rounded-full bg-pl-yellow px-6 py-3 text-sm font-bold text-ink shadow-lg transition hover:bg-pl-yellow/90"
           >
             Probar gratis
             <IconArrowRight className="h-4 w-4" />
-          </button>
+          </Link>
         </div>
       </div>
     </section>
@@ -665,8 +664,10 @@ function Footer() {
           <a href="#inicio" className="hover:text-pl-green">Inicio</a>
           <a href="#funciones" className="hover:text-pl-green">Funciones</a>
           <a href="#precios" className="hover:text-pl-green">Precios</a>
-          <button type="button" className="hover:text-pl-green">Blog</button>
-          <a href="#contacto" className="hover:text-pl-green">Contacto</a>
+          <Link href="/preguntas" className="hover:text-pl-green">
+            Preguntas
+          </Link>
+          <Link href="/contacto" className="hover:text-pl-green">Contacto</Link>
         </nav>
         <div className="ml-auto flex flex-wrap items-center gap-x-5 gap-y-2">
           <nav className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-ink-soft">
@@ -680,20 +681,6 @@ function Footer() {
               Tratamiento de datos (Colombia)
             </Link>
           </nav>
-          <div className="flex items-center gap-3 text-ink-soft">
-            <button type="button" aria-label="Instagram" className="hover:text-pl-green">
-              <IconInstagram className="h-4 w-4" />
-            </button>
-            <button type="button" aria-label="Facebook" className="hover:text-pl-green">
-              <IconFacebook className="h-4 w-4" />
-            </button>
-            <button type="button" aria-label="LinkedIn" className="hover:text-pl-green">
-              <IconLinkedIn className="h-4 w-4" />
-            </button>
-            <button type="button" aria-label="YouTube" className="hover:text-pl-green">
-              <IconYoutube className="h-4 w-4" />
-            </button>
-          </div>
         </div>
       </div>
     </footer>

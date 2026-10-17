@@ -39,13 +39,20 @@ export default function MobileMenu({ items }: { items: Item[] }) {
                 {item.label}
               </a>
             ))}
-            <a
-              href="#faq"
+            <Link
+              href="/preguntas"
               onClick={close}
               className="block rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-neutral-50"
             >
               Preguntas frecuentes
-            </a>
+            </Link>
+            <Link
+              href="/contacto"
+              onClick={close}
+              className="block rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-neutral-50"
+            >
+              Contacto
+            </Link>
             <div className="my-2 border-t border-neutral-100" />
             <Link
               href="/login"
@@ -54,13 +61,14 @@ export default function MobileMenu({ items }: { items: Item[] }) {
             >
               Iniciar sesión
             </Link>
-            <button
-              type="button"
+            <Link
+              href="/signup"
+              onClick={close}
               className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-full bg-pl-green-2 px-4 py-2.5 text-sm font-semibold text-white"
             >
               Probar gratis
               <IconArrowRight className="h-4 w-4" />
-            </button>
+            </Link>
           </div>
         </>
       )}
