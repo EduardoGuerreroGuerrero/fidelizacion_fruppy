@@ -98,7 +98,7 @@ export default async function MiTarjeta({
             title="Progreso de tus sellos"
             actionText={`${Math.min(current, goal!)} de ${goal}`}
           />
-          <StampRow current={current} goal={goal!} />
+          <StampRow current={current} goal={goal!} icon={card.stamp_icon} />
         </>
       ) : null}
 

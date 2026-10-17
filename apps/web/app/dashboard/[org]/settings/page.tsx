@@ -1,6 +1,9 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { updateOrgPrivacy, updateOrgSettings } from "@/lib/admin/actions";
+import { defaultPolicyText } from "@/lib/legal/policy-template";
+import { STAMP_ICON_OPTIONS } from "@/app/t/[token]/_components/stamp-icons";
+import { ColorPicker } from "./color-picker";
 
 export const instant = false;
 
@@ -39,13 +42,18 @@ export default async function SettingsPage({
     .maybeSingle();
   if (!org) notFound();
 
-  const brand = (org.brand ?? {}) as { color?: string; logo_url?: string };
+  const brand = (org.brand ?? {}) as {
+    color?: string;
+    logo_url?: string;
+    stamp_icon?: string;
+  };
   const brandColor = brand.color ?? "#16a34a";
+  const stampIcon = brand.stamp_icon ?? "strawberry";
   const legal = (org.legal ?? {}) as {
     privacy_email?: string;
-    policy_url?: string;
     data_controller?: string;
     consent_version?: string;
+    policy_text?: string;
   };
   const features = (org.features ?? {}) as Record<string, unknown>;
 
@@ -67,6 +75,9 @@ export default async function SettingsPage({
       <div className="grid gap-6 sm:grid-cols-2">
         <form action={updateOrgSettings.bind(null, slug)} className="space-y-4">
           <div>
+            {/* El nombre aquí ES el nombre registrado de la organización —
+                única fuente de verdad: se usa igual en el panel, el QR,
+                la tarjeta del cliente y el pase de Wallet. */}
             <label htmlFor="name" className={label}>
               Nombre del comercio
             </label>
@@ -99,29 +110,68 @@ export default async function SettingsPage({
             </div>
           </div>
           <div>
-            <label htmlFor="brand_color" className={label}>
-              Color de tarjeta (#RRGGBB)
-            </label>
-            <input
-              id="brand_color"
-              name="brand_color"
-              defaultValue={brand.color ?? ""}
-              placeholder="#16a34a"
-              className={input}
-            />
+            <label className={label}>Color de tarjeta</label>
+            <ColorPicker name="brand_color" defaultValue={brand.color ?? ""} />
           </div>
           <div>
-            <label htmlFor="logo_url" className={label}>
-              Logo (URL https o PNG subido)
+            <label htmlFor="logo" className={label}>
+              Logo (PNG sin fondo)
             </label>
+            {brand.logo_url && (
+              <div className="mb-2 flex items-center gap-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={brand.logo_url}
+                  alt="Logo actual"
+                  className="h-10 w-auto rounded border border-neutral-200 bg-white object-contain p-1 dark:border-neutral-700"
+                />
+                <label className="flex items-center gap-1.5 text-xs text-neutral-500">
+                  <input type="checkbox" name="remove_logo" className="accent-brand" />
+                  Quitar logo actual
+                </label>
+              </div>
+            )}
             <input
-              id="logo_url"
-              name="logo_url"
-              type="text"
-              defaultValue={brand.logo_url ?? ""}
-              className={input}
+              id="logo"
+              name="logo"
+              type="file"
+              accept="image/png"
+              className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm text-neutral-600 file:mr-3 file:rounded-full file:border-0 file:bg-neutral-100 file:px-3 file:py-1 file:text-xs file:font-semibold dark:border-neutral-700 dark:bg-transparent dark:text-neutral-400"
             />
+            <p className="mt-1 text-xs text-neutral-400">
+              Máx. 256 KB. Este mismo logo se usa en el panel, el formulario
+              de registro por QR, la tarjeta del cliente y el pase de Google
+              Wallet.
+            </p>
           </div>
+
+          <div>
+            <label className={label}>Figura de los sellos</label>
+            <div className="grid grid-cols-4 gap-2">
+              {STAMP_ICON_OPTIONS.map(({ key, label: l, Icon }) => (
+                <label
+                  key={key}
+                  className="flex cursor-pointer flex-col items-center gap-1 rounded-lg border border-neutral-200 p-2 text-center has-[:checked]:border-brand has-[:checked]:bg-brand/5 dark:border-neutral-700"
+                >
+                  <input
+                    type="radio"
+                    name="stamp_icon"
+                    value={key}
+                    defaultChecked={stampIcon === key}
+                    className="sr-only"
+                  />
+                  <Icon filled className="size-6" />
+                  <span className="text-[11px] leading-tight text-neutral-600 dark:text-neutral-400">
+                    {l}
+                  </span>
+                </label>
+              ))}
+            </div>
+            <p className="mt-1 text-xs text-neutral-400">
+              {STAMP_ICON_OPTIONS.find((o) => o.key === stampIcon)?.hint}
+            </p>
+          </div>
+
           <button
             type="submit"
             className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
@@ -155,8 +205,9 @@ export default async function SettingsPage({
       </div>
 
       {/* Privacidad y funciones por comercio (Ley 1581): responsable,
-          canal de derechos, política y versión del texto de consentimiento.
-          Los flags activan autorregistro QR, push y ubicación opcional. */}
+          canal de derechos, política propia y versión del texto de
+          consentimiento. Los flags activan autorregistro QR, push y
+          ubicación opcional. */}
       <form
         action={updateOrgPrivacy.bind(null, slug)}
         className="mt-8 space-y-4 rounded-lg border border-neutral-200 p-5 dark:border-neutral-800"
@@ -202,15 +253,23 @@ export default async function SettingsPage({
           </div>
         </div>
         <div>
-          <label htmlFor="policy_url" className={label}>
-            URL de la política de tratamiento (https)
+          <label htmlFor="policy_text" className={label}>
+            Política de tratamiento de datos
           </label>
-          <input
-            id="policy_url"
-            name="policy_url"
-            type="url"
-            defaultValue={legal.policy_url ?? ""}
-            className={input}
+          <p className="mb-2 text-xs text-neutral-500">
+            Se precarga un texto base que reconoce a {org.name || "tu comercio"}{" "}
+            como responsable del tratamiento y a PineappleLoyalty como
+            encargado técnico (Ley 1581 de 2012). Puedes editarlo libremente
+            — esto reemplaza enlazar a una URL externa: el texto vigente
+            queda guardado aquí y se muestra en el formulario de registro y
+            en la tarjeta del cliente.
+          </p>
+          <textarea
+            id="policy_text"
+            name="policy_text"
+            rows={14}
+            defaultValue={legal.policy_text || defaultPolicyText(org.name)}
+            className={input + " font-mono text-xs leading-relaxed"}
           />
         </div>
 

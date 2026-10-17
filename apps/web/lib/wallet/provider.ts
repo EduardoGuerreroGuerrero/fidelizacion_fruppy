@@ -9,6 +9,9 @@ export interface WalletPassData {
   customerId: string;
   programId: string | null;
   orgName: string;
+  /** URL https pública del logo del comercio (servida por /logo/{orgId}), o
+   *  null si no subió uno — Wallet exige una URL real, nunca data: URIs. */
+  logoUrl: string | null;
   firstName: string;
   programName: string;
   /** null si el programa es de puntos. */

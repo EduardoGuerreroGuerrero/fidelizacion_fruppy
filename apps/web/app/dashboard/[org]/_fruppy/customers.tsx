@@ -22,9 +22,58 @@ import {
   IconX,
 } from "@/app/t/[token]/_components/icons";
 import { displayName } from "@/lib/format";
+import { archiveCustomer } from "@/lib/customers/actions";
 import { Avatar, Card, Chip, IconTile } from "./ui";
 import { timeAgo } from "./config";
 import { ImportCsvButton } from "./import-csv";
+
+// Menú de acciones por cliente (ficha, QR, eliminar). <details>/<summary>
+// nativo: no requiere JS de cliente y funciona igual en la fila de escritorio
+// y en la tarjeta móvil — antes el botón de 3 puntos solo enlazaba al panel
+// lateral rápido, que en móvil queda fuera de vista y parecía "no hacer nada".
+function RowMenu({
+  slug,
+  customerId,
+  name,
+}: {
+  slug: string;
+  customerId: string;
+  name: string;
+}) {
+  const base = `/dashboard/${slug}/customers`;
+  return (
+    <details className="group/menu relative">
+      <summary
+        aria-label={`Más acciones para ${name}`}
+        className="flex size-8 cursor-pointer list-none items-center justify-center rounded-lg text-neutral-400 transition hover:bg-neutral-100 hover:text-navy [&::-webkit-details-marker]:hidden"
+      >
+        <IconDotsV className="size-4" />
+      </summary>
+      <div className="absolute right-0 top-full z-20 mt-1 w-44 overflow-hidden rounded-xl bg-white py-1 shadow-lg ring-1 ring-black/5">
+        <Link
+          href={`${base}/${customerId}`}
+          className="block px-4 py-2 text-left text-sm text-navy hover:bg-neutral-50"
+        >
+          Ver ficha
+        </Link>
+        <Link
+          href={`${base}/${customerId}#tarjetas`}
+          className="block px-4 py-2 text-left text-sm text-navy hover:bg-neutral-50"
+        >
+          Ver QR de tarjeta
+        </Link>
+        <form action={archiveCustomer.bind(null, slug, customerId)}>
+          <button
+            type="submit"
+            className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+          >
+            Eliminar cliente
+          </button>
+        </form>
+      </div>
+    </details>
+  );
+}
 
 export type CustomerRow = {
   id: string;
@@ -278,8 +327,9 @@ export function FruppyCustomers({
                         aria-label="Panel rápido"
                         className="rounded-lg p-1.5 text-neutral-400 transition hover:bg-neutral-100 hover:text-navy"
                       >
-                        <IconDotsV className="size-4" />
+                        <IconChevron className="size-4" />
                       </Link>
+                      <RowMenu slug={slug} customerId={c.id} name={c.name} />
                     </span>
                   </td>
                 </tr>
@@ -368,19 +418,13 @@ export function FruppyCustomers({
                 </div>
                 <div className="flex shrink-0 flex-col items-center gap-1">
                   <Link
-                    href={`${customersBase}/${c.id}`}
+                    href={`${customersBase}/${c.id}#tarjetas`}
                     aria-label="Ver tarjeta / QR"
                     className={iconBtn}
                   >
                     <IconQr className="size-4" />
                   </Link>
-                  <Link
-                    href={panelUrl(c.id)}
-                    aria-label="Panel rápido"
-                    className="rounded-lg p-1 text-neutral-400"
-                  >
-                    <IconDotsV className="size-4" />
-                  </Link>
+                  <RowMenu slug={slug} customerId={c.id} name={c.name} />
                 </div>
               </div>
             </li>

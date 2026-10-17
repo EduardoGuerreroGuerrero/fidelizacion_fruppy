@@ -12,6 +12,7 @@ type JoinInfo = {
   logo_url?: string | null;
   privacy_email?: string | null;
   policy_url?: string | null;
+  policy_text?: string | null;
   data_controller?: string | null;
   push_enabled?: boolean;
   location_enabled?: boolean;
@@ -161,22 +162,19 @@ export default async function JoinPage({
             <span>
               Autorizo el tratamiento de mis datos personales por parte de{" "}
               <strong>{controller}</strong> para administrar el programa de
-              fidelización
-              {info.policy_url ? (
-                <>
-                  , conforme a la{" "}
-                  <a
-                    href={info.policy_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-medium text-brand underline"
-                  >
-                    política de tratamiento de datos
-                  </a>
-                </>
-              ) : (
-                ""
-              )}
+              fidelización, conforme a la{" "}
+              <a
+                href={
+                  info.policy_url
+                    ? info.policy_url
+                    : `/join/${token}/privacidad`
+                }
+                target={info.policy_url ? "_blank" : undefined}
+                rel={info.policy_url ? "noopener noreferrer" : undefined}
+                className="font-medium text-brand underline"
+              >
+                política de tratamiento de datos
+              </a>
               . <span className="text-ink-soft">(obligatorio)</span>
             </span>
           </label>
@@ -192,6 +190,18 @@ export default async function JoinPage({
               <span className="text-ink-soft">(opcional)</span>
             </span>
           </label>
+          <p className="mt-3 text-[12px] leading-snug text-ink-soft">
+            Al continuar también aceptas los{" "}
+            <a
+              href={`/join/${token}/terminos`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-brand underline"
+            >
+              términos y condiciones
+            </a>{" "}
+            del programa.
+          </p>
           <p className="mt-3 text-[11px] leading-snug text-ink-soft">
             Podrás activar o retirar notificaciones y otros permisos desde tu
             tarjeta, en cualquier momento y por separado

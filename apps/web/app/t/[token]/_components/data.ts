@@ -44,6 +44,10 @@ export type CardAppData = {
   consent_pending: boolean;
   location_enabled?: boolean;
   wallet_enabled?: boolean;
+  stamp_icon?: string | null;
+  policy_text?: string | null;
+  data_controller?: string | null;
+  privacy_email?: string | null;
   rewards: CardReward[];
   locations: CardLocation[];
   visits: CardVisit[];

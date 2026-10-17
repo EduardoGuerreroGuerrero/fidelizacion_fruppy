@@ -5,6 +5,7 @@ import { createClient, supabaseAdmin } from "@/lib/supabase/server";
 import { walletProvider } from "./passlet";
 import { WalletNotConfiguredError, type WalletPassData } from "./provider";
 import { displayName } from "@/lib/format";
+import { publicLogoUrl } from "@/lib/organizations/logo";
 
 // Sincronización Wallet: wallet_passes es ESPEJO técnico (serial, estado,
 // último error). Nunca toca el ledger — un fallo de Wallet no revierte
@@ -21,7 +22,7 @@ export async function syncWalletPass(orgSlug: string, customerId: string): Promi
 
   const { data: org } = await supabase
     .from("organizations")
-    .select("id, name")
+    .select("id, name, brand")
     .eq("slug", orgSlug)
     .maybeSingle();
   if (!org) return { ok: false, detail: "forbidden" };
@@ -53,6 +54,9 @@ export async function syncWalletPass(orgSlug: string, customerId: string): Promi
     customerId,
     programId: acc?.program_id ?? null,
     orgName: org.name,
+    logoUrl: (org.brand as { logo_url?: string } | null)?.logo_url
+      ? publicLogoUrl(baseUrl, org.id)
+      : null,
     firstName: displayName(cust?.first_name) || "Cliente",
     programName: prog?.name ?? "Fidelización",
     stamps:

@@ -101,6 +101,7 @@ export class PassletWalletProvider implements WalletProvider {
         const data = await passDataBySerial(serial);
         if (!data) return null;
         const { serialNumber: _serial, ...content } = this.contentOf(data);
+        void _serial;
         return { content, template: this.templateOf(data), updatedAt: new Date() };
       },
     };
@@ -153,8 +154,10 @@ export class PassletWalletProvider implements WalletProvider {
       google: baseUrl
         ? {
             issuerName: data.orgName,
-            logo: `${baseUrl}/brand/wallet-logo.png?v=2`,
-            hero: `${baseUrl}/brand/wallet-hero.png?v=2`,
+            // Logo del comercio si lo subió; si no, el genérico de la marca
+            // SaaS. Sin "hero": sin esa imagen la tarjeta queda unicolor
+            // (antes mostraba una promo fija de ejemplo, ajena al comercio).
+            logo: data.logoUrl ?? `${baseUrl}/brand/wallet-logo.png?v=2`,
           }
         : undefined,
       fields: [

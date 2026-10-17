@@ -60,7 +60,7 @@ export default async function BonoDetalle({
         </p>
         <div className="mt-3">
           {isStamps ? (
-            <StampMini current={current} goal={goal} />
+            <StampMini current={current} goal={goal} icon={card.stamp_icon} />
           ) : (
             <span className="text-sm font-semibold text-ink">
               {Math.min(current, goal)} / {goal} puntos

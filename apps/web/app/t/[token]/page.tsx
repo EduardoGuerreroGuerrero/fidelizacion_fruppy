@@ -119,7 +119,7 @@ export default async function CardHome({
       {isStamps ? (
         <>
           <Section title="Tu progreso" />
-          <StampRow current={current} goal={goal!} />
+          <StampRow current={current} goal={goal!} icon={card.stamp_icon} />
         </>
       ) : null}
 

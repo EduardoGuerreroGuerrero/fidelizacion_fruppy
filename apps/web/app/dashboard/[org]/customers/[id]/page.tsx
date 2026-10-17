@@ -291,7 +291,9 @@ export default async function CustomerPage({
             </button>
           </form>
 
-          <h2 className="mb-3 mt-8 text-lg font-medium">Tarjetas</h2>
+          <h2 id="tarjetas" className="mb-3 mt-8 scroll-mt-20 text-lg font-medium">
+            Tarjetas
+          </h2>
           <ul className="mb-8 space-y-2">
             {(programs ?? []).map((p) => {
               const account = (accounts ?? []).find(

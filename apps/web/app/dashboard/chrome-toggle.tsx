@@ -33,8 +33,8 @@ export function DashboardChrome({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/pineapple/logo.png"
-          alt="PineappleLoyalty"
-          className="h-14 w-auto sm:h-12"
+          alt="PineappleLoyalty — Make every visit count."
+          className="h-20 w-auto sm:h-16"
         />
         <div className="flex min-w-0 items-center gap-3 text-sm sm:gap-4">
           <span className="hidden truncate text-ink-soft sm:inline">

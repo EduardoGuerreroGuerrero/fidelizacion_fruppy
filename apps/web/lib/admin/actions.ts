@@ -3,6 +3,8 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { logoToDataUri } from "@/lib/organizations/logo";
+import { STAMP_ICON_KEYS } from "@/app/t/[token]/_components/stamp-icons";
 
 // Acciones de administración del comercio (Fase 7). Todas verifican sesión
 // + membresía activa en servidor; RLS refuerza en DB. Las policies de
@@ -195,6 +197,33 @@ export async function setRewardStatus(
   revalidatePath(`/dashboard/${orgSlug}/rewards`);
 }
 
+// Borrado real, no solo desactivación — a petición del comercio. Si la
+// recompensa ya tiene canjes asociados, la FK de `redemptions` bloquea el
+// DELETE (23503): esa evidencia de canje es inmutable, así que se devuelve
+// un error claro en vez de dejar caer la excepción cruda.
+export async function deleteReward(orgSlug: string, rewardId: string) {
+  const { supabase, user, orgId } = await requireMembership(orgSlug);
+  const back = `/dashboard/${orgSlug}/rewards`;
+
+  const { error } = await supabase
+    .from("rewards")
+    .delete()
+    .eq("id", rewardId)
+    .eq("organization_id", orgId);
+  if (error) {
+    fail(
+      back,
+      error.code === "23503"
+        ? "No se puede eliminar: ya tiene canjes registrados. Desactívala en su lugar."
+        : "No se pudo eliminar la recompensa.",
+    );
+  }
+
+  await audit(orgId, user.id, "reward.deleted", "reward", rewardId);
+  revalidatePath(back);
+  redirect(back + "?ok=" + encodeURIComponent("Recompensa eliminada."));
+}
+
 // ---------- Sedes ------------------------------------------------------------
 
 export async function saveLocation(orgSlug: string, formData: FormData) {
@@ -363,16 +392,26 @@ export async function updateOrgSettings(orgSlug: string, formData: FormData) {
     .toUpperCase();
   const timezone = String(formData.get("timezone") ?? "America/Bogota").trim();
   const brandColor = String(formData.get("brand_color") ?? "").trim();
-  const logoUrl = String(formData.get("logo_url") ?? "").trim();
+  const stampIcon = String(formData.get("stamp_icon") ?? "").trim();
+  const logoFile = formData.get("logo");
+  const removeLogo = formData.get("remove_logo") === "on";
 
   if (name.length < 2 || name.length > 120) fail(back, "Nombre inválido.");
   if (!/^[A-Z]{3}$/.test(currency)) fail(back, "Moneda inválida (ISO 4217).");
   if (brandColor && !/^#[0-9a-fA-F]{6}$/.test(brandColor))
     fail(back, "Color inválido (formato #RRGGBB).");
-  // El logo puede venir de la URL manual o del PNG subido al crear la org
-  // (data:image/png;base64,...). Ambos formatos se sirven igual en <img>.
-  if (logoUrl && !/^https:\/\/|^data:image\/png;base64,/.test(logoUrl))
-    fail(back, "El logo debe ser una URL https o un PNG subido.");
+  if (stampIcon && !(STAMP_ICON_KEYS as readonly string[]).includes(stampIcon))
+    fail(back, "Figura de sello inválida.");
+
+  // El logo se adjunta como archivo (PNG sin fondo) — si no se sube uno
+  // nuevo, se conserva el existente; "Quitar logo" lo borra explícitamente.
+  let newLogoUrl: string | null | undefined;
+  if (logoFile instanceof File && logoFile.size > 0) {
+    newLogoUrl = await logoToDataUri(logoFile);
+    if (!newLogoUrl) fail(back, "El logo debe ser un PNG sin fondo de máximo 256 KB.");
+  } else if (removeLogo) {
+    newLogoUrl = null;
+  }
 
   const { data: current } = await supabase
     .from("organizations")
@@ -382,8 +421,11 @@ export async function updateOrgSettings(orgSlug: string, formData: FormData) {
   const brand = { ...((current?.brand ?? {}) as Record<string, unknown>) };
   if (brandColor) brand.color = brandColor;
   else delete brand.color;
-  if (logoUrl) brand.logo_url = logoUrl;
-  else delete brand.logo_url;
+  if (stampIcon) brand.stamp_icon = stampIcon;
+  if (newLogoUrl !== undefined) {
+    if (newLogoUrl) brand.logo_url = newLogoUrl;
+    else delete brand.logo_url;
+  }
 
   const { error } = await supabase
     .from("organizations")
@@ -410,21 +452,20 @@ export async function updateOrgPrivacy(orgSlug: string, formData: FormData) {
     fail(back, "Solo owner/admin puede cambiar la configuración.");
 
   const privacyEmail = String(formData.get("privacy_email") ?? "").trim().toLowerCase();
-  const policyUrl = String(formData.get("policy_url") ?? "").trim();
+  const policyText = String(formData.get("policy_text") ?? "").trim();
   const controller = String(formData.get("data_controller") ?? "").trim();
   const consentVersion = String(formData.get("consent_version") ?? "").trim() || "v1";
 
   if (privacyEmail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(privacyEmail))
     fail(back, "Correo de privacidad inválido.");
-  if (policyUrl && !/^https:\/\//.test(policyUrl))
-    fail(back, "La política debe ser una URL https.");
   if (controller.length > 200) fail(back, "Responsable demasiado largo.");
   if (consentVersion.length > 40) fail(back, "Versión inválida.");
+  if (policyText.length > 20000) fail(back, "La política es demasiado larga (máx. 20.000 caracteres).");
 
   const flag = (k: string) => formData.get(k) === "on";
   const legal: Record<string, string> = { consent_version: consentVersion };
   if (privacyEmail) legal.privacy_email = privacyEmail;
-  if (policyUrl) legal.policy_url = policyUrl;
+  if (policyText) legal.policy_text = policyText;
   if (controller) legal.data_controller = controller;
 
   const features = {

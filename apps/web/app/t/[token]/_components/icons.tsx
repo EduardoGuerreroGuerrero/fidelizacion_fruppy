@@ -457,3 +457,117 @@ export function StampStrawberry({
     </svg>
   );
 }
+
+// ---------- Figuras de sello alternativas (negocios no gastronómicos) ------
+// Mismo contrato que StampStrawberry: `filled` cambia entre color sólido y
+// contorno gris. Permiten que cada comercio elija la figura de su sello
+// (peluquería → bigote, salud → bandita, mascotas → huella, etc.).
+
+function strokeProps(filled: boolean, color: string) {
+  return filled
+    ? ({ fill: color, stroke: "none" } as const)
+    : ({ fill: "none", stroke: "#d9d2e0", strokeWidth: 1.6 } as const);
+}
+
+export function StampMustache({ filled, className }: { filled: boolean; className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path
+        d="M12 10c-1.4-2.2-3.6-3.2-5.6-2.6C4 8.1 2.6 10 3 11.8c.3 1.3 1.6 1.9 2.7 1.3.5-.3.8-.9 1.4-1.1.9-.3 1.6.4 2.2 1 .8.8 1.7 1.4 2.7 1.4s1.9-.6 2.7-1.4c.6-.6 1.3-1.3 2.2-1 .6.2.9.8 1.4 1.1 1.1.6 2.4 0 2.7-1.3.4-1.8-1-3.7-3.4-4.4-2-.6-4.2.4-5.6 2.6Z"
+        {...strokeProps(filled, "#6b4a36")}
+      />
+    </svg>
+  );
+}
+
+export function StampBandage({ filled, className }: { filled: boolean; className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <g transform="rotate(-35 12 12)">
+        <rect x="4" y="9" width="16" height="6" rx="3" {...strokeProps(filled, "#f2c9a0")} />
+        {filled ? (
+          <>
+            <rect x="9.5" y="9" width="5" height="6" fill="#fff" opacity="0.85" />
+            <circle cx="10.5" cy="10.5" r="0.5" fill="#c98f5c" />
+            <circle cx="12.3" cy="12" r="0.5" fill="#c98f5c" />
+            <circle cx="10.5" cy="13.3" r="0.5" fill="#c98f5c" />
+            <circle cx="13.5" cy="13.3" r="0.5" fill="#c98f5c" />
+          </>
+        ) : null}
+      </g>
+    </svg>
+  );
+}
+
+export function StampPaw({ filled, className }: { filled: boolean; className?: string }) {
+  const p = strokeProps(filled, "#8a6a4f");
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <ellipse cx="12" cy="16" rx="5.2" ry="4.2" {...p} />
+      <ellipse cx="5.8" cy="10.5" rx="2" ry="2.6" {...p} />
+      <ellipse cx="10.2" cy="7.2" rx="2" ry="2.6" {...p} />
+      <ellipse cx="13.8" cy="7.2" rx="2" ry="2.6" {...p} />
+      <ellipse cx="18.2" cy="10.5" rx="2" ry="2.6" {...p} />
+    </svg>
+  );
+}
+
+export function StampCoffee({ filled, className }: { filled: boolean; className?: string }) {
+  const p = strokeProps(filled, "#6f4e37");
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path d="M5 9h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V9Z" {...p} />
+      <path
+        d="M16 10.5h1.5a2 2 0 0 1 0 4H16"
+        fill="none"
+        stroke={filled ? "#6f4e37" : "#d9d2e0"}
+        strokeWidth="1.6"
+      />
+      {filled ? (
+        <path
+          d="M8 6.5c.4-.8.1-1.4-.3-2M11 6.5c.4-.8.1-1.4-.3-2"
+          fill="none"
+          stroke="#c7a98a"
+          strokeWidth="1.3"
+          strokeLinecap="round"
+        />
+      ) : null}
+    </svg>
+  );
+}
+
+export function StampHeart({ filled, className }: { filled: boolean; className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path
+        d="M12 20.3 4.6 13C2.6 11 2.8 7.6 5.1 5.9c1.9-1.4 4.5-1 5.9.8l1 1.3 1-1.3c1.4-1.8 4-2.2 5.9-.8 2.3 1.7 2.5 5.1.5 7.1L12 20.3Z"
+        {...strokeProps(filled, "#ff5c74")}
+      />
+    </svg>
+  );
+}
+
+export function StampStar({ filled, className }: { filled: boolean; className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path
+        d="M12 2.8 14.6 9l6.6.5-5 4.4 1.5 6.4L12 17l-5.7 3.3 1.5-6.4-5-4.4L9.4 9 12 2.8Z"
+        {...strokeProps(filled, "#f0a040")}
+      />
+    </svg>
+  );
+}
+
+export function StampFlower({ filled, className }: { filled: boolean; className?: string }) {
+  const p = strokeProps(filled, "#c5699e");
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <circle cx="12" cy="7.2" r="2.6" {...p} />
+      <circle cx="17.3" cy="10.8" r="2.6" {...p} />
+      <circle cx="15.3" cy="17" r="2.6" {...p} />
+      <circle cx="8.7" cy="17" r="2.6" {...p} />
+      <circle cx="6.7" cy="10.8" r="2.6" {...p} />
+      <circle cx="12" cy="12" r="2.3" fill={filled ? "#f6c945" : "none"} stroke={filled ? "none" : "#d9d2e0"} strokeWidth="1.6" />
+    </svg>
+  );
+}
