@@ -185,7 +185,10 @@ export async function processPushQueue(limit = 50): Promise<{
           body: campaign.body,
           url: campaign.url ?? undefined,
         }),
-        { TTL: 60 * 60 * 24 },
+        // urgency:high → FCM prioridad alta: despierta el dispositivo al
+        // instante aunque Chrome esté dormido (Doze/MIUI). Con prioridad
+        // normal Android difiere la entrega y el usuario no ve nada.
+        { TTL: 60 * 60 * 24, urgency: "high" },
       );
       await admin
         .from("push_deliveries")
