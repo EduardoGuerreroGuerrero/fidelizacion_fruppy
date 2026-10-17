@@ -61,10 +61,28 @@ async function passDataBySerial(serial) {
   const acc = first(card.loyalty_accounts);
   const prog = acc ? first(acc.loyalty_programs) : null;
   const org = first(card.organizations);
+  const lmRes = await fetch(
+    `${env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/wallet_passes?serial_number=eq.${serial}` +
+      `&select=last_message&order=created_at.desc&limit=1`,
+    {
+      headers: {
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+      },
+    },
+  );
+  const lm = (await lmRes.json())?.[0]?.last_message;
+  const hasLogo = !!org?.brand?.logo_url?.startsWith("data:");
   return {
     serialNumber: card.id,
+    orgId: card.organization_id,
     orgName: org?.name ?? "Comercio",
-    logoUrl: org?.brand?.logo_url ? `${BASE}/logo/${card.organization_id}` : null,
+    logoUrl: hasLogo ? `${BASE}/logo/${card.organization_id}` : null,
+    brandColor:
+      typeof org?.brand?.color === "string" && /^#[0-9a-fA-F]{6}$/.test(org.brand.color)
+        ? org.brand.color
+        : null,
+    lastMessage: lm && lm.header && lm.body ? { header: lm.header, body: lm.body } : null,
     firstName: cust?.first_name ?? "Cliente",
     programName: prog?.name ?? "Fidelización",
     stamps:
@@ -96,9 +114,9 @@ const wallet = new Wallet({
 
 function templateOf(data) {
   return wallet.loyalty({
-    id: "fruppy-loyalty",
+    id: `loyalty-${data.orgId}`,
     name: data.programName,
-    color: "#0d9488",
+    color: data.brandColor ?? "#0d9488",
     google: {
       issuerName: data.orgName,
       logo: data.logoUrl ?? `${BASE}/brand/wallet-logo.png?v=2`,
@@ -122,6 +140,11 @@ function contentOf(data) {
     },
     barcode: { format: "QR", value: data.cardUrl },
     apple: data.revoked ? { voided: true } : undefined,
+    google: {
+      messages: data.lastMessage
+        ? [{ header: data.lastMessage.header, body: data.lastMessage.body, messageType: "TEXT" }]
+        : [],
+    },
   };
 }
 
@@ -132,16 +155,50 @@ if (!serial) {
 }
 
 if (cmd === "update") {
+  const data = await passDataBySerial(serial);
+  if (!data) {
+    console.error("serial no encontrado");
+    process.exit(1);
+  }
+  await templateOf(data).publish();
+  console.log("clase publicada:", `loyalty-${data.orgId}`);
   const r = await wallet.update(serial, { notify: true });
   console.log("update →", JSON.stringify(r));
 } else if (cmd === "message") {
-  const template = templateOf({ programName: "Fidelización", orgName: "Fruppy Helados", logoUrl: null });
+  const data = await passDataBySerial(serial);
+  if (!data) {
+    console.error("serial no encontrado");
+    process.exit(1);
+  }
+  const template = templateOf(data);
+  await template.publish();
   await template.sendMessage(serial, {
-    header: header ?? "Fruppy Helados",
+    header: header ?? data.orgName,
     body: body ?? "Tienes novedades en tu tarjeta.",
     messageType: "TEXT_AND_NOTIFY",
   });
   console.log("mensaje enviado (TEXT_AND_NOTIFY)");
+  // Persistir último mensaje + colapsar messages[] como hace sendPassMessage.
+  await fetch(
+    `${env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/wallet_passes?serial_number=eq.${serial}`,
+    {
+      method: "PATCH",
+      headers: {
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        last_message: {
+          header: header ?? data.orgName,
+          body: body ?? "Tienes novedades en tu tarjeta.",
+          sent_at: new Date().toISOString(),
+        },
+      }),
+    },
+  );
+  await wallet.update(serial);
+  console.log("messages[] colapsado al último");
 } else {
   console.error("comando desconocido:", cmd);
   process.exit(1);

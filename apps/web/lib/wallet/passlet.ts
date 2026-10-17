@@ -8,6 +8,7 @@ import {
   type WalletConfig,
 } from "passlet";
 import { passDataBySerial } from "./pass-data";
+import { supabaseAdmin } from "@/lib/supabase/server";
 import {
   WalletNotConfiguredError,
   type WalletIssueResult,
@@ -39,6 +40,10 @@ function pem(pathVar: string, inlineVar: string): string | undefined {
 export class PassletWalletProvider implements WalletProvider {
   readonly name = "passlet";
   private wallet: Wallet | null = null;
+  // Clases ya publicadas en este proceso: templateId → firma del config.
+  // publish() sobreescribe la clase en Google (create() solo crea las que
+  // faltan), así evitamos republicar la misma config una y otra vez.
+  private published = new Map<string, string>();
 
   configured(): boolean {
     return this.appleConfigured() || this.googleConfigured();
@@ -133,12 +138,14 @@ export class PassletWalletProvider implements WalletProvider {
   private templateOf(data: WalletPassData) {
     const wallet = this.getWallet();
     const baseUrl = env("NEXT_PUBLIC_BASE_URL");
-    // Template estable: los campos se definen una vez; cada pase solo fija
-    // `values`. changeMessage hace que Apple muestre aviso al actualizar.
+    // Una clase por comercio: logo, color y nombre salen de organizations.brand
+    // — cada negocio ve su pase personalizado (Google no permite variar la
+    // clase por objeto). Google crea la clase al emitir/actualizar el objeto;
+    // ensurePublished() la sobreescribe cuando la marca cambia.
     return wallet.loyalty({
-      id: "fruppy-loyalty",
+      id: `loyalty-${data.orgId}`,
       name: data.programName,
-      color: "#0d9488",
+      color: data.brandColor ?? "#0d9488",
       apple: baseUrl
         ? {
             icon: {
@@ -169,6 +176,29 @@ export class PassletWalletProvider implements WalletProvider {
     });
   }
 
+  // Sobrescribe la clase de Google cuando la marca del comercio cambió
+  // (create() no toca clases existentes). Cacheada por firma por proceso:
+  // solo vuelve a publicar si el config efectivo es distinto del anterior.
+  private async ensurePublished(data: WalletPassData): Promise<void> {
+    const t = this.templateOf(data);
+    const sig = JSON.stringify([
+      data.brandColor,
+      data.logoUrl,
+      data.orgName,
+      data.programName,
+    ]);
+    const key = `loyalty-${data.orgId}`;
+    if (this.published.get(key) === sig) return;
+    try {
+      await t.publish();
+      this.published.set(key, sig);
+    } catch (e) {
+      // Publicar es mejora de marca, no debe romper emisión ni updates; sin
+      // marcar como publicada, la próxima llamada lo reintenta.
+      console.error("[wallet] class publish failed:", e instanceof Error ? e.message : e);
+    }
+  }
+
   private contentOf(data: WalletPassData): PassContent {
     return {
       serialNumber: data.serialNumber,
@@ -180,10 +210,19 @@ export class PassletWalletProvider implements WalletProvider {
       },
       barcode: { format: "QR", value: data.cardUrl },
       apple: data.revoked ? { voided: true } : undefined,
+      // Google acumula messages[] en el objeto; wallet.update() reescribe el
+      // array desde aquí → solo sobrevive el último mensaje enviado, el
+      // historial queda limpio como en el diseño del mockup.
+      google: {
+        messages: data.lastMessage
+          ? [{ header: data.lastMessage.header, body: data.lastMessage.body, messageType: "TEXT" as const }]
+          : [],
+      },
     };
   }
 
   async issuePass(data: WalletPassData): Promise<WalletIssueResult> {
+    await this.ensurePublished(data);
     const issued = await this.templateOf(data).create(this.contentOf(data));
     return {
       applePkpass: issued.apple ?? null,
@@ -196,6 +235,8 @@ export class PassletWalletProvider implements WalletProvider {
     // notify: Google alerta al usuario de los campos con changeMessage (sin
     // esto el pase se actualiza en silencio). En Apple no aplica: APNs
     // siempre avisa cuando hay changeMessage.
+    const data = await passDataBySerial(serialNumber);
+    if (data) await this.ensurePublished(data);
     await this.getWallet().update(serialNumber, { notify: true });
   }
 
@@ -207,10 +248,28 @@ export class PassletWalletProvider implements WalletProvider {
     // update() — la fuente de verdad no es el pase emitido sino la tarjeta.
     const data = await passDataBySerial(serialNumber);
     if (!data) return;
+    await this.ensurePublished(data);
     await this.templateOf(data).sendMessage(serialNumber, {
       header: message.header,
       body: message.body,
       messageType: message.notify === false ? "TEXT" : "TEXT_AND_NOTIFY",
+    });
+    // Solo el último mensaje queda en el pase: lo persistimos y el update
+    // (sin notify, nada cambió en los campos) reescribe messages[] con este.
+    await supabaseAdmin()
+      .from("wallet_passes")
+      .update({
+        last_message: {
+          header: message.header,
+          body: message.body,
+          sent_at: new Date().toISOString(),
+        },
+      })
+      .eq("serial_number", serialNumber);
+    await this.getWallet().update(serialNumber).catch((e) => {
+      // El mensaje ya llegó; si el colapso falla se limpia en el próximo
+      // update. No convertir en error del envío.
+      console.error("[wallet] message collapse failed:", e instanceof Error ? e.message : e);
     });
   }
 
