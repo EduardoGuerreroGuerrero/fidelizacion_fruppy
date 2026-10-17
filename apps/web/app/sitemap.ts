@@ -9,5 +9,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 1,
     },
+    ...["/legal/terminos", "/legal/privacidad", "/legal/datos"].map((path) => ({
+      url: `${base}${path}`,
+      lastModified: new Date(),
+      changeFrequency: "yearly" as const,
+      priority: 0.3,
+    })),
   ];
 }

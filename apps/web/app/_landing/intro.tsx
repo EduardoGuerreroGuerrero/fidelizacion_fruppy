@@ -30,14 +30,24 @@ export default function IntroVideo() {
       .catch(() => setNeedsTap(true));
   }, []);
 
+  // Sin animación forzada: quien pide menos movimiento salta el intro de una
+  // vez (la media query CSS ya reduce el fundido a ~0ms).
   useEffect(() => {
-    const timeout = window.setTimeout(finish, MAX_WAIT_MS);
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const timeout = window.setTimeout(finish, reduced ? 0 : MAX_WAIT_MS);
+    return () => window.clearTimeout(timeout);
+  }, [finish]);
+
+  // Bloquea el scroll solo mientras el overlay está visible; se libera al
+  // terminar (el componente retorna null sin desmontarse).
+  useEffect(() => {
+    if (gone) return;
+    const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
-      window.clearTimeout(timeout);
-      document.body.style.overflow = "";
+      document.body.style.overflow = prev;
     };
-  }, [finish]);
+  }, [gone]);
 
   if (gone) return null;
 

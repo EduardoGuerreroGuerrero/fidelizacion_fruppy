@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import IntroVideo from "./_landing/intro";
 import MobileMenu from "./_landing/mobile-menu";
@@ -669,11 +670,15 @@ function Footer() {
         </nav>
         <div className="ml-auto flex flex-wrap items-center gap-x-5 gap-y-2">
           <nav className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-ink-soft">
-            <button type="button" className="hover:text-pl-green">Términos</button>
-            <button type="button" className="hover:text-pl-green">Privacidad</button>
-            <button type="button" className="hover:text-pl-green">
+            <Link href="/legal/terminos" className="hover:text-pl-green">
+              Términos
+            </Link>
+            <Link href="/legal/privacidad" className="hover:text-pl-green">
+              Privacidad
+            </Link>
+            <Link href="/legal/datos" className="hover:text-pl-green">
               Tratamiento de datos (Colombia)
-            </button>
+            </Link>
           </nav>
           <div className="flex items-center gap-3 text-ink-soft">
             <button type="button" aria-label="Instagram" className="hover:text-pl-green">
@@ -694,6 +699,21 @@ function Footer() {
     </footer>
   );
 }
+
+export const metadata: Metadata = {
+  title: "Pineapple Loyalty | Fidelización digital para comercios",
+  description:
+    "Crea un programa de fidelización digital para tu negocio con registro por QR, tarjeta en Google Wallet y herramientas para gestionar la relación con tus clientes.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "Pineapple Loyalty | Fidelización digital para comercios",
+    description:
+      "Crea un programa de fidelización digital para tu negocio con registro por QR y tarjeta en Google Wallet.",
+    type: "website",
+    locale: "es_CO",
+    images: [{ url: "/pineapple/logo.png", alt: "PineappleLoyalty" }],
+  },
+};
 
 export default function Home() {
   return (
