@@ -73,11 +73,18 @@ async function passDataBySerial(serial) {
   );
   const lm = (await lmRes.json())?.[0]?.last_message;
   const hasLogo = !!org?.brand?.logo_url?.startsWith("data:");
+  const logoHash = (s) => {
+    let h = 5381;
+    for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
+    return h.toString(36);
+  };
   return {
     serialNumber: card.id,
     orgId: card.organization_id,
     orgName: org?.name ?? "Comercio",
-    logoUrl: hasLogo ? `${BASE}/logo/${card.organization_id}` : null,
+    logoUrl: hasLogo
+      ? `${BASE}/logo/${card.organization_id}?v=${logoHash(org.brand.logo_url)}`
+      : null,
     brandColor:
       typeof org?.brand?.color === "string" && /^#[0-9a-fA-F]{6}$/.test(org.brand.color)
         ? org.brand.color

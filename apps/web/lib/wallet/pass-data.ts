@@ -71,13 +71,22 @@ async function toPassData(card: CardRow): Promise<WalletPassData> {
   // otra cosa — p. ej. la URL del sitio web del comercio — no es una imagen
   // y Google rechaza la clase si la recibe como logo.
   const hasLogo = !!org?.brand?.logo_url?.startsWith("data:");
+  // Google cachea imágenes por URL: el ?v= cambia con el contenido del logo
+  // para que subir uno nuevo refresque la clase sin tocar código.
+  const logoHash = (s: string) => {
+    let h = 5381;
+    for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
+    return h.toString(36);
+  };
   return {
     serialNumber: card.id,
     orgId: card.organization_id,
     customerId: card.customer_id,
     programId: acc?.program_id ?? null,
     orgName: org?.name ?? "Comercio",
-    logoUrl: hasLogo ? publicLogoUrl(baseUrl, card.organization_id) : null,
+    logoUrl: hasLogo
+      ? `${publicLogoUrl(baseUrl, card.organization_id)}?v=${logoHash(org!.brand!.logo_url!)}`
+      : null,
     brandColor:
       typeof org?.brand?.color === "string" && /^#[0-9a-fA-F]{6}$/.test(org.brand.color)
         ? org.brand.color
