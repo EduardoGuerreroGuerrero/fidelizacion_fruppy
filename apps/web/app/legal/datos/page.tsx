@@ -32,7 +32,7 @@ export default function DatosPage() {
         },
         {
           title: "Procedimiento ARCO",
-          body: "Las consultas se responden en máximo diez (10) días hábiles y los reclamos en máximo quince (15) días hábiles, conforme a la Ley 1581 de 2012. Las solicitudes pueden presentarse por el canal de soporte disponible en el panel de la cuenta o ante el comercio responsable, según corresponda.",
+          body: "Las consultas se responden en máximo diez (10) días hábiles y los reclamos en máximo quince (15) días hábiles, conforme a la Ley 1581 de 2012. Las solicitudes pueden presentarse por el canal de soporte disponible en el panel de la cuenta, escribiendo a privacidad@pineappleloyalty.com, o ante el comercio responsable, según corresponda.",
         },
         {
           title: "Medidas de seguridad",

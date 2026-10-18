@@ -49,6 +49,20 @@ export default function ContactoPage() {
           </Link>
         </div>
 
+        <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+          <h2 className="text-sm font-bold text-ink">Escríbenos</h2>
+          <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
+            También puedes contactar al equipo por correo. Respondemos en
+            horario laboral.
+          </p>
+          <a
+            href="mailto:soporte@pineappleloyalty.com"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-pl-green/30 px-5 py-2.5 text-sm font-semibold text-pl-green transition hover:border-pl-green/60"
+          >
+            soporte@pineappleloyalty.com →
+          </a>
+        </div>
+
         <p className="text-sm text-ink-soft">
           Antes de escribir, revisa las{" "}
           <Link href="/preguntas" className="font-medium text-pl-green">
