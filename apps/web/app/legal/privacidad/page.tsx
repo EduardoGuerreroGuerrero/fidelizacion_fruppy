@@ -28,7 +28,7 @@ export default function PrivacidadPage() {
         },
         {
           title: "Tus derechos",
-          body: "Como titular puedes consultar, actualizar, rectificar o suprimir tus datos, y revocar la autorización. Las solicitudes se ejercen desde el panel de la cuenta o por el canal de contacto indicado en la política de tratamiento de datos.",
+          body: "Como titular puedes consultar, actualizar, rectificar o suprimir tus datos, y revocar la autorización. Las solicitudes se ejercen desde el panel de la cuenta o escribiendo a privacidad@pineappleloyalty.com.",
         },
         {
           title: "Conservación y seguridad",
