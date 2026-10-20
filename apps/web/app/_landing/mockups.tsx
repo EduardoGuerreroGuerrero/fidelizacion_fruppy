@@ -71,7 +71,7 @@ function MiniBrand({ light = false }: { light?: boolean }) {
       <span
         className={`text-[8px] font-bold ${light ? "text-white" : "text-pl-green"}`}
       >
-        Pineapple<span className="text-pl-green-2">Loyalty</span>
+        Pineapple<span className={light ? "text-pl-green-2" : "text-pl-action"}>Loyalty</span>
       </span>
     </div>
   );
@@ -84,15 +84,15 @@ function StampCard({ title, sub }: { title: string; sub: string }) {
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="text-[10px] font-bold leading-tight text-white">{title}</p>
-          <p className="text-[6.5px] text-white/60">{sub}</p>
+          <p className="text-[6.5px] text-white/75">{sub}</p>
         </div>
         <IceCream className="h-11 w-9 shrink-0" />
       </div>
-      <p className="mt-1 text-[6px] uppercase tracking-wide text-white/50">
+      <p className="mt-1 text-[6px] uppercase tracking-wide text-white/70">
         Sellos
       </p>
       <p className="text-sm font-extrabold leading-none text-white">
-        8<span className="text-white/50">/10</span>
+        8<span className="text-white/70">/10</span>
       </p>
       <div className="mt-1.5 flex gap-0.5">
         {Array.from({ length: 10 }).map((_, i) => (
@@ -294,7 +294,7 @@ export function AdminLaptop() {
                     />
                   ))}
                 </div>
-                <p className="mt-1 text-[4.5px] text-white/60">
+                <p className="mt-1 text-[4.5px] text-white/75">
                   10 sellos = 1 producto gratis
                 </p>
               </div>
@@ -333,13 +333,13 @@ export function FormPhone() {
               <span className="mt-px flex h-2.5 w-2.5 items-center justify-center rounded-sm bg-pl-green-2">
                 <IconCheckCircle className="h-2 w-2 text-white" strokeWidth={3} />
               </span>
-              <span className="text-[5px] leading-tight text-neutral-400">
+              <span className="text-[5px] leading-snug text-neutral-500">
                 Acepto la política de tratamiento de datos y quiero recibir
                 notificaciones de Fruppy Helados.
               </span>
             </div>
           </div>
-          <div className="mt-2 rounded-md bg-pl-green-2 py-1.5 text-center text-[8px] font-semibold text-white">
+          <div className="mt-2 rounded-md bg-pl-action py-1.5 text-center text-[8px] font-semibold text-white">
             Registrarme
           </div>
           <p className="mt-1.5 text-center text-[5px] text-neutral-400">
@@ -452,7 +452,7 @@ export function VisQr() {
 
 export function VisWallet() {
   return (
-    <div className="rounded-lg border border-sky-100 bg-sky-50/50 p-2">
+    <div className="p-2">
       <div className="mx-auto w-24 rounded-md border border-neutral-800 bg-neutral-900 p-1">
         <div className="rounded-sm bg-gradient-to-br from-pl-green to-[#0b3d24] p-1.5">
           <p className="text-[5.5px] font-bold text-white">Fruppy Club</p>
@@ -478,7 +478,7 @@ export function VisSellos() {
         { t: "Puntos", d: "Acumula puntos por cada compra." },
         { t: "Sellos", d: "Completa sellos y recibe recompensa." },
       ].map((x) => (
-        <div key={x.t} className="rounded-lg border border-amber-100 bg-amber-50/60 p-1.5">
+        <div key={x.t} className="rounded-lg border border-pl-cream bg-pl-cream/40 p-1.5">
           <p className="text-[7px] font-bold text-ink">{x.t}</p>
           <p className="text-[5.5px] leading-tight text-neutral-500">{x.d}</p>
         </div>
@@ -540,7 +540,7 @@ export function VisSedes() {
 
 export function VisCampana() {
   return (
-    <div className="rounded-lg border border-violet-100 bg-violet-50/50 p-2">
+    <div className="rounded-lg bg-pl-ivory p-2">
       <p className="text-[7px] font-bold text-ink">Nueva campaña</p>
       {[
         ["Tipo de campaña", "Promoción"],
@@ -554,7 +554,7 @@ export function VisCampana() {
           </div>
         </div>
       ))}
-      <div className="mt-1.5 rounded bg-pl-green-2 py-1 text-center text-[5.5px] font-semibold text-white">
+      <div className="mt-1.5 rounded bg-pl-action py-1 text-center text-[5.5px] font-semibold text-white">
         Programar campaña
       </div>
     </div>
@@ -564,7 +564,7 @@ export function VisCampana() {
 export function VisReporte() {
   const bars = [30, 45, 60, 50, 75, 90];
   return (
-    <div className="rounded-lg border border-amber-100 bg-amber-50/50 p-2">
+    <div className="rounded-lg bg-pl-ivory p-2">
       <div className="flex items-center justify-between">
         <p className="text-[6.5px] font-bold text-ink">Visitas registradas</p>
         <p className="text-[5px] text-neutral-400">Últimos 6 meses</p>
