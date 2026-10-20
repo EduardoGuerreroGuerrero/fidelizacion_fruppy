@@ -5,7 +5,9 @@ import "./globals.css";
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  // 800: los titulares de la landing usan font-extrabold; sin este peso el
+  // navegador sintetiza la negrita.
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 // Script para los acentos decorativos del panel Fruppy Helados (mockups).
