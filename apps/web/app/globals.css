@@ -27,7 +27,8 @@
   --color-pastel-lav: #efe7fd;
   --color-pastel-sky: #e0f0fb;
   --color-ink: #2b2f33;
-  --color-ink-soft: #8a9299;
+  /* #8a9299 daba 3.0:1 sobre blanco; #5d6670 da 5.8:1 (AA). */
+  --color-ink-soft: #5d6670;
   /* Panel admin Fruppy Helados (mockups) */
   --color-navy: #1e2a52;
   --color-wine: #a01755;
@@ -40,6 +41,29 @@
   --color-pl-cream: #fef3c7;
   --color-pl-ivory: #fdfaf0;
   --color-pl-bg: #f8fafc;
+  /* Verde de acción: fondo de botones con texto blanco (5.0:1, AA).
+     pl-green-2 queda para acentos e íconos (blanco sobre él da 2.3:1). */
+  --color-pl-action: #15803d;
+}
+
+/* Landing pública: superficies del navegador con la paleta de marca. */
+.pl-landing {
+  caret-color: var(--color-pl-action);
+  accent-color: var(--color-pl-action);
+}
+/* Titulares sin líneas desbalanceadas; párrafos sin una palabra suelta al final. */
+.pl-landing :is(h1, h2, h3, h4) {
+  text-wrap: balance;
+}
+.pl-landing p {
+  text-wrap: pretty;
+}
+.pl-landing ::selection {
+  background: var(--color-pl-cream);
+  color: var(--color-pl-green);
+}
+.pl-landing :focus-visible {
+  outline-color: var(--color-pl-green);
 }
 
 body {

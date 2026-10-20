@@ -24,10 +24,6 @@ import {
   IconDumbbell,
   IconCup,
   IconScissors,
-  IconInstagram,
-  IconX,
-  IconFacebook,
-  IconYoutube,
   IconBolt,
   IconGear,
   IconHeadset,
@@ -98,14 +94,6 @@ const RECURSOS_MENU = [
   { label: "Contacto", href: "/contacto" },
 ] as const;
 
-function Chip({ children }: { children: string }) {
-  return (
-    <span className="inline-block rounded-full border border-pl-green/15 bg-pl-green-2/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.15em] text-pl-green">
-      {children}
-    </span>
-  );
-}
-
 function BrandLogo({ compact = false }: { compact?: boolean }) {
   return (
     <Link href="#inicio" className="flex items-center gap-2">
@@ -123,7 +111,7 @@ function BrandLogo({ compact = false }: { compact?: boolean }) {
           Pineapple<span className="text-pl-green-2">Loyalty</span>
         </span>
         {!compact && (
-          <span className="block text-[9px] font-medium text-ink-soft">
+          <span className="block text-[11px] font-medium text-ink-soft">
             Make every visit count.
           </span>
         )}
@@ -155,9 +143,12 @@ function Header() {
             </a>
           ))}
           <div className="group relative">
-            <button className="flex items-center gap-1 whitespace-nowrap text-sm font-medium text-ink-soft transition-colors hover:text-pl-green">
+            <button
+              type="button"
+              aria-haspopup="true"
+              className="flex items-center gap-1 whitespace-nowrap text-sm font-medium text-ink-soft transition-colors hover:text-pl-green">
               Recursos
-              <IconChevronDown className="h-3.5 w-3.5 transition-transform group-hover:rotate-180" />
+              <IconChevronDown className="h-3.5 w-3.5 transition-transform group-hover:rotate-180 group-focus-within:rotate-180" />
             </button>
             <div className="invisible absolute left-0 top-full pt-2 opacity-0 transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
               <ul className="w-48 rounded-xl border border-pl-green/10 bg-white py-1.5 shadow-lg">
@@ -184,7 +175,7 @@ function Header() {
           </Link>
           <Link
             href="/signup"
-            className="hidden items-center gap-1.5 whitespace-nowrap rounded-full bg-pl-green-2 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green sm:flex"
+            className="hidden items-center gap-1.5 whitespace-nowrap rounded-full bg-pl-action px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green sm:flex"
           >
             Probar gratis
             <IconArrowRight className="h-3.5 w-3.5" />
@@ -227,8 +218,7 @@ function Hero() {
 
       <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 pb-32 pt-12 sm:px-6 lg:grid-cols-2 lg:gap-8 lg:pt-20">
         <div className="max-w-xl">
-          <Chip>Programa de fidelización para comercios</Chip>
-          <h1 className="mt-6 text-4xl font-extrabold leading-[1.08] tracking-tight text-ink sm:text-5xl">
+          <h1 className="text-4xl font-extrabold leading-[1.08] tracking-tight text-ink sm:text-5xl">
             Convierte clientes ocasionales en{" "}
             <span className="relative inline-block text-pl-green">
               clientes frecuentes
@@ -244,7 +234,7 @@ function Hero() {
           <div className="mt-9 flex flex-wrap items-center gap-4">
             <Link
               href="/signup"
-              className="flex items-center gap-2 rounded-full bg-pl-green-2 px-7 py-3.5 font-semibold text-white shadow-lg shadow-pl-green-2/25 transition hover:bg-pl-green"
+              className="flex items-center gap-2 rounded-full bg-pl-action px-7 py-3.5 font-semibold text-white shadow-lg shadow-pl-action/25 transition hover:bg-pl-green"
             >
               Probar gratis
               <IconArrowRight className="h-4 w-4" />
@@ -279,8 +269,8 @@ function Hero() {
           </ul>
         </div>
 
-        {/* Composición de dispositivos */}
-        <div className="relative mx-auto w-full max-w-md px-4 lg:px-0">
+        {/* Composición de dispositivos: ilustración, oculta a lectores de pantalla */}
+        <div aria-hidden className="relative mx-auto w-full max-w-md px-4 lg:px-0">
           <div className="pointer-events-none absolute left-0 top-14">
             <ScanCard />
           </div>
@@ -337,8 +327,7 @@ function HowItWorks() {
       <CornerLeaves side="tl" />
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <Chip>Cómo funciona</Chip>
-          <h2 className="mt-4 text-3xl font-extrabold text-ink sm:text-4xl">
+          <h2 className="text-3xl font-extrabold text-ink sm:text-4xl">
             ¿Cómo <span className="text-pl-green">funciona</span>?
           </h2>
           <p className="mt-4 text-ink-soft">
@@ -348,14 +337,14 @@ function HowItWorks() {
         <ol className="mt-14 grid gap-12 lg:grid-cols-3 lg:gap-6">
           {STEPS.map(({ n, title, desc, Mock }, i) => (
             <li key={n} className="relative text-center">
-              <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-pl-green-2 text-sm font-bold text-white">
+              <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-pl-action text-sm font-bold text-white">
                 {n}
               </span>
               <h3 className="mt-4 text-lg font-bold text-ink">{title}</h3>
               <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-ink-soft">
                 {desc}
               </p>
-              <div className="mt-6">
+              <div aria-hidden className="mt-6">
                 <Mock />
               </div>
               {i < 2 && (
@@ -469,8 +458,7 @@ function Features() {
       <Leaf className="pointer-events-none absolute -right-4 top-16 h-28 rotate-[135deg] opacity-60" />
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <Chip>Funciones principales</Chip>
-          <h2 className="mt-4 text-3xl font-extrabold text-ink sm:text-4xl">
+          <h2 className="text-3xl font-extrabold text-ink sm:text-4xl">
             Todo lo que necesitas en{" "}
             <span className="text-pl-green">un solo lugar</span>
           </h2>
@@ -482,7 +470,7 @@ function Features() {
           {FEATURES.map(({ icon: Ic, bg, title, desc, Visual }) => (
             <li
               key={title}
-              className="flex flex-col rounded-2xl border border-ink/5 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+              className="flex flex-col rounded-2xl border border-ink/5 bg-white p-5 shadow-sm"
             >
               <span
                 className={`flex h-10 w-10 items-center justify-center rounded-xl ${bg}`}
@@ -493,7 +481,7 @@ function Features() {
               <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
                 {desc}
               </p>
-              <div className="mt-auto pt-4">
+              <div aria-hidden className="mt-auto pt-4">
                 <Visual />
               </div>
             </li>
@@ -536,8 +524,7 @@ function Benefits() {
     <section id="beneficios" className="scroll-mt-20 bg-white py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <Chip>Beneficios</Chip>
-          <h2 className="mt-4 text-3xl font-extrabold text-ink sm:text-4xl">
+          <h2 className="text-3xl font-extrabold text-ink sm:text-4xl">
             Beneficios de{" "}
             <span className="text-pl-green">PineappleLoyalty</span>
           </h2>
@@ -586,8 +573,7 @@ function Sectors() {
       <Leaf color="#22c55e" className="pointer-events-none absolute right-8 top-10 h-24 rotate-[150deg] opacity-50" />
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <Chip>Sectores</Chip>
-          <h2 className="mt-4 text-3xl font-extrabold text-ink sm:text-4xl">
+          <h2 className="text-3xl font-extrabold text-ink sm:text-4xl">
             Ideal para tu{" "}
             <span className="text-pl-green">tipo de negocio</span>
           </h2>
@@ -633,7 +619,7 @@ const PLANS: {
     icon: IconSprout,
     name: "Gratis",
     price: "$0",
-    tag: "/mes",
+    tag: "COP/mes",
     desc: "Prueba PineappleLoyalty sin costo.",
     features: [
       "1 programa de fidelización",
@@ -649,7 +635,7 @@ const PLANS: {
     icon: IconBars,
     name: "Pro",
     price: "$29.000",
-    tag: "/mes",
+    tag: "COP/mes",
     desc: "Para negocios que empiezan a crecer.",
     features: [
       "Todo lo del plan Gratis",
@@ -667,7 +653,7 @@ const PLANS: {
     icon: IconStore,
     name: "Business",
     price: "$59.000",
-    tag: "/mes",
+    tag: "COP/mes",
     desc: "Para negocios con varias sedes.",
     features: [
       "Todo lo del plan Pro",
@@ -703,7 +689,7 @@ function Pricing() {
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         {/* Nota manuscrita */}
         <div className="pointer-events-none absolute right-4 top-4 hidden flex-col items-center lg:flex">
-          <p className="font-script text-xl text-pl-green-2">
+          <p className="font-script text-xl text-pl-action">
             Escala tu programa
             <br />
             cuando lo necesites
@@ -711,8 +697,7 @@ function Pricing() {
           <HandArrow className="mt-1 h-12 w-12" />
         </div>
         <div className="mx-auto max-w-2xl text-center">
-          <Chip>Precios</Chip>
-          <h2 className="mt-4 text-3xl font-extrabold text-ink sm:text-4xl">
+          <h2 className="text-3xl font-extrabold text-ink sm:text-4xl">
             Empieza <span className="text-pl-green">gratis</span> y{" "}
             <span className="text-pl-green">crece a tu ritmo</span>
           </h2>
@@ -733,7 +718,7 @@ function Pricing() {
                 }`}
               >
                 {popular && (
-                  <span className="absolute -top-3.5 left-1/2 flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full bg-pl-green-2 px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white">
+                  <span className="absolute -top-3.5 left-1/2 flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full bg-pl-action px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white">
                     <IconCrown className="h-3.5 w-3.5" />
                     Más popular
                   </span>
@@ -744,7 +729,7 @@ function Pricing() {
                 <h3 className="mt-3 text-2xl font-extrabold text-ink">{name}</h3>
                 <p className="mt-1 text-sm text-ink-soft">{desc}</p>
                 <p className="mt-4">
-                  <span className="text-3xl font-extrabold text-ink">
+                  <span className="text-3xl font-extrabold tabular-nums text-ink">
                     {price}
                   </span>
                   <span className="text-sm font-semibold text-ink-soft">
@@ -766,7 +751,7 @@ function Pricing() {
                   href={href}
                   className={`mt-7 flex items-center justify-center gap-2 rounded-xl py-3 font-semibold transition ${
                     popular
-                      ? "bg-pl-green-2 text-white shadow-md shadow-pl-green-2/30 hover:bg-pl-green"
+                      ? "bg-pl-action text-white shadow-md shadow-pl-action/30 hover:bg-pl-green"
                       : "border border-ink/15 text-ink hover:border-pl-green-2 hover:text-pl-green"
                   }`}
                 >
@@ -843,7 +828,7 @@ const FEATURED_RESOURCES: {
 }[] = [
   {
     tag: "GUÍA",
-    tagBg: "bg-pl-green-2",
+    tagBg: "bg-pl-action text-white",
     title: "Cómo configurar tu programa de fidelización",
     desc: "Aprende paso a paso a crear tu programa desde el panel.",
     Thumb: ThumbAdmin,
@@ -851,7 +836,7 @@ const FEATURED_RESOURCES: {
   },
   {
     tag: "VIDEO",
-    tagBg: "bg-pl-yellow",
+    tagBg: "bg-pl-yellow text-ink",
     title: "Cómo tus clientes se registran con el QR",
     desc: "Mira cómo tus clientes se unen en menos de un minuto.",
     Thumb: ThumbVideo,
@@ -859,7 +844,7 @@ const FEATURED_RESOURCES: {
   },
   {
     tag: "PLANTILLA",
-    tagBg: "bg-violet-500",
+    tagBg: "bg-violet-600 text-white",
     title: "Mensajes listos para campañas",
     desc: "Usa plantillas para promocionar tus productos.",
     Thumb: ThumbPlantilla,
@@ -867,7 +852,7 @@ const FEATURED_RESOURCES: {
   },
   {
     tag: "GUÍA",
-    tagBg: "bg-pl-green-2",
+    tagBg: "bg-pl-action text-white",
     title: "Cómo interpretar tus reportes",
     desc: "Aprende a usar tus métricas para tomar decisiones.",
     Thumb: ThumbReporte,
@@ -993,8 +978,7 @@ function Resources() {
       <Leaf color="#22c55e" className="pointer-events-none absolute right-24 top-32 h-14 rotate-[170deg] opacity-50" />
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <Chip>Recursos</Chip>
-          <h2 className="mt-4 text-3xl font-extrabold text-ink sm:text-4xl">
+          <h2 className="text-3xl font-extrabold text-ink sm:text-4xl">
             Todo lo que necesitas{" "}
             <span className="text-pl-green">para empezar</span>
           </h2>
@@ -1036,7 +1020,7 @@ function Resources() {
           </h3>
           <Link
             href="/preguntas"
-            className="flex items-center gap-1 text-sm font-semibold text-pl-green-2 hover:text-pl-green"
+            className="flex items-center gap-1 text-sm font-semibold text-pl-action hover:text-pl-green"
           >
             Ver todos los recursos
             <IconArrowRight className="h-4 w-4" />
@@ -1051,11 +1035,13 @@ function Resources() {
               >
                 <div className="relative h-36 bg-gradient-to-br from-pl-ivory to-pl-cream/50">
                   <span
-                    className={`absolute left-3 top-3 z-10 rounded px-2 py-0.5 text-[9px] font-bold tracking-wider text-white ${tagBg}`}
+                    className={`absolute left-3 top-3 z-10 rounded px-2 py-0.5 text-[11px] font-bold tracking-wider ${tagBg}`}
                   >
                     {tag}
                   </span>
-                  <Thumb />
+                  <div aria-hidden className="h-full">
+                    <Thumb />
+                  </div>
                 </div>
                 <div className="p-4">
                   <h4 className="text-sm font-bold leading-snug text-ink">
@@ -1086,7 +1072,7 @@ function Resources() {
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 href="/preguntas"
-                className="flex items-center gap-2 rounded-full bg-pl-green-2 px-6 py-3 text-sm font-semibold text-white shadow-md shadow-pl-green-2/25 transition hover:bg-pl-green"
+                className="flex items-center gap-2 rounded-full bg-pl-action px-6 py-3 text-sm font-semibold text-white shadow-md shadow-pl-action/25 transition hover:bg-pl-green"
               >
                 Ir a preguntas frecuentes
               </Link>
@@ -1153,8 +1139,7 @@ function Faq() {
     <section id="faq" className="scroll-mt-20 bg-white py-20">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <Chip>Preguntas frecuentes</Chip>
-          <h2 className="mt-4 text-3xl font-extrabold text-ink sm:text-4xl">
+          <h2 className="text-3xl font-extrabold text-ink sm:text-4xl">
             Preguntas frecuentes
           </h2>
           <p className="mt-4 text-ink-soft">
@@ -1167,7 +1152,7 @@ function Faq() {
               key={q}
               className="group rounded-2xl border border-ink/10 bg-white px-6 py-5 open:border-pl-green-2/30"
             >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-ink [&::-webkit-details-marker]:hidden">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-ink transition-colors hover:text-pl-green [&::-webkit-details-marker]:hidden">
                 {q}
                 <IconChevronDown className="h-5 w-5 shrink-0 text-pl-green-2 transition-transform group-open:rotate-180" />
               </summary>
@@ -1223,10 +1208,6 @@ function Cta() {
               <IconArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          <p className="mt-6 text-xs text-white/50">
-            Copyright © 2026 PineappleLoyalty · Hecho con dedicación en
-            Barranquilla, Colombia
-          </p>
         </div>
       </div>
     </section>
@@ -1243,32 +1224,6 @@ function Footer() {
             <p className="mt-3 max-w-xs text-sm text-ink-soft">
               Programa de fidelización digital para comercios.
             </p>
-            <div className="mt-4 flex justify-center gap-3 lg:justify-start">
-              <span
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-pl-green-2/10 text-pl-green-2"
-                title="Instagram"
-              >
-                <IconInstagram className="h-4 w-4" />
-              </span>
-              <span
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-pl-green-2/10 text-pl-green-2"
-                title="X"
-              >
-                <IconX className="h-4 w-4" />
-              </span>
-              <span
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-pl-green-2/10 text-pl-green-2"
-                title="Facebook"
-              >
-                <IconFacebook className="h-4 w-4" />
-              </span>
-              <span
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-pl-green-2/10 text-pl-green-2"
-                title="YouTube"
-              >
-                <IconYoutube className="h-4 w-4" />
-              </span>
-            </div>
           </div>
           <nav className="grid grid-cols-2 gap-x-16 gap-y-2 text-sm sm:grid-cols-3">
             <div className="space-y-2">
@@ -1330,7 +1285,7 @@ function Footer() {
 
 export default function LandingPage() {
   return (
-    <>
+    <div className="pl-landing">
       <IntroVideo />
       <Header />
       <main>
@@ -1345,6 +1300,6 @@ export default function LandingPage() {
         <Cta />
       </main>
       <Footer />
-    </>
+    </div>
   );
 }
