@@ -131,7 +131,7 @@ export function CornerLeaves({ side }: { side: "tl" | "tr" | "bl" | "br" }) {
   return (
     <div
       aria-hidden
-      className={`pointer-events-none absolute ${pos} h-40 w-40 overflow-hidden sm:h-56 sm:w-56`}
+      className={`pointer-events-none absolute ${pos} h-40 w-40 overflow-hidden max-sm:hidden sm:h-56 sm:w-56`}
     >
       <div
         className={`absolute -inset-6 rounded-full bg-pl-cream/80 ${vert} ${flip}`}

@@ -5,12 +5,10 @@ import Link from "next/link";
 import type { ComponentType, SVGProps } from "react";
 import type { Metadata } from "next";
 import {
-  IconUsers,
   IconAward,
   IconChat,
   IconArrowRight,
   IconCheck,
-  IconCheckCircle,
   IconChevronDown,
   IconQr,
   IconWallet,
@@ -19,7 +17,6 @@ import {
   IconPin,
   IconMap,
   IconBars,
-  IconPercent,
   IconBag,
   IconDumbbell,
   IconCup,
@@ -32,11 +29,11 @@ import {
   IconVideo,
   IconDoc,
   IconQuestion,
-  IconSprout,
-  IconStore,
   IconCard,
-  IconCrown,
-  IconPlay,
+  IconIceCream,
+  IconBread,
+  IconUtensils,
+  IconBriefcase,
 } from "./_landing/icons";
 import {
   FakeQr,
@@ -69,11 +66,11 @@ import MobileMenu from "./_landing/mobile-menu";
 type Icon = ComponentType<SVGProps<SVGSVGElement>>;
 
 export const metadata: Metadata = {
-  title: "Pineapple Loyalty | Fidelización digital para comercios",
+  title: "PineappleLoyalty | Fidelización digital para comercios",
   description:
     "Crea tarjetas digitales de fidelización para Google Wallet, registra clientes con un QR y mide resultados en tiempo real. Sin app para tus clientes y con soporte en español.",
   openGraph: {
-    title: "Pineapple Loyalty | Fidelización digital para comercios",
+    title: "PineappleLoyalty | Fidelización digital para comercios",
     description:
       "Convierte clientes ocasionales en clientes frecuentes con tarjetas digitales para Google Wallet.",
     images: ["/pineapple/logo.png"],
@@ -82,7 +79,6 @@ export const metadata: Metadata = {
 };
 
 const NAV = [
-  { label: "Inicio", href: "#inicio" },
   { label: "Cómo funciona", href: "#como-funciona" },
   { label: "Funciones", href: "#funciones" },
   { label: "Precios", href: "#precios" },
@@ -106,9 +102,9 @@ function BrandLogo({ compact = false }: { compact?: boolean }) {
       />
       <span className="leading-tight">
         <span
-          className={`block font-bold tracking-tight text-ink ${compact ? "text-sm" : "text-[17px]"}`}
+          className={`block font-bold tracking-tight text-ink ${compact ? "text-sm" : "text-[15px] sm:text-[17px]"}`}
         >
-          Pineapple<span className="text-pl-green-2">Loyalty</span>
+          Pineapple<span className="text-pl-action">Loyalty</span>
         </span>
         {!compact && (
           <span className="block text-[11px] font-medium text-ink-soft">
@@ -127,7 +123,7 @@ function BrandLogo({ compact = false }: { compact?: boolean }) {
 function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-pl-green/10 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3 sm:px-6 sm:py-3.5">
+      <div className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-3 sm:gap-4 sm:px-6 sm:py-3.5">
         <BrandLogo />
         <nav
           className="hidden items-center gap-6 lg:ml-6 lg:flex"
@@ -166,7 +162,7 @@ function Header() {
             </div>
           </div>
         </nav>
-        <div className="ml-auto flex items-center gap-3 lg:ml-6">
+        <div className="ml-auto flex items-center gap-2 sm:gap-3 lg:ml-6">
           <Link
             href="/login"
             className="hidden whitespace-nowrap text-sm font-semibold text-ink-soft transition-colors hover:text-pl-green sm:inline-block"
@@ -175,10 +171,10 @@ function Header() {
           </Link>
           <Link
             href="/signup"
-            className="hidden items-center gap-1.5 whitespace-nowrap rounded-full bg-pl-action px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green sm:flex"
+            className="flex items-center gap-1.5 whitespace-nowrap rounded-full bg-pl-action px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green sm:px-4"
           >
             Probar gratis
-            <IconArrowRight className="h-3.5 w-3.5" />
+            <IconArrowRight className="hidden h-3.5 w-3.5 sm:block" />
           </Link>
           <MobileMenu items={[...NAV]} />
         </div>
@@ -203,10 +199,10 @@ function Hero() {
       {/* Círculos y hojas decorativas */}
       <div className="pointer-events-none absolute -left-24 top-16 h-64 w-64 rounded-full bg-pl-cream/70" />
       <div className="pointer-events-none absolute -right-32 top-40 h-96 w-96 rounded-full bg-pl-cream/60" />
-      <Leaf className="pointer-events-none absolute left-4 top-24 h-24 -rotate-[20deg] sm:left-10 sm:h-36" />
+      <Leaf className="pointer-events-none absolute max-sm:hidden left-4 top-24 h-24 -rotate-[20deg] sm:left-10 sm:h-36" />
       <Leaf
         color="#22c55e"
-        className="pointer-events-none absolute left-24 top-10 h-16 rotate-12 opacity-70 sm:left-36 sm:h-24"
+        className="pointer-events-none absolute max-sm:hidden left-24 top-10 h-16 rotate-12 opacity-70 sm:left-36 sm:h-24"
       />
       <Leaf className="pointer-events-none absolute bottom-24 left-6 h-20 rotate-45 opacity-70" />
       <Leaf
@@ -214,7 +210,7 @@ function Hero() {
         className="pointer-events-none absolute right-8 top-16 hidden h-28 rotate-[160deg] lg:block"
       />
       <Leaf className="pointer-events-none absolute bottom-40 right-24 hidden h-16 -rotate-[140deg] lg:block" />
-      <Sparkle className="pointer-events-none absolute right-[42%] top-16 h-8 w-8" />
+      <Sparkle className="pointer-events-none absolute max-sm:hidden right-[42%] top-16 h-8 w-8" />
 
       <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 pb-32 pt-12 sm:px-6 lg:grid-cols-2 lg:gap-8 lg:pt-20">
         <div className="max-w-xl">
@@ -226,10 +222,9 @@ function Hero() {
             </span>
           </h1>
           <p className="mt-7 text-lg leading-relaxed text-ink-soft">
-            Con PineappleLoyalty creas tarjetas digitales para{" "}
-            <strong className="font-semibold text-ink">Google Wallet</strong>,
-            registra clientes con un simple código QR y mide resultados en
-            tiempo real.
+            Crea tu programa de fidelización en minutos, sin saber de
+            tecnología. Tus clientes se registran con un QR y guardan su
+            tarjeta en <strong className="font-semibold text-ink">Google Wallet</strong>.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-4">
             <Link
@@ -239,12 +234,12 @@ function Hero() {
               Probar gratis
               <IconArrowRight className="h-4 w-4" />
             </Link>
-            <Link
-              href="/login"
+            <a
+              href="#como-funciona"
               className="rounded-full border-2 border-pl-green/25 px-7 py-3.5 font-semibold text-pl-green transition hover:border-pl-green hover:bg-pl-green/5"
             >
-              Iniciar sesión
-            </Link>
+              Ver cómo funciona
+            </a>
           </div>
           {/* Beneficios del hero */}
           <ul className="mt-12 grid gap-5 sm:grid-cols-3">
@@ -260,7 +255,7 @@ function Hero() {
                   <span className="block text-sm font-bold leading-snug text-ink">
                     {title}
                   </span>
-                  <span className="mt-0.5 block text-xs leading-snug text-ink-soft">
+                  <span className="mt-0.5 block text-[13px] leading-snug text-ink-soft">
                     {sub}
                   </span>
                 </span>
@@ -312,11 +307,6 @@ const STEPS: { n: string; title: string; desc: string; Mock: ComponentType }[] =
   },
 ];
 
-const STEPS_PILLS = [
-  { icon: IconGear, title: "Configuración en minutos", sub: "Sin conocimientos técnicos" },
-  { icon: IconUsers, title: "Registro en segundos", sub: "Sin necesidad de una app" },
-  { icon: IconBars, title: "Resultados en tiempo real", sub: "Toma mejores decisiones" },
-];
 
 function HowItWorks() {
   return (
@@ -350,29 +340,12 @@ function HowItWorks() {
               {i < 2 && (
                 <>
                   <IconChevronDown className="mx-auto mt-6 h-6 w-6 text-pl-green-2 lg:hidden" />
-                  <IconArrowRight className="absolute -right-7 top-24 hidden h-8 w-8 rotate-[-20deg] text-pl-green-2 lg:block" />
+                  <IconArrowRight className="absolute -right-5 top-24 hidden h-8 w-8 rotate-[-20deg] text-pl-green-2 lg:block" />
                 </>
               )}
             </li>
           ))}
         </ol>
-        {/* Pills de beneficios rápidos */}
-        <ul className="mt-16 grid gap-4 sm:grid-cols-3">
-          {STEPS_PILLS.map(({ icon: Ic, title, sub }) => (
-            <li
-              key={title}
-              className="flex items-center gap-3 rounded-2xl border border-pl-green-2/15 bg-pl-green-2/5 px-5 py-4"
-            >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-pl-green-2 text-pl-green-2">
-                <Ic className="h-4.5 w-4.5" strokeWidth={1.8} />
-              </span>
-              <span>
-                <span className="block text-sm font-bold text-ink">{title}</span>
-                <span className="block text-xs text-ink-soft">{sub}</span>
-              </span>
-            </li>
-          ))}
-        </ul>
       </div>
     </section>
   );
@@ -384,63 +357,54 @@ function HowItWorks() {
 
 const FEATURES: {
   icon: Icon;
-  bg: string;
   title: string;
   desc: string;
   Visual: ComponentType;
 }[] = [
   {
     icon: IconQr,
-    bg: "bg-violet-50 text-violet-600",
     title: "Registro con código QR",
     desc: "Tus clientes se registran escaneando un código, sin descargar una app.",
     Visual: VisQr,
   },
   {
     icon: IconWallet,
-    bg: "bg-sky-50 text-sky-600",
     title: "Tarjeta en Google Wallet",
     desc: "Cada cliente recibe su tarjeta digital directamente en Google Wallet.",
     Visual: VisWallet,
   },
   {
     icon: IconGift,
-    bg: "bg-amber-50 text-amber-600",
     title: "Puntos o sellos",
     desc: "Configura tu programa con puntos acumulables o con sellos digitales.",
     Visual: VisSellos,
   },
   {
     icon: IconBell,
-    bg: "bg-sky-50 text-sky-600",
     title: "Notificaciones push",
     desc: "Envía promociones directo al celular de tus clientes.",
     Visual: VisNotif,
   },
   {
     icon: IconPin,
-    bg: "bg-emerald-50 text-emerald-600",
     title: "Ubicación en el mapa",
     desc: "Los clientes ven tus comercios cercanos directo desde el mapa.",
     Visual: VisMap,
   },
   {
     icon: IconMap,
-    bg: "bg-rose-50 text-rose-500",
     title: "Programa multi-sede",
     desc: "Gestiona tu programa de fidelización en varias ubicaciones.",
     Visual: VisSedes,
   },
   {
     icon: IconChat,
-    bg: "bg-violet-50 text-violet-600",
     title: "Campañas por segmento",
     desc: "Crea promociones dirigidas a grupos específicos de clientes.",
     Visual: VisCampana,
   },
   {
     icon: IconBars,
-    bg: "bg-amber-50 text-amber-600",
     title: "Reportes y métricas",
     desc: "Conoce el rendimiento de tu programa con datos en tiempo real.",
     Visual: VisReporte,
@@ -453,9 +417,9 @@ function Features() {
       id="funciones"
       className="relative scroll-mt-20 overflow-hidden bg-pl-ivory py-20"
     >
-      <Leaf className="pointer-events-none absolute -left-4 top-8 h-24 -rotate-45 opacity-70 sm:h-32" />
-      <Leaf color="#22c55e" className="pointer-events-none absolute left-12 top-16 h-14 rotate-12 opacity-60" />
-      <Leaf className="pointer-events-none absolute -right-4 top-16 h-28 rotate-[135deg] opacity-60" />
+      <Leaf className="pointer-events-none absolute max-sm:hidden -left-4 top-8 h-24 -rotate-45 opacity-70 sm:h-32" />
+      <Leaf color="#22c55e" className="pointer-events-none absolute max-sm:hidden left-12 top-16 h-14 rotate-12 opacity-60" />
+      <Leaf className="pointer-events-none absolute max-sm:hidden -right-4 top-16 h-28 rotate-[135deg] opacity-60" />
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-extrabold text-ink sm:text-4xl">
@@ -467,17 +431,16 @@ function Features() {
           </p>
         </div>
         <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {FEATURES.map(({ icon: Ic, bg, title, desc, Visual }) => (
+          {FEATURES.map(({ icon: Ic, title, desc, Visual }) => (
             <li
               key={title}
               className="flex flex-col rounded-2xl border border-ink/5 bg-white p-5 shadow-sm"
             >
-              <span
-                className={`flex h-10 w-10 items-center justify-center rounded-xl ${bg}`}
-              >
-                <Ic className="h-5 w-5" />
-              </span>
-              <h3 className="mt-4 font-bold text-ink">{title}</h3>
+              {/* Ícono junto al título (como el mockup), sin recuadro */}
+              <h3 className="flex items-center gap-2.5 font-bold text-ink">
+                <Ic className="h-5 w-5 shrink-0 text-pl-action" />
+                {title}
+              </h3>
               <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
                 {desc}
               </p>
@@ -496,24 +459,20 @@ function Features() {
 /* Beneficios                                                          */
 /* ------------------------------------------------------------------ */
 
-const BENEFITS: { icon: Icon; title: string; desc: string }[] = [
+const BENEFITS: { title: string; desc: string }[] = [
   {
-    icon: IconUsers,
     title: "Clientes frecuentes",
     desc: "Incentiva a tus clientes a volver con recompensas.",
   },
   {
-    icon: IconAward,
     title: "Ventas recurrentes",
     desc: "Aumenta las visitas con promociones personalizadas.",
   },
   {
-    icon: IconChat,
     title: "Conexión directa",
     desc: "Envía mensajes y promociones directo a sus celulares.",
   },
   {
-    icon: IconCheckCircle,
     title: "Todo automático",
     desc: "Gestiona tu programa con actualizaciones automáticas.",
   },
@@ -532,14 +491,12 @@ function Benefits() {
             Herramientas prácticas para hacer crecer tu negocio.
           </p>
         </div>
-        <ul className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {BENEFITS.map(({ icon: Ic, title, desc }) => (
-            <li key={title} className="text-center">
-              <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-pl-green-2/10 text-pl-green-2">
-                <Ic className="h-6 w-6" />
-              </span>
-              <h3 className="mt-4 font-bold text-ink">{title}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
+        {/* Resultados como tipografía: una regla verde marca cada beneficio */}
+        <ul className="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+          {BENEFITS.map(({ title, desc }) => (
+            <li key={title} className="border-t-2 border-pl-green-2 pt-5">
+              <h3 className="text-xl font-extrabold text-pl-green">{title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink-soft">
                 {desc}
               </p>
             </li>
@@ -555,12 +512,14 @@ function Benefits() {
 /* ------------------------------------------------------------------ */
 
 const SECTORS: { icon: Icon; name: string; program: string }[] = [
+  { icon: IconIceCream, name: "Heladerías", program: "Sellos por compra" },
   { icon: IconCup, name: "Cafeterías", program: "Sellos o puntos por compra" },
+  { icon: IconBread, name: "Panaderías", program: "Sellos por compra" },
+  { icon: IconUtensils, name: "Restaurantes", program: "Sellos por consumo" },
   { icon: IconScissors, name: "Barberías", program: "Sellos por servicio" },
   { icon: IconDumbbell, name: "Gimnasios", program: "Puntos por asistencia" },
-  { icon: IconPercent, name: "Restaurantes", program: "Sellos por consumo" },
   { icon: IconBag, name: "Tiendas de ropa", program: "Puntos por compra" },
-  { icon: IconCheck, name: "Servicios", program: "Puntos por contratación" },
+  { icon: IconBriefcase, name: "Servicios", program: "Puntos por contratación" },
 ];
 
 function Sectors() {
@@ -570,7 +529,7 @@ function Sectors() {
       className="relative scroll-mt-20 overflow-hidden bg-pl-ivory py-20"
     >
       <Leaf className="pointer-events-none absolute -left-6 bottom-8 h-32 -rotate-30 opacity-60" />
-      <Leaf color="#22c55e" className="pointer-events-none absolute right-8 top-10 h-24 rotate-[150deg] opacity-50" />
+      <Leaf color="#22c55e" className="pointer-events-none absolute max-sm:hidden right-8 top-10 h-24 rotate-[150deg] opacity-50" />
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-extrabold text-ink sm:text-4xl">
@@ -581,7 +540,7 @@ function Sectors() {
             PineappleLoyalty se adapta a cualquier tipo de comercio.
           </p>
         </div>
-        <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="mt-12 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {SECTORS.map(({ icon: Ic, name, program }) => (
             <li
               key={name}
@@ -605,8 +564,8 @@ function Sectors() {
 /* ------------------------------------------------------------------ */
 
 const PLANS: {
-  icon: Icon;
   name: string;
+  fit: string;
   price: string;
   tag: string;
   desc: string;
@@ -616,8 +575,8 @@ const PLANS: {
   popular?: boolean;
 }[] = [
   {
-    icon: IconSprout,
     name: "Gratis",
+    fit: "1 programa · hasta 50 clientes",
     price: "$0",
     tag: "COP/mes",
     desc: "Prueba PineappleLoyalty sin costo.",
@@ -632,8 +591,8 @@ const PLANS: {
     href: "/signup",
   },
   {
-    icon: IconBars,
     name: "Pro",
+    fit: "Clientes ilimitados",
     price: "$29.000",
     tag: "COP/mes",
     desc: "Para negocios que empiezan a crecer.",
@@ -650,8 +609,8 @@ const PLANS: {
     popular: true,
   },
   {
-    icon: IconStore,
     name: "Business",
+    fit: "Varias sedes",
     price: "$59.000",
     tag: "COP/mes",
     desc: "Para negocios con varias sedes.",
@@ -669,8 +628,8 @@ const PLANS: {
 
 const TRUST = [
   { icon: IconGear, title: "Sin contratos", sub: "Cancela cuando quieras" },
-  { icon: IconCard, title: "Pago seguro", sub: "Múltiples métodos de pago" },
-  { icon: IconHeadset, title: "Soporte en español", sub: "Por correo o chat" },
+  { icon: IconCard, title: "Pago seguro", sub: "Pagos en línea protegidos" },
+  { icon: IconHeadset, title: "Soporte en español", sub: "Por correo" },
   {
     icon: IconShield,
     title: "Tus datos seguros",
@@ -708,7 +667,7 @@ function Pricing() {
         </div>
         <ul className="mt-14 grid gap-6 lg:grid-cols-3">
           {PLANS.map(
-            ({ icon: Ic, name, price, tag, desc, features, cta, href, popular }) => (
+            ({ name, fit, price, tag, desc, features, cta, href, popular }) => (
               <li
                 key={name}
                 className={`relative flex flex-col rounded-3xl p-7 pt-10 ${
@@ -719,15 +678,16 @@ function Pricing() {
               >
                 {popular && (
                   <span className="absolute -top-3.5 left-1/2 flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full bg-pl-action px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white">
-                    <IconCrown className="h-3.5 w-3.5" />
-                    Más popular
+                    <IconAward className="h-3.5 w-3.5" />
+                    Recomendado
                   </span>
                 )}
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-pl-green-2/10 text-pl-green-2">
-                  <Ic className="h-5.5 w-5.5" />
-                </span>
-                <h3 className="mt-3 text-2xl font-extrabold text-ink">{name}</h3>
+                <h3 className="text-2xl font-extrabold text-ink">{name}</h3>
                 <p className="mt-1 text-sm text-ink-soft">{desc}</p>
+                {/* Para quién es cada plan, en lugar de un ícono decorativo */}
+                <span className="mt-3 w-fit rounded-full bg-pl-cream px-3 py-1 text-xs font-semibold text-pl-green">
+                  {fit}
+                </span>
                 <p className="mt-4">
                   <span className="text-3xl font-extrabold tabular-nums text-ink">
                     {price}
@@ -749,7 +709,7 @@ function Pricing() {
                 </ul>
                 <Link
                   href={href}
-                  className={`mt-7 flex items-center justify-center gap-2 rounded-xl py-3 font-semibold transition ${
+                  className={`mt-7 flex items-center justify-center gap-2 rounded-full py-3 font-semibold transition ${
                     popular
                       ? "bg-pl-action text-white shadow-md shadow-pl-action/30 hover:bg-pl-green"
                       : "border border-ink/15 text-ink hover:border-pl-green-2 hover:text-pl-green"
@@ -787,31 +747,25 @@ function Pricing() {
 /* Recursos                                                            */
 /* ------------------------------------------------------------------ */
 
-const RESOURCE_CARDS: { icon: Icon; bg: string; title: string; desc: string; href: string }[] = [
+// Sin href = contenido aún no publicado: se muestra como "Próximamente".
+const RESOURCE_CARDS: { icon: Icon; title: string; desc: string; href?: string }[] = [
   {
     icon: IconBook,
-    bg: "bg-emerald-50 text-emerald-600",
     title: "Guías paso a paso",
     desc: "Aprende a configurar tu programa de fidelización en minutos.",
-    href: "/preguntas",
   },
   {
     icon: IconVideo,
-    bg: "bg-amber-50 text-amber-600",
     title: "Videos tutoriales",
-    desc: "Mira cómo usar cada función de Pineapple Loyalty.",
-    href: "/preguntas",
+    desc: "Mira cómo usar cada función de PineappleLoyalty.",
   },
   {
     icon: IconDoc,
-    bg: "bg-violet-50 text-violet-600",
     title: "Plantillas y material",
     desc: "Descarga recursos listos para usar en tu negocio.",
-    href: "/contacto",
   },
   {
     icon: IconQuestion,
-    bg: "bg-sky-50 text-sky-600",
     title: "Preguntas frecuentes",
     desc: "Encuentra respuestas rápidas a dudas comunes.",
     href: "/preguntas",
@@ -824,7 +778,6 @@ const FEATURED_RESOURCES: {
   title: string;
   desc: string;
   Thumb: ComponentType;
-  href: string;
 }[] = [
   {
     tag: "GUÍA",
@@ -832,7 +785,6 @@ const FEATURED_RESOURCES: {
     title: "Cómo configurar tu programa de fidelización",
     desc: "Aprende paso a paso a crear tu programa desde el panel.",
     Thumb: ThumbAdmin,
-    href: "/preguntas",
   },
   {
     tag: "VIDEO",
@@ -840,7 +792,6 @@ const FEATURED_RESOURCES: {
     title: "Cómo tus clientes se registran con el QR",
     desc: "Mira cómo tus clientes se unen en menos de un minuto.",
     Thumb: ThumbVideo,
-    href: "/preguntas",
   },
   {
     tag: "PLANTILLA",
@@ -848,7 +799,6 @@ const FEATURED_RESOURCES: {
     title: "Mensajes listos para campañas",
     desc: "Usa plantillas para promocionar tus productos.",
     Thumb: ThumbPlantilla,
-    href: "/contacto",
   },
   {
     tag: "GUÍA",
@@ -856,7 +806,6 @@ const FEATURED_RESOURCES: {
     title: "Cómo interpretar tus reportes",
     desc: "Aprende a usar tus métricas para tomar decisiones.",
     Thumb: ThumbReporte,
-    href: "/preguntas",
   },
 ];
 
@@ -886,22 +835,19 @@ function ThumbAdmin() {
 function ThumbVideo() {
   return (
     <div className="relative flex h-full items-center justify-center">
-      <div className="w-16 rounded-[0.9rem] border-[3px] border-neutral-800 bg-white p-1.5 shadow-md">
-        <div className="mx-auto w-10 rounded border border-neutral-100 p-0.5">
-          <FakeQr />
-        </div>
-        <span className="mt-1 block h-1 rounded bg-neutral-200" />
-        <span className="mt-0.5 block h-1 w-2/3 rounded bg-neutral-200" />
-        <div className="mt-1 rounded-sm bg-pl-green-2 py-0.5 text-center text-[4px] font-bold text-white">
-          Registrarme
+      {/* Marco del teléfono: el relleno va en un div interno */}
+      <div className="w-16 rounded-[0.9rem] border-[3px] border-neutral-800 bg-white">
+        <div className="p-1.5">
+          <div className="mx-auto w-10 p-0.5">
+            <FakeQr />
+          </div>
+          <span className="mt-1 block h-1 rounded bg-neutral-200" />
+          <span className="mt-0.5 block h-1 w-2/3 rounded bg-neutral-200" />
+          <div className="mt-1 rounded-sm bg-pl-action py-0.5 text-center text-[4px] font-bold text-white">
+            Registrarme
+          </div>
         </div>
       </div>
-      <span className="absolute left-1/2 top-1/2 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow">
-        <IconPlay className="h-3.5 w-3.5 fill-pl-green text-pl-green" />
-      </span>
-      <span className="absolute bottom-2 right-3 rounded bg-neutral-900/80 px-1.5 py-0.5 text-[7px] font-semibold text-white">
-        2:48
-      </span>
     </div>
   );
 }
@@ -909,16 +855,18 @@ function ThumbVideo() {
 function ThumbPlantilla() {
   return (
     <div className="flex h-full items-center justify-center gap-2">
-      <div className="w-24 -rotate-3 rounded-lg border border-neutral-200 bg-white p-2 shadow-md">
-        <Image
-          src="/pineapple/isotipo-trans.png"
-          alt=""
-          width={14}
-          height={14}
-          className="h-3.5 w-3.5 object-contain"
-        />
-        <p className="mt-1 text-[7px] font-bold text-ink">¡Vuelve y disfruta!</p>
-        <p className="text-[5.5px] text-neutral-500">Gracias por tu visita</p>
+      <div className="w-24 -rotate-3 rounded-lg bg-white shadow-md">
+        <div className="p-2">
+          <Image
+            src="/pineapple/isotipo-trans.png"
+            alt=""
+            width={14}
+            height={14}
+            className="h-3.5 w-3.5 object-contain"
+          />
+          <p className="mt-1 text-[7px] font-bold text-ink">¡Vuelve y disfruta!</p>
+          <p className="text-[5.5px] text-neutral-500">Gracias por tu visita</p>
+        </div>
       </div>
     </div>
   );
@@ -972,10 +920,10 @@ function Resources() {
       id="recursos"
       className="relative scroll-mt-20 overflow-hidden bg-pl-ivory py-20"
     >
-      <Leaf className="pointer-events-none absolute left-2 top-24 h-28 -rotate-[30deg] opacity-60" />
-      <Leaf color="#22c55e" className="pointer-events-none absolute left-14 top-40 h-16 rotate-6 opacity-50" />
-      <Leaf className="pointer-events-none absolute right-4 top-12 h-28 rotate-[140deg] opacity-60" />
-      <Leaf color="#22c55e" className="pointer-events-none absolute right-24 top-32 h-14 rotate-[170deg] opacity-50" />
+      <Leaf className="pointer-events-none absolute max-sm:hidden left-2 top-24 h-28 -rotate-[30deg] opacity-60" />
+      <Leaf color="#22c55e" className="pointer-events-none absolute max-sm:hidden left-14 top-40 h-16 rotate-6 opacity-50" />
+      <Leaf className="pointer-events-none absolute max-sm:hidden right-4 top-12 h-28 rotate-[140deg] opacity-60" />
+      <Leaf color="#22c55e" className="pointer-events-none absolute max-sm:hidden right-24 top-32 h-14 rotate-[170deg] opacity-50" />
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-extrabold text-ink sm:text-4xl">
@@ -983,57 +931,65 @@ function Resources() {
             <span className="text-pl-green">para empezar</span>
           </h2>
           <p className="mt-4 text-ink-soft">
-            Aprende a usar Pineapple Loyalty con guías, videos y recursos
+            Aprende a usar PineappleLoyalty con guías, videos y recursos
             diseñados para dueños de negocio.
           </p>
         </div>
 
         {/* 4 tarjetas rápidas */}
         <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {RESOURCE_CARDS.map(({ icon: Ic, bg, title, desc, href }) => (
-            <li key={title}>
-              <Link
-                href={href}
-                className="flex h-full flex-col rounded-2xl border border-ink/5 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
-              >
-                <span
-                  className={`flex h-11 w-11 items-center justify-center rounded-xl ${bg}`}
-                >
-                  <Ic className="h-5.5 w-5.5" />
-                </span>
-                <h3 className="mt-4 font-bold text-ink">{title}</h3>
+          {RESOURCE_CARDS.map(({ icon: Ic, title, desc, href }) => {
+            const body = (
+              <>
+                <h3 className="flex items-center gap-2.5 font-bold text-ink">
+                  <Ic className="h-5 w-5 shrink-0 text-pl-action" />
+                  {title}
+                </h3>
                 <p className="mt-1.5 flex-1 text-sm leading-relaxed text-ink-soft">
                   {desc}
                 </p>
-                <span className="mt-4 flex h-7 w-7 items-center justify-center rounded-full border border-pl-green-2 text-pl-green-2">
-                  <IconArrowRight className="h-3.5 w-3.5" />
-                </span>
-              </Link>
-            </li>
-          ))}
+              </>
+            );
+            return (
+              <li key={title}>
+                {href ? (
+                  <Link
+                    href={href}
+                    className="flex h-full flex-col rounded-2xl border border-ink/5 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+                  >
+                    {body}
+                    <span className="mt-4 flex items-center gap-1 text-sm font-semibold text-pl-action">
+                      Ver preguntas
+                      <IconArrowRight className="h-3.5 w-3.5" />
+                    </span>
+                  </Link>
+                ) : (
+                  <div className="flex h-full flex-col rounded-2xl border border-dashed border-ink/15 bg-white/60 p-5">
+                    {body}
+                    <span className="mt-4 w-fit rounded-full bg-pl-cream px-3 py-1 text-xs font-semibold text-pl-green">
+                      Próximamente
+                    </span>
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ul>
 
         {/* Recursos destacados */}
-        <div className="mt-16 flex items-center justify-between">
+        <div className="mt-16 flex flex-wrap items-baseline justify-between gap-2">
           <h3 className="text-xl font-extrabold text-ink">
             Recursos destacados
           </h3>
-          <Link
-            href="/preguntas"
-            className="flex items-center gap-1 text-sm font-semibold text-pl-action hover:text-pl-green"
-          >
-            Ver todos los recursos
-            <IconArrowRight className="h-4 w-4" />
-          </Link>
+          <p className="text-sm text-ink-soft">
+            Estamos preparando estas guías; te avisaremos al publicarlas.
+          </p>
         </div>
         <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {FEATURED_RESOURCES.map(({ tag, tagBg, title, desc, Thumb, href }) => (
+          {FEATURED_RESOURCES.map(({ tag, tagBg, title, desc, Thumb }) => (
             <li key={title}>
-              <Link
-                href={href}
-                className="block overflow-hidden rounded-2xl border border-ink/5 bg-white shadow-sm transition-shadow hover:shadow-md"
-              >
-                <div className="relative h-36 bg-gradient-to-br from-pl-ivory to-pl-cream/50">
+              <div className="h-full">
+                <div className="relative h-36 border-b border-pl-green/10">
                   <span
                     className={`absolute left-3 top-3 z-10 rounded px-2 py-0.5 text-[11px] font-bold tracking-wider ${tagBg}`}
                   >
@@ -1043,15 +999,18 @@ function Resources() {
                     <Thumb />
                   </div>
                 </div>
-                <div className="p-4">
+                <div className="px-1 pt-3">
                   <h4 className="text-sm font-bold leading-snug text-ink">
                     {title}
                   </h4>
                   <p className="mt-1.5 text-xs leading-relaxed text-ink-soft">
                     {desc}
                   </p>
+                  <span className="mt-3 inline-block rounded-full bg-pl-cream px-2.5 py-0.5 text-[11px] font-semibold text-pl-green">
+                    Próximamente
+                  </span>
                 </div>
-              </Link>
+              </div>
             </li>
           ))}
         </ul>
@@ -1059,16 +1018,22 @@ function Resources() {
         {/* Bloque de ayuda + temas consultados */}
         <div className="mt-14 grid gap-8 lg:grid-cols-2">
           <div className="rounded-3xl border border-ink/5 bg-white p-8 shadow-sm">
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-pl-green-2/10 text-pl-green-2">
-              <IconHeadset className="h-6 w-6" />
-            </span>
-            <h3 className="mt-5 text-xl font-extrabold text-ink">
+            <h3 className="text-xl font-extrabold text-ink">
               ¿Necesitas ayuda?
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-ink-soft">
               Estamos aquí para apoyarte en cada paso de tu programa de
               fidelización.
             </p>
+            <p className="mt-4 font-script text-xl text-pl-action">
+              Te respondemos en español, desde Barranquilla
+            </p>
+            <a
+              href="mailto:soporte@pineappleloyalty.com"
+              className="mt-1 inline-block text-sm font-semibold text-pl-green underline decoration-pl-green-2 underline-offset-4 hover:text-pl-action"
+            >
+              soporte@pineappleloyalty.com
+            </a>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 href="/preguntas"
@@ -1182,9 +1147,9 @@ function Cta() {
   return (
     <section className="bg-pl-ivory px-4 pb-20 sm:px-6">
       <div className="relative mx-auto max-w-4xl overflow-hidden rounded-[2rem] bg-pl-green px-6 py-14 text-center shadow-xl">
-        <Leaf color="#1a7a48" className="pointer-events-none absolute -left-6 -top-6 h-32 rotate-45" />
+        <Leaf color="#1a7a48" className="pointer-events-none absolute max-sm:hidden -left-6 -top-6 h-32 rotate-45" />
         <Leaf color="#166534" className="pointer-events-none absolute -bottom-8 -right-6 h-36 -rotate-[135deg]" />
-        <Leaf color="#1a7a48" className="pointer-events-none absolute -right-4 top-4 h-24 rotate-[160deg]" />
+        <Leaf color="#1a7a48" className="pointer-events-none absolute max-sm:hidden -right-4 top-4 h-24 rotate-[160deg]" />
         <div className="relative">
           <Image
             src="/pineapple/isotipo-trans.png"

@@ -395,3 +395,23 @@ export const IconGWallet = (p: P) => (
     <circle cx="18.8" cy="15.5" r="2" fill="#34A853" fillOpacity="0.85" />
   </svg>
 );
+
+export const IconBread = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M4 10a8 5 0 0 1 16 0c0 1.2-.8 2-2 2v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-7c-1.2 0-2-.8-2-2Z" />
+  </svg>
+);
+
+export const IconUtensils = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M5 3v5a2 2 0 0 0 4 0V3M7 10v11" />
+    <path d="M17 21V3c-2 2-3 5-3 8h3" />
+  </svg>
+);
+
+export const IconBriefcase = (p: P) => (
+  <svg {...base(p)}>
+    <rect x="3" y="7" width="18" height="13" rx="2" />
+    <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18" />
+  </svg>
+);
