@@ -13,6 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       "/preguntas",
       "/contacto",
       "/guias",
+      "/videos",
       "/guias/configurar-programa",
       "/guias/registro-qr",
       "/guias/campanas",
