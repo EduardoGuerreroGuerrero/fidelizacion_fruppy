@@ -14,7 +14,6 @@ import {
   IconWallet,
   IconGift,
   IconBell,
-  IconPin,
   IconMap,
   IconBars,
   IconBag,
@@ -47,7 +46,6 @@ import {
   VisWallet,
   VisSellos,
   VisNotif,
-  VisMap,
   VisSedes,
   VisCampana,
   VisReporte,
@@ -384,12 +382,6 @@ const FEATURES: {
     title: "Notificaciones push",
     desc: "Envía promociones directo al celular de tus clientes.",
     Visual: VisNotif,
-  },
-  {
-    icon: IconPin,
-    title: "Ubicación en el mapa",
-    desc: "Los clientes ven tus comercios cercanos directo desde el mapa.",
-    Visual: VisMap,
   },
   {
     icon: IconMap,
