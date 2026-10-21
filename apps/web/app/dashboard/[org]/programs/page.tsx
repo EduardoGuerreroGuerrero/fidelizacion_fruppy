@@ -138,7 +138,7 @@ export default async function ProgramsPage({
           />
           <button
             type="submit"
-            className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark sm:col-span-2"
+            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper sm:col-span-2"
           >
             Crear programa
           </button>
@@ -159,12 +159,12 @@ export default async function ProgramsPage({
                     {p.program_type}
                   </span>
                   {p.status !== "active" && (
-                    <span className="ml-2 rounded bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500">
+                    <span className="ml-2 rounded bg-neutral-100 px-2 py-0.5 text-xs text-ink-soft">
                       {p.status}
                     </span>
                   )}
                 </p>
-                <p className="mt-0.5 text-sm text-neutral-500">
+                <p className="mt-0.5 text-sm text-ink-soft">
                   {p.program_type === "stamps"
                     ? `Meta: ${p.stamp_goal} sellos`
                     : `${p.points_per_currency_unit} pts por unidad de moneda`}
@@ -220,7 +220,7 @@ export default async function ProgramsPage({
           </li>
         ))}
         {(programs ?? []).length === 0 && (
-          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-neutral-500 dark:border-neutral-700">
+          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-ink-soft dark:border-neutral-700">
             Sin programas todavía.
           </li>
         )}

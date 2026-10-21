@@ -74,12 +74,12 @@ export default async function LocationsPage({
           />
           <button
             type="submit"
-            className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
+            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
           >
             Crear
           </button>
         </form>
-        <p className="mt-2 text-xs text-neutral-500">
+        <p className="mt-2 text-xs text-ink-soft">
           Con latitud/longitud el cliente puede ordenar las sedes por
           cercanía (opcional, se calcula en su dispositivo).
         </p>
@@ -96,12 +96,12 @@ export default async function LocationsPage({
                 <p className="font-medium">
                   {l.name}
                   {l.status !== "active" && (
-                    <span className="ml-2 rounded bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500">
+                    <span className="ml-2 rounded bg-neutral-100 px-2 py-0.5 text-xs text-ink-soft">
                       {l.status}
                     </span>
                   )}
                 </p>
-                <p className="text-sm text-neutral-500">{l.address ?? "—"}</p>
+                <p className="text-sm text-ink-soft">{l.address ?? "—"}</p>
               </div>
               <form
                 action={setLocationStatus.bind(
@@ -147,7 +147,7 @@ export default async function LocationsPage({
           </li>
         ))}
         {(locations ?? []).length === 0 && (
-          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-neutral-500 dark:border-neutral-700">
+          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-ink-soft dark:border-neutral-700">
             Sin sedes. Crea la primera.
           </li>
         )}

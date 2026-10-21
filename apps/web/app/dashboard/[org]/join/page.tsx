@@ -82,7 +82,7 @@ export default async function JoinQrPage({
             Rotar QR (invalida el anterior)
           </button>
         </form>
-        <p className="mt-2 text-xs text-neutral-500">
+        <p className="mt-2 text-xs text-ink-soft">
           Rótalo si el QR se filtró o aparecen registros sospechosos. Los
           clientes ya registrados conservan su tarjeta.
         </p>

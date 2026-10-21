@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   IconAward,
   IconBell,
@@ -66,6 +66,13 @@ export function FruppyShell({
   const [sideCollapsed, setSideCollapsed] = useState(false);
   const [bellOpen, setBellOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
+
+  // Nav móvil en una franja con scroll: la sección actual queda a la vista.
+  useEffect(() => {
+    document
+      .querySelectorAll<HTMLElement>("[data-mobile-nav] [aria-current=\"page\"]")
+      .forEach((el) => el.scrollIntoView({ inline: "center", block: "nearest" }));
+  }, [pathname]);
 
   const hrefFor = (path: string) => `${base}${path ? `/${path}` : ""}`;
   const isOn = (path: string) =>
@@ -200,7 +207,7 @@ export function FruppyShell({
             <p className="font-script text-xl leading-tight text-wine">
               Más momentos dulces juntos
             </p>
-            <p className="mt-0.5 text-[11px] text-navy/60">
+            <p className="mt-0.5 text-xs text-navy/85">
               Gracias por ser parte de {orgName}
             </p>
             <div className="mt-2 flex items-center justify-between gap-2">
@@ -241,9 +248,15 @@ export function FruppyShell({
           </form>
         </header>
 
-        {/* Nav móvil: píldoras en dos filas */}
-        <div className="sticky top-[60px] z-20 border-b border-black/[0.04] bg-[#faf6f8]/95 px-4 py-2 backdrop-blur lg:hidden">
-          <nav className="flex flex-wrap items-center gap-1.5">
+        {/* Nav móvil: una franja con scroll horizontal (más una para "Más") */}
+        <div
+          data-mobile-nav
+          className="sticky top-[60px] z-20 border-b border-black/[0.04] bg-[#faf6f8]/95 px-4 py-2 backdrop-blur lg:hidden"
+        >
+          <nav
+            aria-label="Secciones"
+            className="-mx-4 flex items-center gap-1.5 overflow-x-auto px-4 [scrollbar-width:none] [&>*]:shrink-0"
+          >
             {nav
               .filter(([p]) => p !== "programs")
               .map(([path, label]) => {
@@ -253,9 +266,10 @@ export function FruppyShell({
                   <Link
                     key={path}
                     href={hrefFor(path)}
+                    aria-current={on ? "page" : undefined}
                     className={`${pill} ${
                       on
-                        ? "bg-brand text-white shadow-sm"
+                        ? "bg-brand-dark text-white shadow-sm"
                         : "bg-white text-ink-soft hover:text-ink"
                     }`}
                   >
@@ -267,9 +281,10 @@ export function FruppyShell({
             {programsItem && (
               <Link
                 href={hrefFor("programs")}
+                aria-current={isOn("programs") ? "page" : undefined}
                 className={`${pill} ${
                   isOn("programs")
-                    ? "bg-brand text-white shadow-sm"
+                    ? "bg-brand-dark text-white shadow-sm"
                     : "bg-white text-ink-soft hover:text-ink"
                 }`}
               >
@@ -298,7 +313,7 @@ export function FruppyShell({
             )}
           </nav>
           {secondary.length > 0 && (moreOpen || secondaryActive) && (
-            <div className="mt-1.5 flex flex-wrap gap-1.5">
+            <div className="-mx-4 mt-1.5 flex gap-1.5 overflow-x-auto px-4 [scrollbar-width:none] [&>*]:shrink-0">
               {secondary.map(([path, label]) => {
                 const Icon = PATH_ICON[path] ?? (() => null);
                 const on = isOn(path);
@@ -307,9 +322,10 @@ export function FruppyShell({
                     key={path}
                     href={hrefFor(path)}
                     onClick={() => setMoreOpen(false)}
+                    aria-current={on ? "page" : undefined}
                     className={`${pill} ${
                       on
-                        ? "bg-brand text-white shadow-sm"
+                        ? "bg-brand-dark text-white shadow-sm"
                         : "bg-white text-ink-soft hover:text-ink"
                     }`}
                   >
@@ -385,14 +401,14 @@ export function FruppyShell({
                   }}
                   className="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-3 ring-1 ring-neutral-200 transition hover:bg-neutral-50"
                 >
-                  <span className="flex size-9 items-center justify-center rounded-full bg-pastel-lav text-xs font-bold text-[#7c5cd6]">
+                  <span className="flex size-9 items-center justify-center rounded-full bg-pastel-lav text-xs font-bold text-[#6545c4]">
                     {userInitials || "?"}
                   </span>
                   <span className="leading-tight">
                     <span className="block max-w-[160px] truncate text-left text-sm font-semibold text-navy">
                       {userName}
                     </span>
-                    <span className="block text-[11px] text-ink-soft">
+                    <span className="block text-xs text-ink-soft">
                       {roleLabel}
                     </span>
                   </span>

@@ -29,7 +29,7 @@ export function OrgNav({
 
   return (
     <div className="relative mb-6">
-      <nav className="flex flex-wrap items-center gap-1.5 rounded-2xl bg-white p-1.5 shadow-sm ring-1 ring-neutral-100">
+      <nav className="flex items-center gap-1.5 overflow-x-auto rounded-2xl bg-white p-1.5 shadow-sm ring-1 ring-neutral-100 [scrollbar-width:none] sm:flex-wrap [&>*]:shrink-0">
         {items.map(([path, label]) => {
           const href = hrefFor(path);
           const on = isOn(path, href);
@@ -37,9 +37,10 @@ export function OrgNav({
             <Link
               key={path}
               href={href}
+              aria-current={on ? "page" : undefined}
               className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
                 on
-                  ? "bg-brand text-white shadow-sm"
+                  ? "bg-brand-dark text-white shadow-sm"
                   : "text-ink-soft hover:bg-neutral-100 hover:text-ink"
               }`}
             >
@@ -83,9 +84,10 @@ export function OrgNav({
                 key={path}
                 href={href}
                 onClick={() => setOpen(false)}
+                aria-current={on ? "page" : undefined}
                 className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
                   on
-                    ? "bg-brand text-white shadow-sm"
+                    ? "bg-brand-dark text-white shadow-sm"
                     : "text-ink-soft hover:bg-neutral-100 hover:text-ink"
                 }`}
               >

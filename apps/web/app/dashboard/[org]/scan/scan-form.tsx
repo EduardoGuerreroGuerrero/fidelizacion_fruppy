@@ -93,7 +93,7 @@ export function ScanForm({
         <button
           type="button"
           onClick={() => void startScanner()}
-          className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-brand px-4 py-4 text-base font-semibold text-white shadow-sm transition hover:bg-brand-dark"
+          className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-brand-dark px-4 py-4 text-base font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
         >
           <IconScan className="size-6" />
           Escanear con cámara
@@ -133,7 +133,7 @@ export function ScanForm({
       </div>
       <button
         type="submit"
-        className="w-full rounded-full bg-brand px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
+        className="w-full rounded-full bg-brand-dark px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
       >
         Registrar visita
       </button>

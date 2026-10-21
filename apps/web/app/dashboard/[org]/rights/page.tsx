@@ -86,11 +86,11 @@ export default async function RightsPage({
                 <div className="min-w-0">
                   <p className="font-medium">
                     {TYPE_LABEL[r.request_type] ?? r.request_type}
-                    <span className="ml-2 rounded bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500 dark:bg-neutral-800">
+                    <span className="ml-2 rounded bg-neutral-100 px-2 py-0.5 text-xs text-ink-soft dark:bg-neutral-800">
                       {STATUS_LABEL[r.status] ?? r.status}
                     </span>
                   </p>
-                  <p className="mt-0.5 text-sm text-neutral-500">
+                  <p className="mt-0.5 text-sm text-ink-soft">
                     {cust?.first_name ?? "—"} {cust?.email ? `· ${cust.email}` : ""}
                   </p>
                   {r.detail ? (
@@ -98,7 +98,7 @@ export default async function RightsPage({
                       {r.detail}
                     </p>
                   ) : null}
-                  <p className="mt-1 text-xs text-neutral-400">
+                  <p className="mt-1 text-xs text-ink-soft">
                     {new Date(r.created_at).toLocaleString("es-CO")}
                   </p>
                 </div>
@@ -107,7 +107,7 @@ export default async function RightsPage({
                     <form action={updateRightsRequest.bind(null, slug, r.id, "resolved")}>
                       <button
                         type="submit"
-                        className="w-full rounded-md bg-brand px-3 py-1 text-xs font-semibold text-white"
+                        className="w-full rounded-md bg-brand-dark px-3 py-1 text-xs font-semibold text-white"
                       >
                         Resolver
                       </button>
@@ -135,7 +135,7 @@ export default async function RightsPage({
           );
         })}
         {(requests ?? []).length === 0 && (
-          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-neutral-500 dark:border-neutral-700">
+          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-ink-soft dark:border-neutral-700">
             Sin solicitudes de derechos.
           </li>
         )}

@@ -141,7 +141,7 @@ export default async function CustomersPage({
   if (!fruppy) {
     return (
       <div className="mx-auto max-w-4xl">
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-ink-soft">
           <Link href={`/dashboard/${slug}`} className="hover:underline">
             {org.name}
           </Link>{" "}
@@ -158,7 +158,7 @@ export default async function CustomersPage({
             </a>
             <Link
               href={`/dashboard/${slug}/customers/new`}
-              className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
+              className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
             >
               Nuevo cliente
             </Link>
@@ -211,7 +211,7 @@ export default async function CustomersPage({
                     <p className="font-medium">
                       {displayName(`${c.first_name} ${c.last_name ?? ""}`)}
                     </p>
-                    <p className="break-all text-sm text-neutral-500">
+                    <p className="break-all text-sm text-ink-soft">
                       {[c.email, c.phone].filter(Boolean).join(" · ") || "—"}
                     </p>
                   </div>
@@ -241,7 +241,7 @@ export default async function CustomersPage({
             ))}
           </ul>
         ) : (
-          <p className="rounded-lg border border-dashed border-neutral-300 p-8 text-center text-neutral-500 dark:border-neutral-700">
+          <p className="rounded-lg border border-dashed border-neutral-300 p-8 text-center text-ink-soft dark:border-neutral-700">
             {needle
               ? "Sin resultados para esa búsqueda."
               : "Aún no hay clientes. Registra el primero."}
