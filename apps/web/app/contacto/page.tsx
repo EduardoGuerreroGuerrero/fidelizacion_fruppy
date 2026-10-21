@@ -5,6 +5,9 @@ import { RememberForm } from "@/app/_components/remember-form";
 import { SubmitButton } from "@/app/_components/submit-button";
 import { sendContactMessage } from "@/lib/contact/actions";
 
+// Lee ?sent / ?error del formulario: ruta dinámica (Next 16 cacheComponents).
+export const instant = false;
+
 export const metadata: Metadata = {
   title: "Contacto | PineappleLoyalty",
   description:
