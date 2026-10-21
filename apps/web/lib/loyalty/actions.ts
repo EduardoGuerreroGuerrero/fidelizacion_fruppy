@@ -166,15 +166,23 @@ export async function scanCard(orgSlug: string, formData: FormData): Promise<voi
     20,
   );
   const idem = String(formData.get("idem") ?? "").trim() || null;
+  // Monto de la compra (programas por puntos), en unidades de moneda.
+  const amountRaw = parseFloat(
+    String(formData.get("amount") ?? "").replace(",", "."),
+  );
+  const amount = Number.isFinite(amountRaw) && amountRaw > 0 ? amountRaw : null;
 
   if (!token) {
     redirect(back + "?error=" + encodeURIComponent("Falta el token del QR."));
   }
 
+  // La RPC decide según el tipo de programa de la tarjeta: sellos usa
+  // p_stamps; puntos usa p_amount. p_amount solo se envía si hay monto.
   const { data, error } = await supabase.rpc("scan_card", {
     p_token: token,
     p_stamps: stamps,
     p_idempotency_key: idem,
+    ...(amount !== null ? { p_amount: amount } : {}),
   });
 
   if (error) {
@@ -183,7 +191,9 @@ export async function scanCard(orgSlug: string, formData: FormData): Promise<voi
       ? "Tarjeta no encontrada."
       : m.includes("card_revoked")
         ? "Tarjeta revocada."
-        : m.includes("rate_limited")
+        : m.includes("amount_required")
+          ? "Este programa es por puntos: ingresa el monto de la compra."
+          : m.includes("rate_limited")
           ? "Demasiados escaneos por minuto. Espera un momento."
           : m.includes("forbidden")
             ? "Sin permiso para registrar visitas en esta organización."
@@ -194,7 +204,10 @@ export async function scanCard(orgSlug: string, formData: FormData): Promise<voi
   const r = data as {
     first_name?: string;
     current_stamps?: number;
+    current_points?: number;
     stamp_goal?: number;
+    program_type?: string;
+    points_earned?: number;
   } | null;
   // Push Wallet best-effort: la RPC no devuelve card_id; lo resolvemos por
   // token con el cliente del miembro (RLS ya limita a su organización).
@@ -209,7 +222,9 @@ export async function scanCard(orgSlug: string, formData: FormData): Promise<voi
       "?ok=" +
       encodeURIComponent(
         `Visita registrada: ${displayName(r?.first_name) || "cliente"} — ` +
-          `${r?.current_stamps ?? "?"}/${r?.stamp_goal ?? "?"} sellos`,
+          (r?.program_type === "points"
+            ? `+${r.points_earned ?? 0} puntos (total ${r.current_points ?? "?"})`
+            : `${r?.current_stamps ?? "?"}/${r?.stamp_goal ?? "?"} sellos`),
       ),
   );
 }

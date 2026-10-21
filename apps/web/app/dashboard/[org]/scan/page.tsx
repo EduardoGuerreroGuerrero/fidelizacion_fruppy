@@ -30,6 +30,17 @@ export default async function ScanPage({
     .maybeSingle();
   if (!org) notFound();
 
+  // Tipos de programa activos: define qué campo(s) mostrar (sellos / monto).
+  const { data: progs } = await supabase
+    .from("loyalty_programs")
+    .select("program_type")
+    .eq("organization_id", org.id)
+    .eq("status", "active");
+  const types = new Set((progs ?? []).map((p) => p.program_type));
+  const hasPoints = types.has("points");
+  // Sin programas activos se conserva el comportamiento histórico (sellos).
+  const hasStamps = types.has("stamps") || !hasPoints;
+
   const action = scanCard.bind(null, slug);
 
   return (
@@ -53,7 +64,12 @@ export default async function ScanPage({
         </p>
       )}
 
-      <ScanForm action={action} initialToken={token} />
+      <ScanForm
+        action={action}
+        initialToken={token}
+        hasStamps={hasStamps}
+        hasPoints={hasPoints}
+      />
       <p className="mt-3 text-xs text-ink-soft">
         Usa la cámara, un lector USB que escriba el token, o pégalo manualmente.
       </p>
