@@ -757,6 +757,8 @@ const RESOURCE_CARDS: {
     icon: IconVideo,
     title: "Videos tutoriales",
     desc: "Mira cómo usar cada función de PineappleLoyalty.",
+    href: "/videos",
+    cta: "Ver videos",
   },
   {
     icon: IconDoc,
