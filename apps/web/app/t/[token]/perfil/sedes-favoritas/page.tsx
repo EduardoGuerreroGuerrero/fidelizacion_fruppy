@@ -25,7 +25,8 @@ export default async function SedesFavoritas({
       <TitleBar title="Mis sedes favoritas" href={`${base}/perfil`} />
 
       <p className="mx-5 mt-2 text-sm text-ink-soft">
-        Marca con un corazón las sedes que visitas más seguido.
+        Marca con un corazón las sedes que visitas más seguido. Tus favoritas se guardan en
+        este dispositivo (no se sincronizan con otros).
       </p>
 
       <ul className="mt-4 space-y-3 px-5">
@@ -43,7 +44,10 @@ export default async function SedesFavoritas({
                 {l.address}
               </span>
             </span>
-            <FavoriteButton storageKey={`fav-${token}-${l.id}`} />
+            <FavoriteButton
+              storageKey={`fav-${token}-${l.id}`}
+              label={`Marcar ${l.name} como favorita`}
+            />
           </li>
         ))}
         {card.locations.length === 0 ? (

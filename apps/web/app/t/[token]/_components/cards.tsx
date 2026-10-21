@@ -61,17 +61,14 @@ export function RewardCard({
   index,
   base,
   stampIcon,
-  fruppy,
 }: {
   reward: CardReward;
   current: number;
   index: number;
   base: string;
   stampIcon?: string | null;
-  fruppy: boolean;
 }) {
   const style = BONO_STYLES[index % BONO_STYLES.length];
-  const n = (index % 5) + 1;
   const goal = reward.cost_stamps ?? reward.cost_points ?? 0;
   const isStamps = reward.cost_stamps != null;
   const missing = Math.max(goal - current, 0);
@@ -82,7 +79,7 @@ export function RewardCard({
       className={`relative mx-5 mb-4 overflow-hidden rounded-[26px] ${style.bg} p-4 pl-3`}
     >
       <div className="relative flex items-center gap-3">
-        <RewardThumb fruppy={fruppy} n={n} className="size-20 shrink-0 rounded-full shadow-sm" />
+        <RewardThumb className="size-20 shrink-0 rounded-full shadow-sm" />
         <div className="min-w-0 flex-1">
           <p className="font-semibold leading-tight text-ink">{reward.name}</p>
           <p className="mt-1 text-[13px] leading-snug text-ink-soft">
@@ -203,21 +200,17 @@ export function MenuRow({
 
 export function LocationRow({
   location,
-  index,
   distanceKm,
-  fruppy,
 }: {
   location: CardLocation;
-  index: number;
   distanceKm?: number;
-  fruppy: boolean;
 }) {
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     `${location.name} ${location.address ?? ""}`,
   )}`;
   return (
     <li className="mx-5 mb-4 flex gap-3 rounded-3xl bg-white p-3 shadow-sm ring-1 ring-neutral-100">
-      <LocationThumb fruppy={fruppy} index={index} name={location.name} className="size-24 shrink-0 rounded-2xl" />
+      <LocationThumb className="size-24 shrink-0 rounded-2xl" />
       <div className="min-w-0 flex-1 py-0.5">
         <p className="font-semibold leading-tight text-ink">
           {location.name}

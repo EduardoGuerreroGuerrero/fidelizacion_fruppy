@@ -5,7 +5,7 @@ import {
   IconPlus,
   IconStore,
 } from "@/app/t/[token]/_components/icons";
-import { initials, FRUPPY_SLUG } from "./[org]/_fruppy/config";
+import { initials } from "@/lib/format";
 import { OrgLogo } from "./org-logo";
 
 const STATUS_BADGE: Record<string, { label: string; chip: string; dot: string }> =
@@ -27,7 +27,12 @@ const STATUS_BADGE: Record<string, { label: string; chip: string; dot: string }>
     },
   };
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; ok?: string }>;
+}) {
+  const { error, ok } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -42,6 +47,16 @@ export default async function DashboardPage() {
         .eq("user_id", user.id)
         .eq("status", "active")
     : { data: [] };
+
+  // Las organizaciones cerradas no se listan (se conservan solo como historial).
+  const openMemberships = (memberships ?? []).filter((m) => {
+    const o = Array.isArray(m.organizations) ? m.organizations[0] : m.organizations;
+    return o && o.status !== "closed";
+  });
+
+  const business = String(
+    (user?.user_metadata as Record<string, unknown> | undefined)?.business ?? "",
+  ).trim();
 
   return (
     <div className="relative mx-auto max-w-2xl">
@@ -64,30 +79,34 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      {memberships && memberships.length > 0 ? (
+      {error ? (
+        <p className="mb-4 rounded-2xl bg-accent-soft px-4 py-3 text-sm text-accent">{error}</p>
+      ) : null}
+      {ok ? (
+        <p className="mb-4 rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+          {ok}
+        </p>
+      ) : null}
+
+      {openMemberships.length > 0 ? (
         <ul className="flex flex-col gap-4">
-          {memberships.map((m) => {
+          {openMemberships.map((m) => {
             const org = Array.isArray(m.organizations)
               ? m.organizations[0]
               : m.organizations;
-            if (!org) return null;
+            if (!org || org.status === "closed") return null;
             const brand = (org.brand ?? {}) as {
               color?: string;
               logo_url?: string;
             };
             // brand.logo_url puede contener assets de Wallet (SVG en data
             // URI), no el logo del comercio: se aceptan URLs y PNGs subidos
-            // (data:image/png); para Fruppy el logo de /brand (convención ya
-            // usada por el shell del panel).
+            // (data:image/png).
             const servable =
               brand.logo_url &&
               (!brand.logo_url.startsWith("data:") ||
                 brand.logo_url.startsWith("data:image/png"));
-            const logoUrl = servable
-              ? brand.logo_url!
-              : org.slug === FRUPPY_SLUG
-                ? "/brand/logo-sm.png"
-                : null;
+            const logoUrl = servable ? brand.logo_url! : null;
             const badge = STATUS_BADGE[org.status] ?? STATUS_BADGE.active;
             return (
               <li key={org.id}>
@@ -138,6 +157,15 @@ export default async function DashboardPage() {
             Aún no tienes organizaciones. Crea la primera para empezar tu
             programa de fidelización.
           </p>
+          {business ? (
+            <Link
+              href={`/dashboard/new?name=${encodeURIComponent(business)}`}
+              className="mt-5 inline-flex items-center gap-2 rounded-full bg-pl-action px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green"
+            >
+              <IconPlus className="size-4" />
+              Crear «{business}»
+            </Link>
+          ) : null}
         </div>
       )}
     </div>

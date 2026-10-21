@@ -18,6 +18,12 @@ export async function GET(request: Request) {
     }
   }
 
+  if (safeNext.startsWith("/nueva-clave")) {
+    return NextResponse.redirect(
+      `${origin}/recuperar?error=${encodeURIComponent("El enlace venció o se abrió en otro navegador. Solicita uno nuevo y ábrelo en este mismo navegador.")}`,
+    );
+  }
+
   return NextResponse.redirect(
     `${origin}/login?error=${encodeURIComponent("No se pudo completar la verificación. Inicia sesión con tu email y contraseña.")}`,
   );

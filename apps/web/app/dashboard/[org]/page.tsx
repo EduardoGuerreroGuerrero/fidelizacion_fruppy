@@ -2,8 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { displayName } from "@/lib/format";
-import { FruppyHome, type ActivityItem } from "./_fruppy/home";
-import { FRUPPY_SLUG, pctDelta } from "./_fruppy/config";
+import { visitSourceLabel } from "@/lib/labels";
 
 export const instant = false;
 
@@ -27,23 +26,12 @@ export default async function OrgPage({ params }: { params: Promise<{ org: strin
   // eslint-disable-next-line react-hooks/purity
   const now = Date.now();
   const thirtyDaysAgo = new Date(now - 30 * 86400_000).toISOString();
-  const sixtyDaysAgo = new Date(now - 60 * 86400_000).toISOString();
-
-  const fruppy = slug === FRUPPY_SLUG;
 
   const [
     { count: customerCount },
     { count: visits30d },
     { count: redemptionCount },
     { data: recentVisits },
-    { count: customersPrev },
-    { count: visitsPrev },
-    { count: redemptionsPrev },
-    { count: customers30d },
-    { count: redemptions30d },
-    { data: recentRedemptions },
-    { data: recentCustomers },
-    { data: programs },
   ] = await Promise.all([
     supabase
       .from("customers")
@@ -66,139 +54,7 @@ export default async function OrgPage({ params }: { params: Promise<{ org: strin
       .eq("organization_id", org.id)
       .order("created_at", { ascending: false })
       .limit(8),
-    // Deltas solo se consultan para la UI Fruppy (igual son baratos: head+count).
-    fruppy
-      ? supabase
-          .from("customers")
-          .select("id", { count: "exact", head: true })
-          .eq("organization_id", org.id)
-          .gte("created_at", sixtyDaysAgo)
-          .lt("created_at", thirtyDaysAgo)
-      : Promise.resolve({ count: null }),
-    fruppy
-      ? supabase
-          .from("customer_visits")
-          .select("id", { count: "exact", head: true })
-          .eq("organization_id", org.id)
-          .gte("created_at", sixtyDaysAgo)
-          .lt("created_at", thirtyDaysAgo)
-      : Promise.resolve({ count: null }),
-    fruppy
-      ? supabase
-          .from("redemptions")
-          .select("id", { count: "exact", head: true })
-          .eq("organization_id", org.id)
-          .eq("status", "completed")
-          .gte("created_at", sixtyDaysAgo)
-          .lt("created_at", thirtyDaysAgo)
-      : Promise.resolve({ count: null }),
-    fruppy
-      ? supabase
-          .from("customers")
-          .select("id", { count: "exact", head: true })
-          .eq("organization_id", org.id)
-          .gte("created_at", thirtyDaysAgo)
-      : Promise.resolve({ count: null }),
-    fruppy
-      ? supabase
-          .from("redemptions")
-          .select("id", { count: "exact", head: true })
-          .eq("organization_id", org.id)
-          .eq("status", "completed")
-          .gte("created_at", thirtyDaysAgo)
-      : Promise.resolve({ count: null }),
-    fruppy
-      ? supabase
-          .from("redemptions")
-          .select("id, created_at, customers(first_name, last_name)")
-          .eq("organization_id", org.id)
-          .order("created_at", { ascending: false })
-          .limit(5)
-      : Promise.resolve({ data: null }),
-    fruppy
-      ? supabase
-          .from("customers")
-          .select("id, first_name, last_name, created_at")
-          .eq("organization_id", org.id)
-          .order("created_at", { ascending: false })
-          .limit(5)
-      : Promise.resolve({ data: null }),
-    fruppy
-      ? supabase
-          .from("loyalty_programs")
-          .select("name")
-          .eq("organization_id", org.id)
-          .eq("status", "active")
-          .order("created_at")
-          .limit(1)
-      : Promise.resolve({ data: null }),
   ]);
-
-  if (fruppy) {
-    const activity: ActivityItem[] = [
-      ...(recentVisits ?? []).map((v) => {
-        const c = Array.isArray(v.customers) ? v.customers[0] : v.customers;
-        return {
-          id: `v-${v.id}`,
-          name: `${c?.first_name ?? ""} ${c?.last_name ?? ""}`.trim() || "Cliente",
-          kind: "visit" as const,
-          at: v.created_at,
-        };
-      }),
-      ...(recentRedemptions ?? []).map((r) => {
-        const c = Array.isArray(r.customers) ? r.customers[0] : r.customers;
-        return {
-          id: `r-${r.id}`,
-          name: `${c?.first_name ?? ""} ${c?.last_name ?? ""}`.trim() || "Cliente",
-          kind: "redeem" as const,
-          at: r.created_at,
-        };
-      }),
-      ...(recentCustomers ?? []).map((c) => ({
-        id: `c-${c.id}`,
-        name: `${c.first_name ?? ""} ${c.last_name ?? ""}`.trim() || "Cliente",
-        kind: "new" as const,
-        at: c.created_at,
-      })),
-    ]
-      .sort((a, b) => (a.at < b.at ? 1 : -1))
-      .slice(0, 6);
-
-    return (
-      <FruppyHome
-        slug={slug}
-        orgName={org.name}
-        programName={programs?.[0]?.name ?? "Fruppy Club"}
-        activity={activity}
-        stats={[
-          {
-            label: "Clientes activos",
-            value: customerCount ?? 0,
-            delta: pctDelta(customers30d ?? 0, customersPrev ?? 0),
-            href: "customers",
-            icon: "users",
-            tone: "mint",
-          },
-          {
-            label: "Visitas (30 días)",
-            value: visits30d ?? 0,
-            delta: pctDelta(visits30d ?? 0, visitsPrev ?? 0),
-            href: "customers",
-            icon: "calendar",
-            tone: "pink",
-          },
-          {
-            label: "Canjes completados",
-            value: redemptionCount ?? 0,
-            delta: pctDelta(redemptions30d ?? 0, redemptionsPrev ?? 0),
-            href: "rewards",
-            icon: "gift",
-            tone: "lav",
-          },
-        ]}
-      />
-    );
-  }
 
   const cards = [
     { label: "Clientes activos", value: customerCount ?? 0, href: `customers` },
@@ -238,7 +94,7 @@ export default async function OrgPage({ params }: { params: Promise<{ org: strin
                 Visita de {displayName(`${c?.first_name ?? ""} ${c?.last_name ?? ""}`)}
               </span>
               <span className="text-xs text-ink-soft">
-                {new Date(v.created_at).toLocaleString("es-CO")} · {v.source}
+                {new Date(v.created_at).toLocaleString("es-CO")} · {visitSourceLabel(v.source)}
               </span>
             </li>
           );

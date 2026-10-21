@@ -1,9 +1,9 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { saveProgram, setProgramStatus } from "@/lib/admin/actions";
-import { FruppyPrograms, type ProgramRow } from "../_fruppy/programs";
-import { PageHead } from "../_fruppy/ui";
-import { FRUPPY_SLUG } from "../_fruppy/config";
+import { RememberForm } from "@/app/_components/remember-form";
+import { SubmitButton } from "@/app/_components/submit-button";
+import { programTypeLabel, statusLabel } from "@/lib/labels";
 
 export const instant = false;
 
@@ -38,60 +38,6 @@ export default async function ProgramsPage({
     .eq("organization_id", org.id)
     .order("created_at", { ascending: false });
 
-  if (slug === FRUPPY_SLUG) {
-    const [{ data: accounts }, { count: rewardsCount }] = await Promise.all([
-      supabase
-        .from("loyalty_accounts")
-        .select("program_id")
-        .eq("organization_id", org.id)
-        .limit(5000),
-      supabase
-        .from("rewards")
-        .select("id", { count: "exact", head: true })
-        .eq("organization_id", org.id)
-        .eq("status", "active"),
-    ]);
-
-    const participantsByProgram = new Map<string, number>();
-    for (const a of accounts ?? []) {
-      participantsByProgram.set(
-        a.program_id,
-        (participantsByProgram.get(a.program_id) ?? 0) + 1,
-      );
-    }
-
-    const rows: ProgramRow[] = (programs ?? []).map((p) => ({
-      id: p.id,
-      name: p.name,
-      program_type: p.program_type,
-      stamp_goal: p.stamp_goal,
-      points_per_currency_unit: p.points_per_currency_unit,
-      status: p.status,
-      participants: participantsByProgram.get(p.id) ?? 0,
-    }));
-
-    return (
-      <div>
-        <PageHead
-          orgName={org.name}
-          base={`/dashboard/${slug}`}
-          current="Programas"
-          title="Programas de fidelización"
-          subtitle="Crea y administra los programas con los que premias a tus clientes"
-          art="/brand/promo-3.jpg"
-        />
-        <FruppyPrograms
-          slug={slug}
-          programs={rows}
-          totalParticipants={accounts?.length ?? 0}
-          rewardsCount={rewardsCount ?? 0}
-          error={error}
-          ok={ok}
-        />
-      </div>
-    );
-  }
-
   return (
     <div className="mx-auto max-w-3xl">
       <h1 className="mb-4 text-2xl font-semibold">Programas</h1>
@@ -109,7 +55,7 @@ export default async function ProgramsPage({
 
       <section className="mb-8 rounded-lg border border-neutral-200 p-5 dark:border-neutral-800">
         <h2 className="mb-3 font-medium">Nuevo programa</h2>
-        <form action={saveProgram.bind(null, slug)} className="grid gap-3 sm:grid-cols-4">
+        <RememberForm storageKey="program-new" action={saveProgram.bind(null, slug)} className="grid gap-3 sm:grid-cols-4">
           <input
             name="name"
             required
@@ -136,13 +82,11 @@ export default async function ProgramsPage({
             placeholder="Pts por $ (puntos)"
             className={input + " sm:col-span-2"}
           />
-          <button
-            type="submit"
-            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper sm:col-span-2"
-          >
+          <SubmitButton
+            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper sm:col-span-2">
             Crear programa
-          </button>
-        </form>
+          </SubmitButton>
+        </RememberForm>
       </section>
 
       <ul className="space-y-3">
@@ -156,11 +100,11 @@ export default async function ProgramsPage({
                 <p className="font-medium">
                   {p.name}
                   <span className="ml-2 rounded bg-neutral-100 px-2 py-0.5 text-xs dark:bg-neutral-800">
-                    {p.program_type}
+                    {programTypeLabel(p.program_type)}
                   </span>
                   {p.status !== "active" && (
                     <span className="ml-2 rounded bg-neutral-100 px-2 py-0.5 text-xs text-ink-soft">
-                      {p.status}
+                      {statusLabel(p.status)}
                     </span>
                   )}
                 </p>
@@ -178,12 +122,10 @@ export default async function ProgramsPage({
                   p.status === "active" ? "archived" : "active",
                 )}
               >
-                <button
-                  type="submit"
-                  className="rounded-md border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-                >
+                <SubmitButton
+                  className="rounded-md border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
                   {p.status === "active" ? "Archivar" : "Reactivar"}
-                </button>
+                </SubmitButton>
               </form>
             </div>
 
@@ -210,12 +152,10 @@ export default async function ProgramsPage({
                   className={input + " w-32"}
                 />
               )}
-              <button
-                type="submit"
-                className="shrink-0 rounded-md border border-neutral-300 px-3 py-2 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-              >
+              <SubmitButton
+                className="shrink-0 rounded-md border border-neutral-300 px-3 py-2 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
                 Guardar
-              </button>
+              </SubmitButton>
             </form>
           </li>
         ))}

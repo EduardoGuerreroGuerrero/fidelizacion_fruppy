@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { optionalEnv } from "@/lib/env";
 import { displayName } from "@/lib/format";
+import { normalizeCardToken } from "@/lib/loyalty/token";
 import { senderFor, sendEmail } from "@/lib/email/send";
 import { pushWalletUpdate } from "@/lib/wallet/push";
 
@@ -105,6 +106,37 @@ export async function revokeCard(orgSlug: string, customerId: string, cardId: st
   redirect(back + "?ok=" + encodeURIComponent("Tarjeta revocada."));
 }
 
+// Reemitir una tarjeta revocada: token nuevo y vuelve a estar activa (el saldo
+// vive en la cuenta, no se pierde). El QR/enlace anterior queda inválido.
+export async function reissueCard(orgSlug: string, customerId: string, cardId: string) {
+  const { supabase, user, orgId } = await requireMembership(orgSlug);
+  const back = `/dashboard/${orgSlug}/customers/${customerId}`;
+
+  const { data: card } = await supabase
+    .from("customer_cards")
+    .select("status")
+    .eq("id", cardId)
+    .eq("customer_id", customerId)
+    .maybeSingle();
+  if (card?.status !== "revoked") {
+    redirect(back + "?error=" + encodeURIComponent("Solo se reemiten tarjetas revocadas."));
+  }
+
+  const { error } = await supabase.rpc("rotate_card_token", { p_card_id: cardId });
+  if (error) {
+    redirect(back + "?error=" + encodeURIComponent("No se pudo reemitir la tarjeta."));
+  }
+
+  await audit(orgId, user.id, "card.reissued", "customer", customerId, { card_id: cardId });
+  await pushWalletUpdate(cardId);
+  revalidatePath(back);
+  redirect(
+    back +
+      "?ok=" +
+      encodeURIComponent("Tarjeta reemitida. El enlace y el QR anteriores ya no funcionan."),
+  );
+}
+
 export async function rotateCardToken(orgSlug: string, customerId: string, cardId: string) {
   const { supabase, user, orgId } = await requireMembership(orgSlug);
   const back = `/dashboard/${orgSlug}/customers/${customerId}`;
@@ -128,7 +160,7 @@ export async function rotateCardToken(orgSlug: string, customerId: string, cardI
 export async function scanCard(orgSlug: string, formData: FormData): Promise<void> {
   const { supabase } = await requireMembership(orgSlug);
   const back = `/dashboard/${orgSlug}/scan`;
-  const token = String(formData.get("token") ?? "").trim();
+  const token = normalizeCardToken(String(formData.get("token") ?? ""));
   const stamps = Math.min(
     Math.max(parseInt(String(formData.get("stamps") ?? "1"), 10) || 1, 0),
     20,

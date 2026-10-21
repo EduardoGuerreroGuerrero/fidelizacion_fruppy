@@ -1,11 +1,15 @@
 import { createServerClient } from "@supabase/ssr";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import { requireEnv } from "@/lib/env";
 
 // Server client bound to the request's session cookie. All queries run as the
 // signed-in user and are subject to RLS.
 export async function createClient() {
+  // Dato por petición: sin esto, Next (cacheComponents) intenta prerrenderizar
+  // en el shell y el SDK de Supabase usa Date.now() → error en consola.
+  await connection();
   const cookieStore = await cookies();
   return createServerClient(
     requireEnv("NEXT_PUBLIC_SUPABASE_URL"),

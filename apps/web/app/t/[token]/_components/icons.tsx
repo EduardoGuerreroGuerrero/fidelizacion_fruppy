@@ -196,7 +196,7 @@ export const IconHeart = (p: P) => (
   </svg>
 );
 
-// ---- Iconos del panel admin-owner (mockups Fruppy Helados) ----
+// ---- Iconos adicionales del panel ----
 
 export const IconUsers = (p: P) => (
   <svg {...base(p)}>

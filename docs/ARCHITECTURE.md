@@ -1,4 +1,4 @@
-# ARCHITECTURE — SaaS Fidelización Fruppy
+# ARCHITECTURE — PineappleLoyalty
 
 > Estado: propuesta Fase 0 (pendiente aprobación). Ver `DECISIONS.md` ADR-001/003.
 

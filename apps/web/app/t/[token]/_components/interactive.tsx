@@ -29,7 +29,13 @@ export function CopyButton({ text }: { text: string }) {
 }
 
 // Corazón de sede favorita — persiste en localStorage del dispositivo.
-export function FavoriteButton({ storageKey }: { storageKey: string }) {
+export function FavoriteButton({
+  storageKey,
+  label = "Marcar como favorita",
+}: {
+  storageKey: string;
+  label?: string;
+}) {
   const [fav, setFav] = useState(false);
   useEffect(() => {
     // Preferencia por dispositivo: solo existe en el cliente → lectura en efecto.
@@ -39,7 +45,8 @@ export function FavoriteButton({ storageKey }: { storageKey: string }) {
   return (
     <button
       type="button"
-      aria-label="Marcar como favorita"
+      aria-label={label}
+      aria-pressed={fav}
       onClick={() => {
         const next = !fav;
         setFav(next);

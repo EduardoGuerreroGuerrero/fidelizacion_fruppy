@@ -128,6 +128,70 @@ export async function signInWithGoogle(formData: FormData) {
   redirect(data.url);
 }
 
+// Recuperación de contraseña. Respuesta SIEMPRE genérica (no revela si el
+// correo existe). El enlace del correo vuelve a /auth/callback (PKCE: debe
+// abrirse en el mismo navegador) y de ahí a /nueva-clave.
+export async function requestPasswordReset(formData: FormData) {
+  const email = String(formData.get("email") ?? "")
+    .trim()
+    .toLowerCase();
+  if (!EMAIL_RE.test(email)) fail("/recuperar", "Email inválido.");
+
+  const h = await headers();
+  const origin =
+    h.get("origin") ??
+    process.env.NEXT_PUBLIC_BASE_URL ??
+    `${h.get("x-forwarded-proto") ?? "https"}://${h.get("x-forwarded-host") ?? h.get("host")}`;
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/callback?next=${encodeURIComponent("/nueva-clave")}`,
+  });
+  // Límite de envíos de Supabase: sí se avisa, para que no reintente en bucle.
+  if (error?.code === "over_email_send_rate_limit" || error?.status === 429) {
+    fail("/recuperar", "Demasiados intentos. Espera unos minutos y vuelve a intentarlo.");
+  }
+
+  redirect(
+    `/recuperar?notice=${encodeURIComponent(
+      "Si ese correo tiene una cuenta, te enviamos un enlace para crear una contraseña nueva. Ábrelo en este mismo navegador.",
+    )}`,
+  );
+}
+
+// Fija la contraseña nueva. Exige la sesión de recuperación creada por el
+// callback; sin ella (enlace vencido o abierto en otro navegador) no hace nada.
+export async function updatePassword(formData: FormData) {
+  const password = String(formData.get("password") ?? "");
+  const confirm = String(formData.get("confirm") ?? "");
+  if (password.length < MIN_PASSWORD) {
+    fail("/nueva-clave", `La contraseña debe tener al menos ${MIN_PASSWORD} caracteres.`);
+  }
+  if (password !== confirm) fail("/nueva-clave", "Las contraseñas no coinciden.");
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    fail("/recuperar", "El enlace venció o se abrió en otro navegador. Solicita uno nuevo.");
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) {
+    fail(
+      "/nueva-clave",
+      error.code === "same_password"
+        ? "La contraseña nueva debe ser distinta de la anterior."
+        : error.code === "weak_password"
+          ? "Esa contraseña es demasiado débil. Usa una más larga o variada."
+          : "No se pudo actualizar la contraseña. Intenta de nuevo.",
+    );
+  }
+
+  redirect("/dashboard");
+}
+
 export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();

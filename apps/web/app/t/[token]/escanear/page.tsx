@@ -56,7 +56,7 @@ export default async function Escanear({
             <span className="text-right">
               <p className="font-semibold">{card.first_name}</p>
               <span className="mt-1 inline-block rounded-full bg-white/90 px-2.5 py-0.5 text-[10px] font-semibold text-brand-dark">
-                Cliente activo
+                {card.card_status === "active" ? "Cliente activo" : "Tarjeta revocada"}
               </span>
             </span>
           </div>

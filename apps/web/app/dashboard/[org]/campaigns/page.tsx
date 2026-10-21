@@ -6,6 +6,8 @@ import {
   queuePushCampaign,
   savePushCampaign,
 } from "@/lib/admin/actions";
+import { RememberForm } from "@/app/_components/remember-form";
+import { SubmitButton } from "@/app/_components/submit-button";
 
 export const instant = false;
 
@@ -111,7 +113,7 @@ export default async function CampaignsPage({
             antes de enviar.
           </p>
         ) : null}
-        <form action={savePushCampaign.bind(null, slug)} className="mt-3 space-y-3">
+        <RememberForm storageKey="campaign-new" action={savePushCampaign.bind(null, slug)} className="mt-3 space-y-3">
           <input
             name="title"
             required
@@ -143,14 +145,12 @@ export default async function CampaignsPage({
               className={input}
             />
           </div>
-          <button
-            type="submit"
+          <SubmitButton
             disabled={!pushEnabled || !configured}
-            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper disabled:opacity-50"
-          >
+            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper disabled:opacity-50">
             Crear campaña
-          </button>
-        </form>
+          </SubmitButton>
+        </RememberForm>
         <p className="mt-2 text-xs text-ink-soft">
           Solo llega a clientes que activaron las notificaciones de {org.name}.
           Quien las desactive antes del envío no la recibe.
@@ -182,24 +182,22 @@ export default async function CampaignsPage({
                 <div className="flex shrink-0 gap-2">
                   {(c.status === "draft" || c.status === "scheduled") && (
                     <form action={queuePushCampaign.bind(null, slug, c.id)}>
-                      <button
-                        type="submit"
+                      <SubmitButton
                         className="rounded-md bg-brand-dark px-3 py-1 text-xs font-semibold text-white"
-                      >
+                        confirm="¿Enviar la campaña ahora a todos los clientes suscritos? No se puede deshacer.">
                         Enviar ahora
-                      </button>
+                      </SubmitButton>
                     </form>
                   )}
                   {(c.status === "draft" ||
                     c.status === "scheduled" ||
                     c.status === "sending") && (
                     <form action={cancelPushCampaign.bind(null, slug, c.id)}>
-                      <button
-                        type="submit"
+                      <SubmitButton
                         className="rounded-md border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-                      >
+                        confirm="¿Seguro que quieres cancelar?">
                         Cancelar
-                      </button>
+                      </SubmitButton>
                     </form>
                   )}
                 </div>

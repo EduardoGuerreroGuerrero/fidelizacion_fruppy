@@ -1,6 +1,8 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { rotateJoinToken } from "@/lib/admin/actions";
+import { SubmitButton } from "@/app/_components/submit-button";
+import { PrintButton } from "@/app/_components/print-button";
 
 export const instant = false;
 
@@ -23,13 +25,15 @@ export default async function JoinQrPage({
 
   const { data: org } = await supabase
     .from("organizations")
-    .select("id, name, join_token, features")
+    .select("id, name, join_token, features, legal")
     .eq("slug", slug)
     .maybeSingle();
   if (!org) notFound();
 
   const selfReg =
     ((org.features ?? {}) as Record<string, unknown>).self_registration !== false;
+  const hasPrivacyChannel =
+    String(((org.legal ?? {}) as Record<string, unknown>).privacy_email ?? "").trim() !== "";
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
   const joinUrl = `${baseUrl}/join/${org.join_token}`;
 
@@ -47,6 +51,17 @@ export default async function JoinQrPage({
           {ok}
         </p>
       )}
+
+      {!hasPrivacyChannel ? (
+        <p className="mb-4 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+          El QR está <strong>deshabilitado</strong> hasta que configures un correo de
+          privacidad en{" "}
+          <a className="underline" href={`/dashboard/${slug}/settings`}>
+            Configuración → Privacidad y funciones
+          </a>
+          . La Ley 1581 exige que el titular pueda contactar al responsable de sus datos.
+        </p>
+      ) : null}
 
       {!selfReg ? (
         <p className="mb-4 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
@@ -73,14 +88,23 @@ export default async function JoinQrPage({
           <code className="break-all rounded-md bg-neutral-100 px-3 py-2 text-xs dark:bg-neutral-800">
             {joinUrl}
           </code>
+          <div className="flex flex-wrap justify-center gap-2 print:hidden">
+            <a
+              href={`/dashboard/${slug}/join/qr`}
+              download={`qr-registro-${slug}.png`}
+              className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
+            >
+              Descargar QR (PNG)
+            </a>
+            <PrintButton />
+          </div>
         </div>
         <form action={rotateJoinToken.bind(null, slug)} className="mt-4">
-          <button
-            type="submit"
+          <SubmitButton
             className="rounded-full border border-neutral-300 px-4 py-2 text-sm font-semibold transition hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-          >
+            confirm="¿Rotar el QR de registro? Los QR ya impresos dejarán de funcionar.">
             Rotar QR (invalida el anterior)
-          </button>
+          </SubmitButton>
         </form>
         <p className="mt-2 text-xs text-ink-soft">
           Rótalo si el QR se filtró o aparecen registros sospechosos. Los

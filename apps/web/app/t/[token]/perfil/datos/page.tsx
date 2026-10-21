@@ -23,7 +23,7 @@ export default async function DatosPersonales({
     ["Nombre", card.first_name],
     ["Programa", card.program_name],
     ["Comercio", card.org_name],
-    ["Estado", card.card_status === "active" ? "Cliente activo" : "Tarjeta inactiva"],
+    ["Estado", card.card_status === "active" ? "Cliente activo" : "Tarjeta revocada"],
   ];
 
   return (

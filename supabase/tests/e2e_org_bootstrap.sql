@@ -192,6 +192,43 @@ end $$;
 
 reset role;
 
+-- ---------- O14 · directorio de miembros con correo (QA-B2) -------------------
+update auth.users set email = 'ofelia@org-f.test', raw_user_meta_data = '{"full_name":"Ofelia Owner"}'
+ where id = '00000000-0000-0000-0000-0000000000f2';
+update auth.users set email = 'ale@org-f.test' where id = '00000000-0000-0000-0000-0000000000f1';
+
+select set_config('app.user_id', '00000000-0000-0000-0000-0000000000f2', false);
+do $$
+declare n int;
+begin
+  select count(*) into n from public.org_member_directory('f0f0f0f0-0000-0000-0000-000000000001');
+  perform pg_temp.t_ok(n >= 3, 'O14a el owner ve el directorio del equipo');
+  perform pg_temp.t_ok(
+    (select email = 'ofelia@org-f.test' and full_name = 'Ofelia Owner'
+       from public.org_member_directory('f0f0f0f0-0000-0000-0000-000000000001')
+      where user_id = '00000000-0000-0000-0000-0000000000f2'),
+    'O14b correo y nombre del miembro');
+  perform pg_temp.t_ok(
+    (select full_name is null from public.org_member_directory('f0f0f0f0-0000-0000-0000-000000000001')
+      where user_id = '00000000-0000-0000-0000-0000000000f1'),
+    'O14c sin nombre en metadatos → full_name nulo');
+end $$;
+
+select set_config('app.user_id', '00000000-0000-0000-0000-0000000000f3', false);
+do $$
+begin
+  perform pg_temp.t_err(
+    $q$select * from public.org_member_directory('f0f0f0f0-0000-0000-0000-000000000001')$q$,
+    'forbidden', 'O14d staff no ve correos del equipo');
+end $$;
+select set_config('app.user_id', '00000000-0000-0000-0000-0000000000f4', false);
+do $$
+begin
+  perform pg_temp.t_err(
+    $q$select * from public.org_member_directory('f0f0f0f0-0000-0000-0000-000000000001')$q$,
+    'forbidden', 'O14e un extraño no ve el directorio de otra org');
+end $$;
+
 -- ---------- O13 · borrar la organización en cascada no choca con el guard ----
 select set_config('app.user_id', '', false);
 do $$

@@ -1,18 +1,30 @@
 import { createOrganization } from "@/lib/organizations/actions";
+import { createClient } from "@/lib/supabase/server";
 import {
   IconPlus,
   IconStore,
   IconUpload,
 } from "@/app/t/[token]/_components/icons";
+import { SubmitButton } from "@/app/_components/submit-button";
 
 export const instant = false;
 
 export default async function NewOrganizationPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; name?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, name } = await searchParams;
+
+  // El signup pide el nombre del negocio: se aprovecha como valor inicial.
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const business = String(
+    (user?.user_metadata as Record<string, unknown> | undefined)?.business ?? "",
+  ).trim();
+  const initialName = (name ?? business).slice(0, 120);
 
   return (
     <div className="relative mx-auto max-w-md">
@@ -60,6 +72,7 @@ export default async function NewOrganizationPage({
         <input
           id="name"
           name="name"
+          defaultValue={initialName}
           required
           minLength={2}
           maxLength={120}
@@ -87,13 +100,11 @@ export default async function NewOrganizationPage({
           organizaciones.
         </p>
 
-        <button
-          type="submit"
-          className="mt-7 flex w-full items-center justify-center gap-2 rounded-full bg-pl-green-2 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green"
-        >
+        <SubmitButton
+          className="mt-7 flex w-full items-center justify-center gap-2 rounded-full bg-pl-green-2 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green">
           <IconPlus className="size-4" />
           Crear organización
-        </button>
+        </SubmitButton>
       </form>
     </div>
   );

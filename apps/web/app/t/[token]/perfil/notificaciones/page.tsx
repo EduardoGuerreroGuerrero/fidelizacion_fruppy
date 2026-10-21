@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { TitleBar } from "../../_components/chrome";
 import { getCardAppData } from "../../_components/data";
 import { PushToggle } from "../../_components/push";
+import { SubmitButton } from "@/app/_components/submit-button";
 
 export const instant = false;
 
@@ -71,20 +72,20 @@ export default async function Notificaciones({
           <form method="post" action={`${base}/prefs`}>
             <input type="hidden" name="purpose" value="marketing_email" />
             <input type="hidden" name="granted" value={marketingOn ? "0" : "1"} />
-            <button
-              type="submit"
+            <SubmitButton
               role="switch"
+              aria-label="Promociones por correo"
+              pendingText={null}
               aria-checked={marketingOn}
               className={`h-7 w-12 shrink-0 rounded-full p-1 transition ${
                 marketingOn ? "bg-brand" : "bg-neutral-200"
-              }`}
-            >
+              }`}>
               <span
                 className={`block size-5 rounded-full bg-white shadow transition ${
                   marketingOn ? "translate-x-5" : ""
                 }`}
               />
-            </button>
+            </SubmitButton>
           </form>
         </li>
 
@@ -105,20 +106,20 @@ export default async function Notificaciones({
                 name="granted"
                 value={consents.location === "granted" ? "0" : "1"}
               />
-              <button
-                type="submit"
+              <SubmitButton
                 role="switch"
+                aria-label="Ubicación para sedes cercanas"
+                pendingText={null}
                 aria-checked={consents.location === "granted"}
                 className={`h-7 w-12 shrink-0 rounded-full p-1 transition ${
                   consents.location === "granted" ? "bg-brand" : "bg-neutral-200"
-                }`}
-              >
+                }`}>
                 <span
                   className={`block size-5 rounded-full bg-white shadow transition ${
                     consents.location === "granted" ? "translate-x-5" : ""
                   }`}
                 />
-              </button>
+              </SubmitButton>
             </form>
           </li>
         ) : null}

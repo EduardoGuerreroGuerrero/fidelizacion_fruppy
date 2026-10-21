@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createCustomer } from "@/lib/customers/actions";
+import { RememberForm } from "@/app/_components/remember-form";
+import { SubmitButton } from "@/app/_components/submit-button";
 
 export const instant = false;
 
@@ -54,7 +56,7 @@ export default async function NewCustomerPage({
         </p>
       )}
 
-      <form action={action} className="space-y-4">
+      <RememberForm storageKey="customer-new" action={action} className="space-y-4">
         <div>
           <label htmlFor="first_name" className={label}>
             Nombre *
@@ -102,6 +104,14 @@ export default async function NewCustomerPage({
         </div>
 
         <label className="flex items-start gap-2 text-sm">
+          <input type="checkbox" name="data_consent" required className="mt-0.5" />
+          <span>
+            El cliente autorizó el tratamiento de sus datos personales conforme a la política del
+            comercio (Ley 1581 de 2012). <strong>Obligatorio.</strong>
+          </span>
+        </label>
+
+        <label className="flex items-start gap-2 text-sm">
           <input type="checkbox" name="marketing_consent" className="mt-0.5" />
           <span>
             El cliente acepta recibir comunicaciones de marketing (consentimiento registrado con
@@ -117,12 +127,10 @@ export default async function NewCustomerPage({
         )}
 
         <div className="flex gap-2 pt-2">
-          <button
-            type="submit"
-            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
-          >
+          <SubmitButton
+            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper">
             Crear cliente
-          </button>
+          </SubmitButton>
           <Link
             href={`/dashboard/${slug}/customers`}
             className="rounded-md border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
@@ -130,7 +138,7 @@ export default async function NewCustomerPage({
             Cancelar
           </Link>
         </div>
-      </form>
+      </RememberForm>
     </div>
   );
 }

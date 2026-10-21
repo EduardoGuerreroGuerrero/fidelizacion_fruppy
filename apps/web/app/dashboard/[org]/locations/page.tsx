@@ -1,6 +1,9 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { saveLocation, setLocationStatus } from "@/lib/admin/actions";
+import { RememberForm } from "@/app/_components/remember-form";
+import { SubmitButton } from "@/app/_components/submit-button";
+import { statusLabel } from "@/lib/labels";
 
 export const instant = false;
 
@@ -52,7 +55,7 @@ export default async function LocationsPage({
 
       <section className="mb-6 rounded-lg border border-neutral-200 p-5 dark:border-neutral-800">
         <h2 className="mb-3 font-medium">Nueva sede</h2>
-        <form action={saveLocation.bind(null, slug)} className="flex flex-wrap gap-2">
+        <RememberForm storageKey="location-new" action={saveLocation.bind(null, slug)} className="flex flex-wrap gap-2">
           <input
             name="name"
             required
@@ -72,13 +75,11 @@ export default async function LocationsPage({
             inputMode="decimal"
             className={input + " w-28"}
           />
-          <button
-            type="submit"
-            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
-          >
+          <SubmitButton
+            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper">
             Crear
-          </button>
-        </form>
+          </SubmitButton>
+        </RememberForm>
         <p className="mt-2 text-xs text-ink-soft">
           Con latitud/longitud el cliente puede ordenar las sedes por
           cercanía (opcional, se calcula en su dispositivo).
@@ -97,7 +98,7 @@ export default async function LocationsPage({
                   {l.name}
                   {l.status !== "active" && (
                     <span className="ml-2 rounded bg-neutral-100 px-2 py-0.5 text-xs text-ink-soft">
-                      {l.status}
+                      {statusLabel(l.status)}
                     </span>
                   )}
                 </p>
@@ -111,12 +112,10 @@ export default async function LocationsPage({
                   l.status === "active" ? "inactive" : "active",
                 )}
               >
-                <button
-                  type="submit"
-                  className="rounded-md border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-                >
+                <SubmitButton
+                  className="rounded-md border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
                   {l.status === "active" ? "Desactivar" : "Activar"}
-                </button>
+                </SubmitButton>
               </form>
             </div>
             <form action={saveLocation.bind(null, slug)} className="mt-2 flex flex-wrap gap-2">
@@ -137,12 +136,10 @@ export default async function LocationsPage({
                 inputMode="decimal"
                 className={input + " w-24"}
               />
-              <button
-                type="submit"
-                className="shrink-0 rounded-md border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-              >
+              <SubmitButton
+                className="shrink-0 rounded-md border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
                 Guardar
-              </button>
+              </SubmitButton>
             </form>
           </li>
         ))}

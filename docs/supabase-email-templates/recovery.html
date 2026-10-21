@@ -1,0 +1,17 @@
+<!-- Supabase → Authentication → Emails → Templates → "Reset password" -->
+<!-- Asunto sugerido: Crea una contraseña nueva en PineappleLoyalty -->
+<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;max-width:480px;margin:0 auto;color:#262626">
+  <h2 style="color:#0f5132;margin:0 0 12px">Crea una contraseña nueva</h2>
+  <p>Recibimos una solicitud para cambiar la contraseña de <strong>{{ .Email }}</strong> en PineappleLoyalty.</p>
+  <p style="text-align:center;margin:28px 0">
+    <a href="{{ .ConfirmationURL }}"
+       style="background:#0f5132;color:#fff;padding:13px 28px;border-radius:999px;text-decoration:none;font-weight:600;display:inline-block">
+      Elegir contraseña nueva
+    </a>
+  </p>
+  <p style="font-size:13px;color:#737373">
+    Ábrelo en el <strong>mismo navegador</strong> donde lo pediste. El enlace
+    vence en 1 hora. Si no fuiste tú, ignora este mensaje: tu contraseña no cambia.
+  </p>
+  <p style="font-size:12px;color:#a3a3a3">PineappleLoyalty — fidelización digital · pineappleloyalty.com</p>
+</div>

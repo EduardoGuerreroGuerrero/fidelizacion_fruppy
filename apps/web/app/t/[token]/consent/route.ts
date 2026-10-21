@@ -7,7 +7,8 @@ import { createClient } from "@/lib/supabase/server";
 // form — si llega sin él, simplemente se vuelve a la tarjeta sin escribir.
 export async function POST(req: Request, ctx: { params: Promise<{ token: string }> }) {
   const { token } = await ctx.params;
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+  // Origen de la petición (no NEXT_PUBLIC_BASE_URL): local y previews no saltan a producción.
+  const baseUrl = new URL(req.url).origin;
   const back = `${baseUrl}/t/${token}`;
 
   if (!/^[a-f0-9]{32}$/i.test(token)) {

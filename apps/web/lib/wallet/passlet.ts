@@ -145,15 +145,16 @@ export class PassletWalletProvider implements WalletProvider {
     return wallet.loyalty({
       id: `loyalty-${data.orgId}`,
       name: data.programName,
-      color: data.brandColor ?? "#0d9488",
+      color: data.brandColor ?? "#0f5132",
       apple: baseUrl
         ? {
             icon: {
-              base: `${baseUrl}/brand/wallet-icon.png`,
-              retina: `${baseUrl}/brand/wallet-icon@2x.png`,
+              base: `${baseUrl}/pineapple/wallet-icon.png`,
+              retina: `${baseUrl}/pineapple/wallet-icon@2x.png`,
             },
-            // ?v=2: Google cachea imágenes por URL; versionado para refresco.
-            logo: `${baseUrl}/brand/wallet-logo.png?v=2`,
+            // Logo del comercio si lo subió; si no, el de la plataforma.
+            // ?v=3: Google cachea imágenes por URL; versionado para refresco.
+            logo: data.logoUrl ?? `${baseUrl}/pineapple/wallet-logo.png?v=3`,
             logoText: data.orgName,
             description: `${data.programName} — ${data.orgName}`,
           }
@@ -164,7 +165,7 @@ export class PassletWalletProvider implements WalletProvider {
             // Logo del comercio si lo subió; si no, el genérico de la marca
             // SaaS. Sin "hero": sin esa imagen la tarjeta queda unicolor
             // (antes mostraba una promo fija de ejemplo, ajena al comercio).
-            logo: data.logoUrl ?? `${baseUrl}/brand/wallet-logo.png?v=2`,
+            logo: data.logoUrl ?? `${baseUrl}/pineapple/wallet-logo.png?v=3`,
           }
         : undefined,
       fields: [
