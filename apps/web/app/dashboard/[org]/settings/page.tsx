@@ -28,6 +28,21 @@ const TIMEZONES = [
   "Europe/Madrid",
 ];
 
+// Vista previa de sellos en vivo: cada fila se muestra solo cuando su radio
+// stamp_icon está marcado (group-has sobre el contenedor grid). Las clases
+// deben ser literales para que Tailwind las genere.
+const STAMP_SHOWN: Record<string, string> = {
+  strawberry:
+    "group-has-[input[name=stamp_icon][value=strawberry]:checked]:flex",
+  coffee: "group-has-[input[name=stamp_icon][value=coffee]:checked]:flex",
+  mustache: "group-has-[input[name=stamp_icon][value=mustache]:checked]:flex",
+  bandage: "group-has-[input[name=stamp_icon][value=bandage]:checked]:flex",
+  paw: "group-has-[input[name=stamp_icon][value=paw]:checked]:flex",
+  flower: "group-has-[input[name=stamp_icon][value=flower]:checked]:flex",
+  heart: "group-has-[input[name=stamp_icon][value=heart]:checked]:flex",
+  star: "group-has-[input[name=stamp_icon][value=star]:checked]:flex",
+};
+
 // Contraste WCAG del texto blanco de la tarjeta sobre el color de marca.
 function contrastWithWhite(hex: string): number {
   const ch = [1, 3, 5].map((i) => {
@@ -90,6 +105,10 @@ export default async function SettingsPage({
   const previewGoal = activeProgram?.stamp_goal ?? 10;
   const previewIsStamps = !activeProgram || activeProgram.program_type === "stamps";
   const previewCurrent = Math.max(1, Math.round(previewGoal * 0.6));
+  // Los círculos de la vista previa se muestran como máximo 10 (la meta real
+  // puede ser mayor); la cifra "x / y" siempre muestra la meta verdadera.
+  const previewShown = Math.min(previewGoal, 10);
+  const previewFilled = Math.min(previewCurrent, previewShown);
   const stampIcon = brand.stamp_icon ?? "strawberry";
   const legal = (org.legal ?? {}) as {
     privacy_email?: string;
@@ -114,7 +133,7 @@ export default async function SettingsPage({
         </p>
       )}
 
-      <div className="grid gap-6 sm:grid-cols-2">
+      <div className="group grid gap-6 sm:grid-cols-2">
         <RememberForm storageKey="settings-org" action={updateOrgSettings.bind(null, slug)} className="space-y-4">
           <div>
             {/* El nombre aquí ES el nombre registrado de la organización —
@@ -228,21 +247,54 @@ export default async function SettingsPage({
             style={{ backgroundColor: brandColor }}
           >
             {brand.logo_url && (
+              // Mismo tratamiento que la tarjeta real del cliente: PNG
+              // transparente sobre el color, sin caja de fondo.
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={brand.logo_url}
                 alt="Logo"
-                className="mb-3 h-8 w-auto rounded bg-white/80 object-contain"
+                className="mb-3 h-8 w-auto object-contain drop-shadow-md"
               />
             )}
             <p className="text-xs uppercase tracking-wide opacity-80">{org.name}</p>
-            <p className="mt-4 text-2xl font-semibold">
-              {previewIsStamps ? `${previewCurrent} / ${previewGoal}` : "1.250"}
-            </p>
-            <p className="text-sm opacity-80">{previewIsStamps ? "sellos" : "puntos"}</p>
+            {previewIsStamps ? (
+              <>
+                <div className="mt-4">
+                  {STAMP_ICON_OPTIONS.map(({ key, Icon }) => (
+                    <span
+                      key={key}
+                      className={`hidden flex-wrap items-center gap-1.5 ${STAMP_SHOWN[key]}`}
+                    >
+                      {Array.from({ length: previewShown }, (_, i) => (
+                        <span
+                          key={i}
+                          className={`flex size-6 items-center justify-center rounded-full ${
+                            i < previewFilled
+                              ? "bg-pastel-pink"
+                              : "border border-[#f0d4dc] bg-white"
+                          }`}
+                        >
+                          <Icon filled={i < previewFilled} className="size-4" />
+                        </span>
+                      ))}
+                    </span>
+                  ))}
+                </div>
+                <p className="mt-2 text-2xl font-semibold">
+                  {previewCurrent} / {previewGoal}
+                </p>
+                <p className="text-sm opacity-80">sellos</p>
+              </>
+            ) : (
+              <>
+                <p className="mt-4 text-2xl font-semibold">1.250</p>
+                <p className="text-sm opacity-80">puntos</p>
+              </>
+            )}
           </div>
           <p className="mt-2 text-xs text-ink-soft">
-            Así ven la tarjeta tus clientes (los números son un ejemplo).
+            Así ven la tarjeta tus clientes (los sellos y números son un
+            ejemplo).
           </p>
           {brandContrast < 4.5 && (
             <p
