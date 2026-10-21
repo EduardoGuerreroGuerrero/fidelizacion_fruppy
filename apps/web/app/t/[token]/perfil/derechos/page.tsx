@@ -1,5 +1,6 @@
 import { TitleBar } from "../../_components/chrome";
 import { getCardAppData } from "../../_components/data";
+import { SubmitButton } from "@/app/_components/submit-button";
 
 export const instant = false;
 
@@ -86,12 +87,10 @@ export default async function Derechos({
             className={select}
           />
         </div>
-        <button
-          type="submit"
-          className="w-full rounded-2xl bg-brand py-3.5 text-[15px] font-semibold text-white"
-        >
+        <SubmitButton
+          className="w-full rounded-2xl bg-brand py-3.5 text-[15px] font-semibold text-white">
           Enviar solicitud
-        </button>
+        </SubmitButton>
       </form>
 
       <p className="mx-5 mt-4 text-[11px] leading-snug text-ink-soft">

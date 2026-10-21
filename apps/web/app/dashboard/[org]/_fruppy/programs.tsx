@@ -16,6 +16,7 @@ import {
 } from "@/app/t/[token]/_components/icons";
 import { saveProgram, setProgramStatus } from "@/lib/admin/actions";
 import { Card, Chip, IconTile } from "./ui";
+import { SubmitButton } from "@/app/_components/submit-button";
 
 export type ProgramRow = {
   id: string;
@@ -214,12 +215,10 @@ export function FruppyPrograms({
                 />
               </div>
 
-              <button
-                type="submit"
-                className="rounded-full bg-brand-dark px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper sm:col-span-2"
-              >
+              <SubmitButton
+                className="rounded-full bg-brand-dark px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper sm:col-span-2">
                 Crear programa
-              </button>
+              </SubmitButton>
             </form>
           </Card>
 
@@ -262,14 +261,12 @@ export function FruppyPrograms({
                         p.status === "active" ? "archived" : "active",
                       )}
                     >
-                      <button
-                        type="submit"
+                      <SubmitButton
                         title={p.status === "active" ? "Archivar" : "Reactivar"}
-                        className="flex items-center gap-1 rounded-full border border-neutral-200 px-3 py-1.5 text-xs font-semibold text-navy transition hover:bg-neutral-50"
-                      >
+                        className="flex items-center gap-1 rounded-full border border-neutral-200 px-3 py-1.5 text-xs font-semibold text-navy transition hover:bg-neutral-50">
                         <IconArchive className="size-3.5" />
                         {p.status === "active" ? "Archivar" : "Reactivar"}
-                      </button>
+                      </SubmitButton>
                     </form>
                   </div>
                 </div>
@@ -315,12 +312,10 @@ export function FruppyPrograms({
                         />
                       </div>
                     )}
-                    <button
-                      type="submit"
-                      className="rounded-full bg-brand-dark px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-deeper"
-                    >
+                    <SubmitButton
+                      className="rounded-full bg-brand-dark px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-deeper">
                       Guardar
-                    </button>
+                    </SubmitButton>
                   </form>
                 </details>
               </li>

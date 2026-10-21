@@ -6,6 +6,7 @@ import { StampRow } from "./_components/stamps";
 import { NextRewardCard } from "./_components/cards";
 import { IconQr } from "./_components/icons";
 import { walletProvider } from "@/lib/wallet/passlet";
+import { SubmitButton } from "@/app/_components/submit-button";
 
 export const instant = false;
 
@@ -108,12 +109,10 @@ export default async function CardHome({
               <span className="text-ink-soft">(opcional)</span>
             </span>
           </label>
-          <button
-            type="submit"
-            className="mt-3.5 w-full rounded-xl bg-brand py-2.5 text-sm font-semibold text-white"
-          >
+          <SubmitButton
+            className="mt-3.5 w-full rounded-xl bg-brand py-2.5 text-sm font-semibold text-white">
             Confirmar
-          </button>
+          </SubmitButton>
         </form>
       ) : null}
 

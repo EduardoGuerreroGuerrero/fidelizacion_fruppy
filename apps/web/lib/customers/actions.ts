@@ -141,6 +141,17 @@ export async function createCustomer(orgSlug: string, formData: FormData) {
     redirect(back + "?error=" + encodeURIComponent(Object.values(errors)[0]));
   }
 
+  // Ley 1581: no se registran datos personales sin la autorización del titular.
+  if (formData.get("data_consent") !== "on") {
+    redirect(
+      back +
+        "?error=" +
+        encodeURIComponent(
+          "Confirma que el cliente autorizó el tratamiento de sus datos personales.",
+        ),
+    );
+  }
+
   // Detección de duplicados: sin fusión automática — el staff confirma.
   const confirmed = formData.get("confirm_duplicate") === "on";
   if (!confirmed) {
@@ -173,6 +184,7 @@ export async function createCustomer(orgSlug: string, formData: FormData) {
       ...(values.external_ref ? { external_ref: values.external_ref } : {}),
       // El consentimiento se registra como timestamp separado, no booleano.
       marketing_consent_at: values.marketing_consent ? new Date().toISOString() : null,
+      data_consent_at: new Date().toISOString(),
     })
     .select("id")
     .single();
@@ -191,6 +203,7 @@ export async function createCustomer(orgSlug: string, formData: FormData) {
   await audit(orgId, user.id, "customer.created", "customer", customer.id, {
     first_name: values.first_name,
     marketing_consent: values.marketing_consent,
+    data_consent: true,
     confirmed_duplicate: confirmed,
   });
 

@@ -12,7 +12,7 @@ import { senderFor, sendEmail } from "./send";
 
 export type OutboxKind = "welcome_card" | "card_delivery" | "team_invite" | "rights_response";
 
-type OutboxPayload = {
+export type OutboxPayload = {
   first_name?: string;
   org_name?: string;
   program_name?: string;
@@ -103,7 +103,7 @@ function escapeHtml(s: string): string {
   );
 }
 
-function render(kind: OutboxKind, p: OutboxPayload): { subject: string; html: string } | null {
+export function renderOutboxEmail(kind: OutboxKind, p: OutboxPayload): { subject: string; html: string } | null {
   if (kind === "team_invite") return renderTeamInvite(p);
   if (kind === "rights_response") return renderRightsResponse(p);
   const org = p.org_name ?? "el comercio";
@@ -196,7 +196,7 @@ export async function trySendOutbox(
     .maybeSingle();
   if (!row || row.status !== "queued") return false;
 
-  const rendered = render(row.kind as OutboxKind, (row.payload ?? {}) as OutboxPayload);
+  const rendered = renderOutboxEmail(row.kind as OutboxKind, (row.payload ?? {}) as OutboxPayload);
   const orgName = ((row.payload ?? {}) as OutboxPayload).org_name ?? "Comercio";
   const result = rendered
     ? await sendEmail({
@@ -236,7 +236,7 @@ export async function drainEmailOutbox(limit = 25): Promise<{ sent: number; fail
   let sent = 0;
   let failed = 0;
   for (const row of rows ?? []) {
-    const rendered = render(row.kind as OutboxKind, (row.payload ?? {}) as OutboxPayload);
+    const rendered = renderOutboxEmail(row.kind as OutboxKind, (row.payload ?? {}) as OutboxPayload);
     const orgName = ((row.payload ?? {}) as OutboxPayload).org_name ?? "Comercio";
     const result = rendered
       ? await sendEmail({

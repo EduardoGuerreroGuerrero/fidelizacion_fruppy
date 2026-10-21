@@ -5,6 +5,7 @@ import { displayName } from "@/lib/format";
 import { FruppyCustomers, type CustomerRow, type PanelData } from "../_fruppy/customers";
 import { PageHead } from "../_fruppy/ui";
 import { FRUPPY_SLUG } from "../_fruppy/config";
+import { ImportCsvButton } from "../_fruppy/import-csv";
 
 export const instant = false;
 
@@ -149,7 +150,8 @@ export default async function CustomersPage({
         </p>
         <div className="mb-4 mt-1 flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-2xl font-semibold">Clientes</h1>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <ImportCsvButton slug={slug} />
             <a
               href={`/dashboard/${slug}/customers/export`}
               className="rounded-md border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"

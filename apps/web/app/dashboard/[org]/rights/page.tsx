@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { updateRightsRequest } from "@/lib/admin/actions";
 import { rightsDeadline } from "@/lib/legal/deadlines";
+import { SubmitButton } from "@/app/_components/submit-button";
 
 export const instant = false;
 
@@ -138,14 +139,19 @@ export default async function RightsPage({
                       placeholder="Respuesta al titular (obligatoria al resolver o rechazar)"
                       className="w-full rounded-md border border-neutral-300 px-2 py-1.5 text-xs dark:border-neutral-700 dark:bg-transparent"
                     />
-                    <button
-                      type="submit"
+                    <SubmitButton
                       name="status"
                       value="resolved"
-                      className="w-full rounded-md bg-brand-dark px-3 py-1 text-xs font-semibold text-white"
-                    >
+                      confirm={
+                        destructive
+                          ? r.request_type === "erasure"
+                            ? "¿Eliminar los datos personales de este titular? Es irreversible: se anonimiza al cliente, se cierra su tarjeta y se borran sus suscripciones y correos."
+                            : "¿Retirar todas las autorizaciones de este titular y cerrar su tarjeta?"
+                          : undefined
+                      }
+                      className="w-full rounded-md bg-brand-dark px-3 py-1 text-xs font-semibold text-white">
                       {destructive ? "Resolver y ejecutar" : "Resolver"}
-                    </button>
+                    </SubmitButton>
                     {destructive ? (
                       <p className="text-[11px] leading-snug text-ink-soft">
                         {r.request_type === "erasure"
@@ -155,24 +161,21 @@ export default async function RightsPage({
                       </p>
                     ) : null}
                     {r.status === "open" ? (
-                      <button
-                        type="submit"
+                      <SubmitButton
                         name="status"
                         value="in_progress"
                         formNoValidate
-                        className="w-full rounded-md border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-                      >
+                        className="w-full rounded-md border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
                         Marcar en trámite
-                      </button>
+                      </SubmitButton>
                     ) : null}
-                    <button
-                      type="submit"
+                    <SubmitButton
                       name="status"
                       value="rejected"
                       className="w-full rounded-md border border-neutral-300 px-3 py-1 text-xs text-red-600 hover:bg-red-50 dark:border-neutral-700 dark:hover:bg-red-900/20"
-                    >
+                      confirm="¿Rechazar esta solicitud? Se enviará tu respuesta al titular.">
                       Rechazar
-                    </button>
+                    </SubmitButton>
                   </form>
                 ) : null}
               </div>

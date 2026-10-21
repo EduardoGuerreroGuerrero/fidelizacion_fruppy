@@ -43,6 +43,10 @@ export default async function DashboardPage() {
         .eq("status", "active")
     : { data: [] };
 
+  const business = String(
+    (user?.user_metadata as Record<string, unknown> | undefined)?.business ?? "",
+  ).trim();
+
   return (
     <div className="relative mx-auto max-w-2xl">
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
@@ -138,6 +142,15 @@ export default async function DashboardPage() {
             Aún no tienes organizaciones. Crea la primera para empezar tu
             programa de fidelización.
           </p>
+          {business ? (
+            <Link
+              href={`/dashboard/new?name=${encodeURIComponent(business)}`}
+              className="mt-5 inline-flex items-center gap-2 rounded-full bg-pl-action px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green"
+            >
+              <IconPlus className="size-4" />
+              Crear «{business}»
+            </Link>
+          ) : null}
         </div>
       )}
     </div>

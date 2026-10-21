@@ -18,6 +18,8 @@ import {
 import { SignupVisual, TestimonialCard } from "../_landing/mockups";
 import { Leaf } from "../_landing/decorations";
 import PasswordInput from "./password-input";
+import { RememberForm } from "@/app/_components/remember-form";
+import { SubmitButton } from "@/app/_components/submit-button";
 
 export const instant = false;
 
@@ -182,7 +184,7 @@ export default async function SignupPage({
             </p>
           ) : null}
 
-          <form action={signUp} className="mt-7 space-y-4">
+          <RememberForm storageKey="signup" action={signUp} className="mt-7 space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Nombre completo">
                 <div className="relative">
@@ -278,14 +280,12 @@ export default async function SignupPage({
               </span>
             </label>
 
-            <button
-              type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-pl-green-2 py-3.5 font-semibold text-white shadow-md shadow-pl-green-2/25 transition hover:bg-pl-green"
-            >
+            <SubmitButton
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-pl-green-2 py-3.5 font-semibold text-white shadow-md shadow-pl-green-2/25 transition hover:bg-pl-green">
               Crear cuenta gratis
               <IconArrowRight className="h-4 w-4" />
-            </button>
-          </form>
+            </SubmitButton>
+          </RememberForm>
 
           <div className="my-5 flex items-center gap-3">
             <span className="h-px flex-1 bg-ink/10" />
@@ -295,13 +295,11 @@ export default async function SignupPage({
           <form action={signInWithGoogle}>
             <input type="hidden" name="next" value="/dashboard" />
             <input type="hidden" name="from" value="/signup" />
-            <button
-              type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-full border border-ink/15 bg-white py-3.5 text-sm font-semibold text-ink transition hover:bg-neutral-50"
-            >
+            <SubmitButton
+              className="flex w-full items-center justify-center gap-2 rounded-full border border-ink/15 bg-white py-3.5 text-sm font-semibold text-ink transition hover:bg-neutral-50">
               <IconGoogle className="h-4.5 w-4.5" />
               Continuar con Google
-            </button>
+            </SubmitButton>
           </form>
 
           <p className="mt-6 flex items-start justify-center gap-2 text-center text-[11px] leading-relaxed text-ink-soft">

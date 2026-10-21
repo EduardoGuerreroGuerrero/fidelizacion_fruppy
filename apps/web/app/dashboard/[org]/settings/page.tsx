@@ -4,6 +4,8 @@ import { updateOrgPrivacy, updateOrgSettings } from "@/lib/admin/actions";
 import { defaultPolicyText } from "@/lib/legal/policy-template";
 import { STAMP_ICON_OPTIONS } from "@/app/t/[token]/_components/stamp-icons";
 import { ColorPicker } from "./color-picker";
+import { RememberForm } from "@/app/_components/remember-form";
+import { SubmitButton } from "@/app/_components/submit-button";
 
 export const instant = false;
 
@@ -86,7 +88,7 @@ export default async function SettingsPage({
       )}
 
       <div className="grid gap-6 sm:grid-cols-2">
-        <form action={updateOrgSettings.bind(null, slug)} className="space-y-4">
+        <RememberForm storageKey="settings-org" action={updateOrgSettings.bind(null, slug)} className="space-y-4">
           <div>
             {/* El nombre aquí ES el nombre registrado de la organización —
                 única fuente de verdad: se usa igual en el panel, el QR,
@@ -185,13 +187,11 @@ export default async function SettingsPage({
             </p>
           </div>
 
-          <button
-            type="submit"
-            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
-          >
+          <SubmitButton
+            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper">
             Guardar configuración
-          </button>
-        </form>
+          </SubmitButton>
+        </RememberForm>
 
         <div>
           <h2 className="mb-2 text-sm font-medium">Vista previa de tarjeta</h2>
@@ -342,12 +342,10 @@ export default async function SettingsPage({
           </label>
         </fieldset>
 
-        <button
-          type="submit"
-          className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
-        >
+        <SubmitButton
+          className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper">
           Guardar privacidad y funciones
-        </button>
+        </SubmitButton>
       </form>
     </div>
   );

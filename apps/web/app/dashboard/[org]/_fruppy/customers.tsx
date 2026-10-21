@@ -26,6 +26,7 @@ import { archiveCustomer } from "@/lib/customers/actions";
 import { Avatar, Card, Chip, IconTile } from "./ui";
 import { timeAgo } from "./config";
 import { ImportCsvButton } from "./import-csv";
+import { SubmitButton } from "@/app/_components/submit-button";
 
 // Menú de acciones por cliente (ficha, QR, eliminar). <details>/<summary>
 // nativo: no requiere JS de cliente y funciona igual en la fila de escritorio
@@ -63,12 +64,10 @@ function RowMenu({
           Ver QR de tarjeta
         </Link>
         <form action={archiveCustomer.bind(null, slug, customerId)}>
-          <button
-            type="submit"
-            className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
-          >
+          <SubmitButton
+            className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50">
             Eliminar cliente
-          </button>
+          </SubmitButton>
         </form>
       </div>
     </details>
@@ -224,13 +223,11 @@ export function FruppyCustomers({
             </select>
             <IconChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-ink-soft" />
           </div>
-          <button
-            type="submit"
-            className="flex items-center gap-1.5 rounded-full bg-accent-soft px-5 py-2.5 text-sm font-semibold text-accent transition hover:bg-accent/15"
-          >
+          <SubmitButton
+            className="flex items-center gap-1.5 rounded-full bg-accent-soft px-5 py-2.5 text-sm font-semibold text-accent transition hover:bg-accent/15">
             <IconSearch className="size-4" />
             Buscar
-          </button>
+          </SubmitButton>
         </form>
 
         <p className="mt-3 text-sm font-medium text-ink-soft lg:hidden">

@@ -1,6 +1,8 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { cancelInvite, inviteMember, setMemberRole, setMemberStatus } from "@/lib/admin/actions";
+import { RememberForm } from "@/app/_components/remember-form";
+import { SubmitButton } from "@/app/_components/submit-button";
 
 export const instant = false;
 
@@ -67,7 +69,7 @@ export default async function TeamPage({
           La invitación se activa automáticamente cuando esa persona inicia sesión con el email
           indicado.
         </p>
-        <form action={inviteMember.bind(null, slug)} className="flex flex-wrap gap-2">
+        <RememberForm storageKey="team-invite" action={inviteMember.bind(null, slug)} className="flex flex-wrap gap-2">
           <input
             name="email"
             type="email"
@@ -80,13 +82,11 @@ export default async function TeamPage({
             <option value="manager">manager</option>
             <option value="admin">admin</option>
           </select>
-          <button
-            type="submit"
-            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
-          >
+          <SubmitButton
+            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper">
             Invitar
-          </button>
-        </form>
+          </SubmitButton>
+        </RememberForm>
       </section>
 
       <h2 className="mb-3 text-lg font-medium">Miembros</h2>
@@ -122,13 +122,11 @@ export default async function TeamPage({
                     ),
                   )}
                 </select>
-                <button
-                  type="submit"
+                <SubmitButton
                   disabled={m.role === "owner" && !iAmOwner}
-                  className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 disabled:opacity-50 dark:border-neutral-700 dark:hover:bg-neutral-800"
-                >
+                  className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 disabled:opacity-50 dark:border-neutral-700 dark:hover:bg-neutral-800">
                   OK
-                </button>
+                </SubmitButton>
               </form>
               <span
                 className={`rounded px-2 py-1 text-xs ${
@@ -148,12 +146,10 @@ export default async function TeamPage({
                     m.status === "active" ? "suspended" : "active",
                   )}
                 >
-                  <button
-                    type="submit"
-                    className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-                  >
+                  <SubmitButton
+                    className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
                     {m.status === "active" ? "Suspender" : "Reactivar"}
-                  </button>
+                  </SubmitButton>
                 </form>
               )}
             </div>
@@ -176,12 +172,11 @@ export default async function TeamPage({
             </div>
             {i.status === "pending" && (
               <form action={cancelInvite.bind(null, slug, i.id)}>
-                <button
-                  type="submit"
+                <SubmitButton
                   className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-                >
+                  confirm="¿Seguro que quieres cancelar?">
                   Cancelar
-                </button>
+                </SubmitButton>
               </form>
             )}
           </li>

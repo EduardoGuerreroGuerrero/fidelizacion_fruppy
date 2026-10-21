@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { updatePassword } from "@/lib/auth/actions";
 import { createClient } from "@/lib/supabase/server";
+import { SubmitButton } from "@/app/_components/submit-button";
 
 export const instant = false;
 
@@ -52,9 +53,9 @@ export default async function NewPasswordPage({
             className="rounded-xl bg-neutral-100 px-4 py-3 outline-none focus:ring-2 focus:ring-pl-green/50"
           />
         </label>
-        <button type="submit" className="rounded-full bg-pl-green py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green/90">
+        <SubmitButton className="rounded-full bg-pl-green py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green/90">
           Guardar contraseña
-        </button>
+        </SubmitButton>
       </form>
     </>
   );

@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { rotateJoinToken } from "@/lib/admin/actions";
+import { SubmitButton } from "@/app/_components/submit-button";
 
 export const instant = false;
 
@@ -88,12 +89,11 @@ export default async function JoinQrPage({
           </code>
         </div>
         <form action={rotateJoinToken.bind(null, slug)} className="mt-4">
-          <button
-            type="submit"
+          <SubmitButton
             className="rounded-full border border-neutral-300 px-4 py-2 text-sm font-semibold transition hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-          >
+            confirm="¿Rotar el QR de registro? Los QR ya impresos dejarán de funcionar.">
             Rotar QR (invalida el anterior)
-          </button>
+          </SubmitButton>
         </form>
         <p className="mt-2 text-xs text-ink-soft">
           Rótalo si el QR se filtró o aparecen registros sospechosos. Los

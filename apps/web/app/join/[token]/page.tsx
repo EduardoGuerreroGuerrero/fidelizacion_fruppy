@@ -1,4 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
+import { RememberForm } from "@/app/_components/remember-form";
+import { SubmitButton } from "@/app/_components/submit-button";
 
 export const instant = false;
 
@@ -92,7 +94,7 @@ export default async function JoinPage({
         </p>
       ) : null}
 
-      <form method="post" action={`/join/${token}/register`} className="mt-6 space-y-4">
+      <RememberForm storageKey="join-register" method="post" action={`/join/${token}/register`} className="mt-6 space-y-4">
         <div>
           <label htmlFor="first_name" className="mb-1.5 block text-sm font-medium text-ink">
             Nombre <span className="text-ink-soft">(obligatorio)</span>
@@ -222,14 +224,12 @@ export default async function JoinPage({
           </p>
         </fieldset>
 
-        <button
-          type="submit"
+        <SubmitButton
           className="w-full rounded-2xl py-3.5 text-[15px] font-semibold text-white shadow-sm transition active:scale-[0.99]"
-          style={{ backgroundColor: brand }}
-        >
+          style={{ backgroundColor: brand }}>
           Crear mi tarjeta
-        </button>
-      </form>
+        </SubmitButton>
+      </RememberForm>
 
       <p className="mt-6 flex items-center justify-center gap-1.5 text-[11px] text-neutral-300">
         Powered by
