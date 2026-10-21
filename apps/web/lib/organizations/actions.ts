@@ -55,7 +55,7 @@ export async function createOrganization(formData: FormData) {
     redirect(
       "/dashboard/new?error=" +
         encodeURIComponent(
-          "El logo debe ser un PNG sin fondo de máximo 256 KB.",
+          "No se pudo usar ese archivo como logo: debe ser una imagen (PNG, JPG, WebP o SVG) de máximo 10 MB.",
         ),
     );
   }
