@@ -200,7 +200,7 @@ begin
   select ORG_A, CUST_S, U_STAFF, 'manual' from generate_series(1, 60);
   perform set_config('app.user_id', U_STAFF::text, false);
   perform pg_temp.t_err(
-    format('select public.scan_card(%L, 1, null, %L)', v_token_p, 'e2e-scan-rl'),
+    format('select public.scan_card(%L, 1, null, %L, 10)', v_token_p, 'e2e-scan-rl'),
     'rate_limited', 'T12 rate limit bloquea el escaneo 61');
   select current_points into nb from public.loyalty_accounts where id = v_acc_p;
   perform pg_temp.t_ok(nb = 120, 'T12b el rechazo por rate limit no mutó saldo');
