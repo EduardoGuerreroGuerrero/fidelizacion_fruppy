@@ -27,7 +27,12 @@ const STATUS_BADGE: Record<string, { label: string; chip: string; dot: string }>
     },
   };
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; ok?: string }>;
+}) {
+  const { error, ok } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -42,6 +47,12 @@ export default async function DashboardPage() {
         .eq("user_id", user.id)
         .eq("status", "active")
     : { data: [] };
+
+  // Las organizaciones cerradas no se listan (se conservan solo como historial).
+  const openMemberships = (memberships ?? []).filter((m) => {
+    const o = Array.isArray(m.organizations) ? m.organizations[0] : m.organizations;
+    return o && o.status !== "closed";
+  });
 
   const business = String(
     (user?.user_metadata as Record<string, unknown> | undefined)?.business ?? "",
@@ -68,13 +79,22 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      {memberships && memberships.length > 0 ? (
+      {error ? (
+        <p className="mb-4 rounded-2xl bg-accent-soft px-4 py-3 text-sm text-accent">{error}</p>
+      ) : null}
+      {ok ? (
+        <p className="mb-4 rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+          {ok}
+        </p>
+      ) : null}
+
+      {openMemberships.length > 0 ? (
         <ul className="flex flex-col gap-4">
-          {memberships.map((m) => {
+          {openMemberships.map((m) => {
             const org = Array.isArray(m.organizations)
               ? m.organizations[0]
               : m.organizations;
-            if (!org) return null;
+            if (!org || org.status === "closed") return null;
             const brand = (org.brand ?? {}) as {
               color?: string;
               logo_url?: string;

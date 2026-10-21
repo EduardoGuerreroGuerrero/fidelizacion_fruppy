@@ -768,3 +768,64 @@ export async function updateRightsRequest(
           : "";
   redirect(back + "?ok=" + encodeURIComponent(base + mail));
 }
+
+// ---------- Cerrar / eliminar la organización (solo owner) -------------------
+
+// Cierre (soft): revoca tarjetas, borra suscripciones push y cancela campañas;
+// el historial se conserva. La org desaparece de "Mis organizaciones".
+export async function closeOrganization(orgSlug: string, formData: FormData) {
+  const { supabase, user, orgId, role } = await requireMembership(orgSlug);
+  const back = `/dashboard/${orgSlug}/settings`;
+  if (role !== "owner") fail(back, "Solo el propietario puede cerrar la organización.");
+  if (String(formData.get("confirm_slug") ?? "").trim() !== orgSlug) {
+    fail(back, "Escribe el identificador exacto de la organización para confirmar.");
+  }
+
+  const { data, error } = await supabase.rpc("close_organization", { p_org_id: orgId });
+  if (error) {
+    fail(
+      back,
+      error.message.includes("already_closed")
+        ? "La organización ya estaba cerrada."
+        : "No se pudo cerrar la organización.",
+    );
+  }
+  await audit(orgId, user.id, "organization.closed", "organization", orgId, {
+    cards_revoked: (data as { cards_revoked?: number } | null)?.cards_revoked ?? 0,
+  });
+  redirect(
+    "/dashboard?ok=" +
+      encodeURIComponent(
+        "Organización cerrada. Sus tarjetas fueron revocadas y su historial se conserva.",
+      ),
+  );
+}
+
+// Eliminación definitiva: solo si la organización nunca tuvo movimientos,
+// visitas ni canjes (p. ej. creada por error). Con historial se cierra.
+export async function deleteOrganization(orgSlug: string, formData: FormData) {
+  const { supabase, user, orgId, role } = await requireMembership(orgSlug);
+  const back = `/dashboard/${orgSlug}/settings`;
+  if (role !== "owner") fail(back, "Solo el propietario puede eliminar la organización.");
+  const confirmSlug = String(formData.get("confirm_slug") ?? "").trim();
+
+  // Auditoría ANTES: la fila queda (org_id pasa a NULL al borrar la org).
+  await audit(orgId, user.id, "organization.deleted", "organization", orgId, { slug: orgSlug });
+
+  const { error } = await supabase.rpc("delete_organization", {
+    p_org_id: orgId,
+    p_slug: confirmSlug,
+  });
+  if (error) {
+    const m = error.message;
+    fail(
+      back,
+      m.includes("slug_mismatch")
+        ? "Escribe el identificador exacto de la organización para confirmar."
+        : m.includes("has_history")
+          ? "Esta organización ya tiene movimientos, visitas o canjes y no puede eliminarse. Ciérrala: se conserva el historial."
+          : "No se pudo eliminar la organización.",
+    );
+  }
+  redirect("/dashboard?ok=" + encodeURIComponent("Organización eliminada."));
+}

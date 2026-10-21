@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/lib/auth/actions";
 import { OrgNav } from "./nav";
@@ -62,17 +63,20 @@ export default async function OrgLayout({
   if (user) {
     const { data: m } = await supabase
       .from("organization_members")
-      .select("role, organizations!inner(slug, name, brand)")
+      .select("role, organizations!inner(slug, name, brand, status)")
       .eq("user_id", user.id)
       .eq("status", "active")
       .eq("organizations.slug", org)
       .maybeSingle();
     role = m?.role ?? null;
     const o = m?.organizations as
-      | { name?: string; brand?: { logo_url?: string } }
-      | { name?: string; brand?: { logo_url?: string } }[]
+      | { name?: string; status?: string; brand?: { logo_url?: string } }
+      | { name?: string; status?: string; brand?: { logo_url?: string } }[]
       | null;
     const orgRow = Array.isArray(o) ? o[0] : o;
+    if (orgRow?.status === "closed") {
+      redirect("/dashboard?error=" + encodeURIComponent("Esa organización está cerrada."));
+    }
     orgName = orgRow?.name ?? null;
     const raw = orgRow?.brand?.logo_url;
     logoUrl =

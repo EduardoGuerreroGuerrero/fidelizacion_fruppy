@@ -13,15 +13,15 @@
 >   · `status` · `doing QA-C1` · `blocked QA-C1` · `note QA-C1 "texto"`.
 
 <!-- PROGRESS:START -->
-**Última actualización:** 2026-10-21 14:47  
-**Global:** 2/40 hechas (5%) `█░░░░░░░░░░░░░░░░░░░` · en curso: 0 · bloqueadas: 0
+**Última actualización:** 2026-10-21 15:45  
+**Global:** 2/41 hechas (5%) `█░░░░░░░░░░░░░░░░░░░` · en curso: 0 · bloqueadas: 4
 
 | Sección | Hecho | Total | % | Progreso |
 |---|---|---|---|---|
 | Fase 1 — Críticos: seguridad y alta de comercios | 0 | 4 | 0% | `░░░░░░░░░░` |
 | Fase 2 — Altos: flujos rotos y cumplimiento | 0 | 12 | 0% | `░░░░░░░░░░` |
 | Fase 3 — Medios: UX, consistencia y pruebas | 0 | 8 | 0% | `░░░░░░░░░░` |
-| Fase 4 — Bajos: pulido | 0 | 10 | 0% | `░░░░░░░░░░` |
+| Fase 4 — Bajos: pulido | 0 | 11 | 0% | `░░░░░░░░░░` |
 | Fase 5 — Producto pendiente | 0 | 3 | 0% | `░░░░░░░░░░` |
 | Verificación de la auditoría | 2 | 3 | 67% | `███████░░░` |
 <!-- PROGRESS:END -->
@@ -111,7 +111,7 @@
   - **Dónde:** FKs `performed_by`/`actor_user_id` → `auth.users` con `on delete set null` en tablas append-only (`loyalty_transactions`…).
   - **Cómo:** (mejor que `restrict`) el trigger append-only tolera SOLO desvincular `performed_by`/`location_id` a NULL: borrar un usuario del panel conserva el ledger sin su identidad. Un único owner sigue sin poder borrarse (QA-C3).
   - **Hecho cuando:** existe un flujo (script o acción admin) que da de baja una cuenta con historial sin violar el ledger; test SQL.
-- [ ] <!-- QA-A12 --> El correo de confirmación de cuenta llega a "Correo no deseado" (Outlook)
+- [!] <!-- QA-A12 --> El correo de confirmación de cuenta llega a "Correo no deseado" (Outlook)
   - **Dónde:** Supabase → Auth → SMTP y plantillas; DNS de `pineappleloyalty.com`.
   - **Cómo:** SMTP propio (Resend, ya integrado para correos transaccionales) con dominio verificado: SPF, DKIM y DMARC; remitente `no-reply@pineappleloyalty.com`; plantilla en español con la marca.
   - **Hecho cuando:** el correo de confirmación llega a la bandeja principal de Outlook y Gmail (mail-tester ≥ 9/10).
@@ -166,20 +166,27 @@
   - Badge según el estado de la tarjeta.
 - [ ] <!-- QA-B9 --> Sedes favoritas solo en `localStorage` (se pierden al cambiar de dispositivo)
   - Persistir por tarjeta en servidor, o aclarar en la UI que son locales.
-- [ ] <!-- QA-B10 --> Landing: "Pago seguro" sin pagos, recursos "Próximamente", Contacto solo `mailto`, "Temas más consultados" sin anclas
-  - Ajustar textos a lo que existe; anclas `#id` en `/preguntas`; formulario de contacto (opcional).
+- [ ] <!-- QA-B10 --> Contacto solo `mailto`, preguntas sin anclas, límites inconsistentes entre FAQ y landing
+  - `/contacto` con formulario real (correo al equipo, reply-to, honeypot); `/preguntas` con anclas por pregunta (`#app-cliente`, `#registro`, `#puntos-sellos`, `#wallet`, `#planes`, `#promociones`, `#datos`, `#cancelar`); FAQ alineada con el plan Gratis de la landing (50 clientes); remitente por defecto de la plataforma.
+- [ ] <!-- QA-B11 --> Landing (`app/page.tsx`, `app/_landing/*`): "Pago seguro" sin pagos, recursos "Próximamente", "Temas más consultados" sin anclas
+  - **Dónde:** archivos de la rama `fix/landing-copy-y-ajustes-ui` (otra sesión trabaja ahí: no tocar desde este plan para evitar conflictos).
+  - **Cómo:** quitar/ajustar "Pago seguro" mientras no haya cobro (ver `docs/BILLING_PLAN.md`); enlazar cada tema de "Temas más consultados" a `/preguntas#<ancla>`; revisar los bloques "Próximamente".
+  - **Hecho cuando:** la landing no promete nada que el producto no hace y los enlaces de ayuda llevan a la pregunta concreta.
 
 ## Fase 5 — Producto pendiente
 
-- [ ] <!-- QA-P1 --> Apple Wallet (hoy 404: sin certificados)
+- [!] <!-- QA-P1 --> Apple Wallet (hoy 404: sin certificados)
+  - Código listo y desactivado; falta el Apple Developer Program (Pass Type ID + certificados). Pasos en `docs/APPLE_WALLET.md`.
 - [ ] <!-- QA-P2 --> Eliminar o cerrar una organización (no existe; necesario también para limpiar datos de prueba)
-- [ ] <!-- QA-P3 --> Planes y pagos (la landing muestra precios Pro y Business, pero no hay cobro ni límites por plan salvo campañas)
+  - Migración 0021: `close_organization` (soft, conserva el ledger) y `delete_organization` (solo sin historial, exige el slug); UI en Configuración → Zona de peligro (solo owner); las orgs cerradas no se listan ni se abren. Además `status`/`limits` dejan de ser editables por el admin.
+- [!] <!-- QA-P3 --> Planes y pagos (la landing muestra precios Pro y Business, pero no hay cobro ni límites por plan salvo campañas)
+  - Requiere decisiones de negocio y una cuenta de pagos: propuesta técnica y preguntas en `docs/BILLING_PLAN.md`.
 
 ## Verificación de la auditoría
 
 - [x] <!-- QA-V1 --> Confirmación de email de cuenta nueva de punta a punta (registro → correo → enlace → login) — _2026-10-21: signup → aviso → login bloqueado sin confirmar → enlace del correo (mismo navegador, PKCE) → /dashboard; login con clave ok. Correo llegó a spam (QA-A12)_
 - [x] <!-- QA-V2 --> Envío real de campaña push ("Enviar ahora") a un cliente suscrito — _2026-10-21: org qa-push, 1 suscripción FCM, 'Enviar ahora' → 1 entregada; notificación mostrada por el service worker_
-- [ ] <!-- QA-V3 --> Limpiar datos de prueba en Supabase de producción
+- [!] <!-- QA-V3 --> Limpiar datos de prueba en Supabase de producción
   - Org "QA Playwright" (`qa-playwright`, `12086a8b-7df0-4b97-8aad-3b25add919d1`): cliente "Cliente QA", programa, sede, recompensa, campaña en borrador, invitación, solicitud de derechos.
   - Org "Heladería QA Push" (`qa-push`, `3129fa8b-5977-4b16-9b65-ed3ec5e782e3`): cliente "Cliente Push QA", suscripción push, campaña enviada.
   - Cuenta `pineappleloyalty+qa1@outlook.com` (owner de `qa-push`).

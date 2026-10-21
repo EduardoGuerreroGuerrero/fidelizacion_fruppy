@@ -1,6 +1,11 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { updateOrgPrivacy, updateOrgSettings } from "@/lib/admin/actions";
+import {
+  closeOrganization,
+  deleteOrganization,
+  updateOrgPrivacy,
+  updateOrgSettings,
+} from "@/lib/admin/actions";
 import { defaultPolicyText } from "@/lib/legal/policy-template";
 import { STAMP_ICON_OPTIONS } from "@/app/t/[token]/_components/stamp-icons";
 import { ColorPicker } from "./color-picker";
@@ -47,6 +52,15 @@ export default async function SettingsPage({
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+
+  const { data: membership } = await supabase
+    .from("organization_members")
+    .select("role, organizations!inner(slug)")
+    .eq("user_id", user.id)
+    .eq("status", "active")
+    .eq("organizations.slug", slug)
+    .maybeSingle();
+  const isOwner = membership?.role === "owner";
 
   const { data: org } = await supabase
     .from("organizations")
@@ -362,6 +376,66 @@ export default async function SettingsPage({
           Guardar privacidad y funciones
         </SubmitButton>
       </form>
+      {isOwner ? (
+        <section className="mt-10 rounded-xl border border-red-200 p-5 dark:border-red-900">
+          <h2 className="text-lg font-semibold text-red-700 dark:text-red-300">Zona de peligro</h2>
+          <p className="mt-1 text-xs text-ink-soft">
+            Solo el propietario ve esto. Para confirmar escribe el identificador de la
+            organización: <code className="rounded bg-neutral-100 px-1 dark:bg-neutral-800">{slug}</code>
+          </p>
+
+          <form action={closeOrganization.bind(null, slug)} className="mt-4 space-y-2">
+            <p className="text-sm font-medium">Cerrar la organización</p>
+            <p className="text-xs text-ink-soft">
+              Revoca todas las tarjetas, apaga el QR de registro, borra las suscripciones push y
+              cancela campañas pendientes. El historial de sellos y canjes se conserva. Desaparece de
+              &quot;Mis organizaciones&quot;.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <input
+                name="confirm_slug"
+                required
+                autoComplete="off"
+                placeholder={slug}
+                aria-label="Escribe el identificador para confirmar el cierre"
+                className="rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-transparent"
+              />
+              <SubmitButton
+                pendingText="Cerrando…"
+                confirm="¿Cerrar esta organización? Se revocan todas las tarjetas y el QR deja de funcionar. Esta acción no se puede deshacer desde el panel."
+                className="rounded-md border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-950"
+              >
+                Cerrar organización
+              </SubmitButton>
+            </div>
+          </form>
+
+          <form action={deleteOrganization.bind(null, slug)} className="mt-6 space-y-2">
+            <p className="text-sm font-medium">Eliminar definitivamente</p>
+            <p className="text-xs text-ink-soft">
+              Solo si la organización nunca tuvo sellos, visitas ni canjes (por ejemplo, la creaste
+              por error). Si ya tiene historial, ciérrala.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <input
+                name="confirm_slug"
+                required
+                autoComplete="off"
+                placeholder={slug}
+                aria-label="Escribe el identificador para confirmar la eliminación"
+                className="rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-transparent"
+              />
+              <SubmitButton
+                pendingText="Eliminando…"
+                confirm="¿Eliminar definitivamente esta organización y todos sus datos? No se puede deshacer."
+                className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+              >
+                Eliminar organización
+              </SubmitButton>
+            </div>
+          </form>
+        </section>
+      ) : null}
     </div>
   );
 }
