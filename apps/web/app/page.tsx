@@ -764,6 +764,8 @@ const RESOURCE_CARDS: {
     icon: IconDoc,
     title: "Plantillas y material",
     desc: "Descarga recursos listos para usar en tu negocio.",
+    href: "/plantillas",
+    cta: "Ver material",
   },
   {
     icon: IconQuestion,
