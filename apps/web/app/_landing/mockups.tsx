@@ -207,7 +207,7 @@ export function Confetti() {
 export function AdminLaptop() {
   const menu = ["Inicio", "Clientes", "Programa", "Campañas", "Reportes", "Configuración"];
   const fields: [string, string][] = [
-    ["Nombre del programa", "Tu negocio"],
+    ["Nombre del programa", "Club"],
     ["Tipo de programa", "Sellos"],
     ["Beneficio", "Producto gratis al completar"],
     ["Cantidad de sellos", "10"],
