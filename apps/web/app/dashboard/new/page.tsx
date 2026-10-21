@@ -76,7 +76,7 @@ export default async function NewOrganizationPage({
           required
           minLength={2}
           maxLength={120}
-          placeholder="Ej. Heladería La Esquina"
+          placeholder="Ej. Tu Negocio"
           className="mt-3 w-full rounded-xl border border-neutral-300 px-4 py-3 text-sm outline-none transition focus:border-pl-green focus:ring-2 focus:ring-pl-green/30"
         />
 

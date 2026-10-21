@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { RememberForm } from "@/app/_components/remember-form";
 import { SubmitButton } from "@/app/_components/submit-button";
@@ -236,6 +237,11 @@ export default async function JoinPage({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/pineapple/isotipo.png" alt="" className="h-3.5 w-auto" />
         PineappleLoyalty — fidelización digital
+      </p>
+      <p className="mt-2 text-center">
+        <Link href="/" className="text-[11px] text-neutral-300 underline-offset-2 hover:underline">
+          ← Volver al inicio
+        </Link>
       </p>
     </main>
   );
