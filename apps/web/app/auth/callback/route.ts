@@ -19,6 +19,6 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.redirect(
-    `${origin}/login?error=${encodeURIComponent("No se pudo iniciar sesión con Google.")}`,
+    `${origin}/login?error=${encodeURIComponent("No se pudo completar la verificación. Inicia sesión con tu email y contraseña.")}`,
   );
 }

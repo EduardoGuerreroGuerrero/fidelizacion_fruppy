@@ -7,13 +7,18 @@ export const instant = false;
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; next?: string }>;
+  searchParams: Promise<{ error?: string; next?: string; notice?: string }>;
 }) {
-  const { error, next } = await searchParams;
+  const { error, next, notice } = await searchParams;
 
   return (
     <>
       <h2 className="mb-4 text-lg font-semibold text-ink">Iniciar sesión</h2>
+      {notice ? (
+        <p className="mb-4 rounded-xl bg-neutral-100 p-3 text-sm text-ink">
+          {notice}
+        </p>
+      ) : null}
       {error ? (
         <p className="mb-4 rounded-xl bg-accent-soft p-3 text-sm text-accent">
           {error}

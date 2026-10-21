@@ -23,7 +23,12 @@ export async function signIn(formData: FormData) {
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) fail("/login", "Credenciales incorrectas.");
+  if (error) {
+    if (error.code === "email_not_confirmed") {
+      fail("/login", "Debes confirmar tu correo antes de iniciar sesión. Revisa tu bandeja.");
+    }
+    fail("/login", "Credenciales incorrectas.");
+  }
 
   redirect(next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard");
 }
@@ -57,13 +62,38 @@ export async function signUp(formData: FormData) {
       .filter(([, v]) => v !== ""),
   );
 
+  const h = await headers();
+  const origin =
+    h.get("origin") ??
+    process.env.NEXT_PUBLIC_BASE_URL ??
+    `${h.get("x-forwarded-proto") ?? "https"}://${h.get("x-forwarded-host") ?? h.get("host")}`;
+
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: metadata },
+    options: {
+      data: metadata,
+      emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent("/dashboard")}`,
+    },
   });
   if (error) fail("/signup", "No se pudo crear la cuenta. Intenta con otro email.");
+
+  // Email ya registrado: Supabase no da error (anti-enumeración) pero devuelve
+  // un usuario sin identities y sin sesión.
+  if (data.user && (data.user.identities?.length ?? 0) === 0) {
+    fail("/signup", "Ese email ya está registrado. Inicia sesión.");
+  }
+
+  // Con "Confirm email" activo en Supabase no hay sesión hasta confirmar:
+  // mandar a /dashboard rebotaba a /login y el login fallaba.
+  if (!data.session) {
+    redirect(
+      `/login?notice=${encodeURIComponent(
+        "Te enviamos un correo de confirmación. Confírmalo y luego inicia sesión.",
+      )}`,
+    );
+  }
 
   redirect("/dashboard");
 }
