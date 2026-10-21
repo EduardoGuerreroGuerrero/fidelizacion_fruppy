@@ -1,3 +1,4 @@
+import { BrandLogo } from "../_components/brand";
 import Link from "next/link";
 import QRCode from "qrcode";
 import { getCardAppData } from "../_components/data";
@@ -51,16 +52,11 @@ export default async function Escanear({
 
         <div className="relative z-10 p-5 text-white">
           <div className="flex items-start justify-between">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/brand/logo.png"
-              alt="Fruppy Helados"
-              className="h-14 w-auto object-contain drop-shadow-md"
-            />
+            <BrandLogo brand={card} className="h-14" />
             <span className="text-right">
               <p className="font-semibold">{card.first_name}</p>
               <span className="mt-1 inline-block rounded-full bg-white/90 px-2.5 py-0.5 text-[10px] font-semibold text-brand-dark">
-                Cliente activo
+                {card.card_status === "active" ? "Cliente activo" : "Tarjeta revocada"}
               </span>
             </span>
           </div>

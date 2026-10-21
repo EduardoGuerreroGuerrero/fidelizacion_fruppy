@@ -1,6 +1,17 @@
-# AGENTS.md — Fidelización Fruppy
+# AGENTS.md — PineappleLoyalty (SaaS de fidelización)
 
 Reglas y contexto persistente del proyecto para agentes.
+
+## Marca y clientes
+
+- La plataforma es **PineappleLoyalty** (`pineappleloyalty.com`). Correos de la
+  plataforma salen de ese dominio (Resend: `notificaciones@`; soporte en Zoho:
+  `soporte@`). Ningún comercio cliente aparece en el código, los textos, los
+  assets ni los correos de la plataforma: cada comercio solo ve su propia marca
+  (logo/color en `organizations.brand`).
+- Nombres heredados de infraestructura (no son marca): repo
+  `fidelizacion_fruppy`, proyecto Vercel `fidelizacion-fruppy`, env conda
+  `F_FRUPPY`, proyecto Neon `fruppy-agentkit`.
 
 ## Documento rector
 
@@ -59,3 +70,10 @@ ruff check scripts/                                                   # lint Pyt
 `CHECKLIST.md` se actualiza SOLO vía `scripts/checklist.py`
 (`done|doing|undone|blocked <ID>`). Nunca editar el bloque PROGRESS a mano.
 Marcar tareas al completarlas — el bloque de progreso se regenera solo.
+
+Hallazgos de QA: `docs/QA_CHECKLIST.md` (mismo formato, IDs `QA-*`). Al
+resolver uno, el commit/PR dice `Closes QA-C1` (o `fixes`/`resuelve`/
+`cierra`); el hook `.githooks/post-merge` (activar con
+`git config core.hooksPath .githooks`) ejecuta
+`scripts/checklist.py --file docs/QA_CHECKLIST.md sync` tras cada pull.
+El `python` del PATH puede ser Python 2: usar el del env `F_FRUPPY`.

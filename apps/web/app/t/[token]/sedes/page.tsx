@@ -37,13 +37,6 @@ export default async function NuestrasSedes({
     <>
       <TitleBar title="Nuestras sedes" href={base} />
 
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/brand/banner-sedes.jpg"
-        alt="Encuentra la sede más cercana a ti"
-        className="mx-auto mt-2 w-[calc(100%-2.5rem)] rounded-3xl"
-      />
-
       {/* Buscador */}
       <form action={`${base}/sedes`} className="mx-5 mt-4">
         <input
@@ -55,23 +48,20 @@ export default async function NuestrasSedes({
         />
       </form>
 
-      {/* Mapa */}
-      <div className="mx-5 mt-3 overflow-hidden rounded-3xl">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/brand/mapa-sedes.jpg" alt="Mapa de sedes" className="w-full" />
-      </div>
 
       {/* Lista de sedes — orden por cercanía opcional (geolocalización
           en el dispositivo, sin persistir ni enviar la posición) */}
       {card.location_enabled ? (
         <NearbySort
           locations={locations}
-          renderRow={(l, i) => <LocationRow key={l.id} location={l} index={i} distanceKm={l._km} />}
+          renderRow={(l) => (
+            <LocationRow key={l.id} location={l} distanceKm={l._km} />
+          )}
         />
       ) : (
         <ul className="mt-4">
-          {locations.map((l, i) => (
-            <LocationRow key={l.id} location={l} index={i} />
+          {locations.map((l) => (
+            <LocationRow key={l.id} location={l} />
           ))}
         </ul>
       )}

@@ -10,7 +10,7 @@ const poppins = Poppins({
   weight: ["400", "500", "600", "700", "800"],
 });
 
-// Script para los acentos decorativos del panel Fruppy Helados (mockups).
+// Tipografía manuscrita para acentos decorativos del landing.
 const caveat = Caveat({
   variable: "--font-caveat",
   subsets: ["latin"],

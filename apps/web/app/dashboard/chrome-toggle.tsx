@@ -1,14 +1,9 @@
 "use client";
 
-import { useSelectedLayoutSegments } from "next/navigation";
 import type { ReactNode } from "react";
 import { IconLogout } from "@/app/t/[token]/_components/icons";
 
-const FRUPPY_SLUG = "fruppy-helados";
-
-// El panel Fruppy Helados tiene chrome propio (sidebar+topbar+móvil); para esa
-// org el header genérico del dashboard se omite. El resto usa el chrome
-// PineappleLoyalty del nivel SaaS.
+// Chrome del nivel SaaS (marca PineappleLoyalty) para todo el panel.
 export function DashboardChrome({
   email,
   signOut,
@@ -18,13 +13,6 @@ export function DashboardChrome({
   signOut: () => void | Promise<void>;
   children: ReactNode;
 }) {
-  const segments = useSelectedLayoutSegments();
-  const fruppy = segments[0] === FRUPPY_SLUG;
-
-  if (fruppy) {
-    return <div className="min-h-screen bg-[#faf6f8]">{children}</div>;
-  }
-
   return (
     <div className="flex min-h-screen flex-col bg-pl-bg">
       <header className="flex items-center justify-between gap-3 border-b border-black/[0.04] bg-white px-4 py-2.5 sm:px-8">

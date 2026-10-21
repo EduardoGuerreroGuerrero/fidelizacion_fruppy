@@ -1,3 +1,4 @@
+import { BrandLogo } from "../_components/brand";
 import Link from "next/link";
 import { createElement } from "react";
 import { getCardAppData } from "../_components/data";
@@ -57,26 +58,14 @@ export default async function MiPerfil({
       {/* Tarjeta de perfil */}
       <div className="relative mx-5 mt-2 overflow-hidden rounded-[28px] bg-gradient-to-br from-brand to-[#f0a040]">
         <span className="absolute -left-14 -top-16 size-52 rounded-full bg-white/10" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/brand/profile-photo.jpg"
-          alt=""
-          className="absolute inset-y-0 right-0 h-full w-[38%] object-cover"
-        />
-        <span className="absolute inset-y-0 right-[28%] w-14 bg-gradient-to-r from-black/0 to-black/10" />
         <div className="relative z-10 p-5 pb-14">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/brand/logo.png"
-            alt="Fruppy Helados"
-            className="h-20 w-auto object-contain drop-shadow-lg"
-          />
+          <BrandLogo brand={card} className="h-20" />
           <p className="mt-3 text-xl font-semibold text-white">
             {card.first_name}
           </p>
           <p className="text-sm text-white/85">{card.org_name}</p>
           <span className="mt-1.5 inline-block rounded-full bg-white/90 px-3 py-0.5 text-[11px] font-semibold text-brand-dark">
-            Cliente activo
+            {card.card_status === "active" ? "Cliente activo" : "Tarjeta revocada"}
           </span>
         </div>
       </div>

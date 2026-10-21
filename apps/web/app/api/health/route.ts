@@ -5,7 +5,7 @@ import { env } from "@/lib/env";
 export async function GET() {
   return Response.json({
     status: "ok",
-    service: "fruppy-web",
+    service: "pineapple-loyalty-web",
     env: env.appEnv,
     timestamp: new Date().toISOString(),
   });

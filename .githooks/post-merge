@@ -1,0 +1,7 @@
+#!/bin/sh
+# Tras `git pull`/merge: marca en docs/QA_CHECKLIST.md las tareas cerradas
+# por commits ("Closes QA-C1"). Activar una vez: git config core.hooksPath .githooks
+# Prefiere el env conda F_FRUPPY (el `python` del PATH puede ser Python 2).
+PY="/c/Users/Acer/anaconda3/envs/F_FRUPPY/python.exe"
+[ -x "$PY" ] || PY=python3
+"$PY" scripts/checklist.py --file docs/QA_CHECKLIST.md sync || true

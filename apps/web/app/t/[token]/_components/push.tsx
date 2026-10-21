@@ -128,6 +128,7 @@ export function PushToggle({
         <button
           type="button"
           role="switch"
+          aria-label={`Notificaciones de ${orgName}`}
           aria-checked={state === "on"}
           disabled={busy || state === "loading"}
           onClick={state === "on" ? disable : enable}

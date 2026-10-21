@@ -66,42 +66,28 @@ export async function createOrganization(formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: org, error: orgError } = await supabase
-    .from("organizations")
-    .insert({
-      name,
-      slug,
-      ...(logoUrl ? { brand: { logo_url: logoUrl } } : {}),
-    })
-    .select("id")
-    .single();
+  // Org + membresía owner en UNA transacción (RPC security definer): un
+  // insert directo + select fallaba por RLS (aún no eras miembro).
+  const { data: orgId, error: orgError } = await supabase.rpc(
+    "create_organization",
+    { p_name: name, p_slug: slug, p_brand: logoUrl ? { logo_url: logoUrl } : {} },
+  );
 
-  if (orgError || !org) {
+  if (orgError || !orgId) {
+    console.error("[createOrganization]", orgError?.code, orgError?.message);
     redirect(
       "/dashboard/new?error=" +
         encodeURIComponent(
           orgError?.code === "23505"
             ? "Ya existe una organización con un nombre similar."
-            : "No se pudo crear la organización.",
+            : orgError?.message?.includes("org_limit")
+              ? "Alcanzaste el máximo de organizaciones por cuenta."
+              : "No se pudo crear la organización.",
         ),
     );
   }
 
-  // Membresía de owner: la policy permite autoinsertarse como owner en una org nueva.
-  const { error: memberError } = await supabase
-    .from("organization_members")
-    .insert({ organization_id: org.id, user_id: user.id, role: "owner" });
-
-  if (memberError) {
-    // La org quedó creada pero sin owner: estado inconsistente — reportar.
-    console.error("[createOrganization] membership failed", memberError.message);
-    redirect(
-      "/dashboard/new?error=" +
-        encodeURIComponent("La organización se creó pero falló la membresía."),
-    );
-  }
-
-  await audit(org.id, user.id, "organization.created", "organization", org.id, {
+  await audit(orgId, user.id, "organization.created", "organization", orgId, {
     name,
     slug,
   });

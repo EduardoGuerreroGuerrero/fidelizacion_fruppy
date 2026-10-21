@@ -11,7 +11,7 @@ export function emailConfigured(): boolean {
 }
 
 export function senderFor(orgName: string): string {
-  return optionalEnv("EMAIL_FROM") ?? `${orgName} <info@fruppyhelados.com>`;
+  return optionalEnv("EMAIL_FROM") ?? `${orgName} <notificaciones@pineappleloyalty.com>`;
 }
 
 export async function sendEmail({
@@ -19,11 +19,13 @@ export async function sendEmail({
   subject,
   html,
   from,
+  replyTo,
 }: {
   to: string;
   subject: string;
   html: string;
   from: string;
+  replyTo?: string;
 }): Promise<SendResult> {
   const apiKey = optionalEnv("RESEND_API_KEY");
   if (!apiKey) return { ok: false, error: "email_not_configured" };
@@ -32,7 +34,13 @@ export async function sendEmail({
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from, to: [to], subject, html }),
+      body: JSON.stringify({
+        from,
+        to: [to],
+        subject,
+        html,
+        ...(replyTo ? { reply_to: replyTo } : {}),
+      }),
     });
     if (!res.ok) {
       const body = (await res.json().catch(() => null)) as { message?: string } | null;

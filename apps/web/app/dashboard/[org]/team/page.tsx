@@ -1,6 +1,9 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { cancelInvite, inviteMember, setMemberRole, setMemberStatus } from "@/lib/admin/actions";
+import { RememberForm } from "@/app/_components/remember-form";
+import { SubmitButton } from "@/app/_components/submit-button";
+import { roleLabel, statusLabel } from "@/lib/labels";
 
 export const instant = false;
 
@@ -30,18 +33,51 @@ export default async function TeamPage({
     .maybeSingle();
   if (!org) notFound();
 
-  const [{ data: members }, { data: invites }] = await Promise.all([
-    supabase
-      .from("organization_members")
-      .select("id, user_id, role, status, created_at")
-      .eq("organization_id", org.id)
-      .order("created_at"),
+  type Member = {
+    id: string;
+    user_id: string;
+    email: string | null;
+    full_name: string | null;
+    role: string;
+    status: string;
+    created_at: string;
+  };
+
+  const [{ data: directory }, { data: invites }] = await Promise.all([
+    supabase.rpc("org_member_directory", { p_org_id: org.id }),
     supabase
       .from("organization_invites")
       .select("id, email, role, status, created_at")
       .eq("organization_id", org.id)
       .order("created_at", { ascending: false }),
   ]);
+
+  // Directorio con correo y nombre (RPC, migración 0020). Si la RPC aún no existe
+  // o el rol no alcanza, se cae al listado básico sin correos.
+  let members: Member[];
+  if (directory) {
+    members = (
+      directory as {
+        member_id: string;
+        user_id: string;
+        email: string | null;
+        full_name: string | null;
+        role: string;
+        status: string;
+        created_at: string;
+      }[]
+    ).map((d) => ({ ...d, id: d.member_id }));
+  } else {
+    const { data: basic } = await supabase
+      .from("organization_members")
+      .select("id, user_id, role, status, created_at")
+      .eq("organization_id", org.id)
+      .order("created_at");
+    members = (basic ?? []).map((b) => ({ ...b, email: null, full_name: null }));
+  }
+
+  const myRole = members.find((m) => m.user_id === user.id)?.role;
+  const iAmOwner = myRole === "owner";
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -64,7 +100,7 @@ export default async function TeamPage({
           La invitación se activa automáticamente cuando esa persona inicia sesión con el email
           indicado.
         </p>
-        <form action={inviteMember.bind(null, slug)} className="flex flex-wrap gap-2">
+        <RememberForm storageKey="team-invite" action={inviteMember.bind(null, slug)} className="flex flex-wrap gap-2">
           <input
             name="email"
             type="email"
@@ -73,28 +109,31 @@ export default async function TeamPage({
             className={input + " flex-1"}
           />
           <select name="role" className={input} defaultValue="staff">
-            <option value="staff">staff</option>
-            <option value="manager">manager</option>
-            <option value="admin">admin</option>
+            <option value="staff">{roleLabel("staff")}</option>
+            <option value="manager">{roleLabel("manager")}</option>
+            <option value="admin">{roleLabel("admin")}</option>
           </select>
-          <button
-            type="submit"
-            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
-          >
+          <SubmitButton
+            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper">
             Invitar
-          </button>
-        </form>
+          </SubmitButton>
+        </RememberForm>
       </section>
 
       <h2 className="mb-3 text-lg font-medium">Miembros</h2>
       <ul className="mb-8 space-y-2">
-        {(members ?? []).map((m) => (
+        {members.map((m) => (
           <li
             key={m.id}
             className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-neutral-200 px-4 py-3 text-sm dark:border-neutral-800"
           >
             <div>
-              <p className="font-mono text-xs text-ink-soft">{m.user_id}</p>
+              <p className="font-medium text-ink">
+                {m.full_name ?? m.email ?? "Miembro del equipo"}
+              </p>
+              {m.full_name && m.email ? (
+                <p className="text-xs text-ink-soft">{m.email}</p>
+              ) : null}
               <p className="text-xs text-ink-soft">
                 {m.user_id === user.id ? "(tú) · " : ""}
                 desde {new Date(m.created_at).toLocaleDateString("es-CO")}
@@ -108,20 +147,22 @@ export default async function TeamPage({
                 <select
                   name="role"
                   defaultValue={m.role}
+                  disabled={m.role === "owner" && !iAmOwner}
                   className="rounded border border-neutral-300 px-2 py-1 text-xs dark:border-neutral-700 dark:bg-transparent"
                 >
-                  {ROLES.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
-                  ))}
+                  {ROLES.filter((r) => r !== "owner" || iAmOwner || m.role === "owner").map(
+                    (r) => (
+                      <option key={r} value={r}>
+                        {roleLabel(r)}
+                      </option>
+                    ),
+                  )}
                 </select>
-                <button
-                  type="submit"
-                  className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-                >
+                <SubmitButton
+                  disabled={m.role === "owner" && !iAmOwner}
+                  className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 disabled:opacity-50 dark:border-neutral-700 dark:hover:bg-neutral-800">
                   OK
-                </button>
+                </SubmitButton>
               </form>
               <span
                 className={`rounded px-2 py-1 text-xs ${
@@ -130,9 +171,9 @@ export default async function TeamPage({
                     : "bg-neutral-100 text-ink-soft dark:bg-neutral-800"
                 }`}
               >
-                {m.status}
+                {statusLabel(m.status)}
               </span>
-              {m.user_id !== user.id && (
+              {m.user_id !== user.id && (m.role !== "owner" || iAmOwner) && (
                 <form
                   action={setMemberStatus.bind(
                     null,
@@ -141,12 +182,10 @@ export default async function TeamPage({
                     m.status === "active" ? "suspended" : "active",
                   )}
                 >
-                  <button
-                    type="submit"
-                    className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-                  >
+                  <SubmitButton
+                    className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
                     {m.status === "active" ? "Suspender" : "Reactivar"}
-                  </button>
+                  </SubmitButton>
                 </form>
               )}
             </div>
@@ -164,17 +203,16 @@ export default async function TeamPage({
             <div>
               <p className="font-medium">{i.email}</p>
               <p className="text-xs text-ink-soft">
-                {i.role} · {i.status}
+                {roleLabel(i.role)} · {statusLabel(i.status)}
               </p>
             </div>
             {i.status === "pending" && (
               <form action={cancelInvite.bind(null, slug, i.id)}>
-                <button
-                  type="submit"
+                <SubmitButton
                   className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-                >
+                  confirm="¿Seguro que quieres cancelar?">
                   Cancelar
-                </button>
+                </SubmitButton>
               </form>
             )}
           </li>

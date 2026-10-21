@@ -89,3 +89,29 @@ Decisiones del usuario (no cambiar):
    `gh` portable en `%LOCALAPPDATA%\gh-cli\bin\gh.exe` con `GH_TOKEN` del
    Credential Manager.
 3. Reportar resultados fielmente: qué pasó, qué se omitió y por qué.
+
+---
+
+## Correcciones al plan (verificado con Playwright el 2026-10-21, QA-M8)
+
+El flujo real difiere del plan original en estos puntos:
+
+- **Paso 6 (repetir el registro):** con la cuenta **aún sin confirmar**, Supabase
+  no marca "ya registrado": reenvía el correo de confirmación y la app vuelve a
+  `/login?notice=…`. El aviso **"Ese email ya está registrado. Inicia sesión."**
+  solo aparece si la cuenta **ya fue confirmada**.
+- **Paso 8 (login tras confirmar):** el usuario nuevo **no recibe organización
+  automática**. Entra a `/dashboard` con "Aún no tienes organizaciones". El
+  nombre del negocio que escribió en el registro se usa para **prellenar**
+  `/dashboard/new` (y aparece el botón "Crear «Negocio»"), pero la organización
+  se crea al enviar ese formulario (RPC `create_organization`, migración 0017).
+- **Pruebas con un solo buzón:** usar alias `usuario+qa1@dominio.com`; para
+  Supabase es otra cuenta y el correo llega al mismo buzón. Una cuenta que ya
+  operó el ledger no se puede borrar hasta aplicar la migración 0019 (antes
+  chocaba con la tabla append-only).
+- **Correo en spam:** el correo de confirmación sale del SMTP por defecto de
+  Supabase y suele caer en "no deseado". Ver `docs/EMAIL_AUTH_SMTP.md`.
+- **PKCE:** el enlace de confirmación/recuperación debe abrirse en el **mismo
+  navegador** donde se hizo el registro o la solicitud.
+- **Recuperación de contraseña:** `/login` → "¿Olvidaste tu contraseña?" →
+  `/recuperar` → correo → `/auth/callback?next=/nueva-clave` → `/nueva-clave`.

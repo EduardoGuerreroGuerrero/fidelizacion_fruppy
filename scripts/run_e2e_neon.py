@@ -3,6 +3,8 @@
 
 Uso:
     NEON_DSN='postgresql://...' python scripts/run_e2e_neon.py
+    NEON_RESET=1 NEON_DSN=... python scripts/run_e2e_neon.py   # reutiliza la rama:
+                                                              # borra public y auth antes
 
 Replica exactamente el job `sql` de CI: stub de auth, luego cada archivo de
 supabase/migrations en orden, luego cada archivo de supabase/tests.
@@ -21,6 +23,8 @@ ROOT = Path(__file__).resolve().parent.parent
 STUB = """
 create schema if not exists auth;
 create table if not exists auth.users(id uuid primary key);
+alter table auth.users add column if not exists email text;
+alter table auth.users add column if not exists raw_user_meta_data jsonb default '{}'::jsonb;
 do $$ begin
   if not exists (select 1 from pg_roles where rolname='anon') then
     create role anon nologin;
@@ -48,6 +52,13 @@ def main() -> int:
     notices: list[str] = []
     with psycopg.connect(dsn, autocommit=True) as conn:
         conn.add_notice_handler(lambda d: notices.append(d.message_primary or ""))
+        if os.environ.get("NEON_RESET") == "1":
+            print("== reset: drop schema public/auth (rama temporal)")
+            conn.execute(
+                "drop schema if exists public cascade; create schema public;"
+                " grant usage on schema public to public;"
+                " drop schema if exists auth cascade;"
+            )
         print("== auth stub")
         conn.execute(STUB)
         for f in files:

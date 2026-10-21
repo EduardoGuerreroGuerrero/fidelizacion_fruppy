@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import { DEFAULT_BRAND_COLOR } from "@/lib/brand";
 
 // Selector de color desplegable (input nativo type="color") sincronizado con
 // un campo de texto hex — el navegador abre su propio picker de color al
@@ -12,7 +13,7 @@ export function ColorPicker({
   name: string;
   defaultValue: string;
 }) {
-  const [value, setValue] = useState(defaultValue || "#16a34a");
+  const [value, setValue] = useState(defaultValue || DEFAULT_BRAND_COLOR);
   const id = useId();
 
   return (
@@ -20,7 +21,7 @@ export function ColorPicker({
       <input
         type="color"
         aria-label="Elegir color de la tarjeta"
-        value={/^#[0-9a-fA-F]{6}$/.test(value) ? value : "#16a34a"}
+        value={/^#[0-9a-fA-F]{6}$/.test(value) ? value : DEFAULT_BRAND_COLOR}
         onChange={(e) => setValue(e.target.value)}
         className="size-10 shrink-0 cursor-pointer rounded-md border border-neutral-300 bg-transparent p-0.5 dark:border-neutral-700"
       />
@@ -29,7 +30,7 @@ export function ColorPicker({
         name={name}
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder="#16a34a"
+        placeholder={DEFAULT_BRAND_COLOR}
         maxLength={7}
         className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-transparent"
       />

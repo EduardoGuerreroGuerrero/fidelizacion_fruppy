@@ -57,13 +57,13 @@ capacidades reales, pero no son el argumento que lidera.
 - Voz: español neutro colombiano, tuteo, frases cortas y prácticas.
 - La landing replica los mockups de `Muckup/landing page/`; son la referencia
   visual aprobada.
-- Fruppy Helados es la marca de un comercio cliente, no del SaaS: aparece solo
-  como ejemplo dentro de ilustraciones.
+- Los comercios clientes no aparecen en la marca del SaaS. Las ilustraciones
+  usan un comercio ficticio ("Heladería La Esquina").
 
 ## Evidence on Hand
 
-- **Fruppy Helados:** cliente piloto real. No hay testimonios, cifras de
-  resultados, logos de otros clientes ni casos publicables.
+- **Primer cliente piloto** en operación. No hay testimonios, cifras de
+  resultados, logos de clientes ni casos publicables.
 - No fabricar testimonios, métricas de clientes, logos de terceros ni
   premios. Las cifras de las ilustraciones (1.248 clientes, +42 %) son
   decorativas y no deben presentarse como resultados reales.

@@ -13,12 +13,13 @@
   --font-script: var(--font-caveat);
 }
 
-/* Identidad Fruppy */
+/* Color de marca por defecto (cada comercio lo sobreescribe con su color de
+   tarjeta: ver lib/brand.ts). Verde PineappleLoyalty, AA con texto blanco. */
 @theme {
-  --color-brand: #17b8a6;
-  --color-brand-dark: #0f9c8c;
-  --color-brand-deeper: #08635a;
-  --color-brand-soft: #d9f3ef;
+  --color-brand: #0f5132;
+  --color-brand-dark: #0b3d25;
+  --color-brand-deeper: #08281a;
+  --color-brand-soft: #e2f5e9;
   --color-accent: #e91e63;
   --color-accent-soft: #fce4ec;
   --color-stamp: #ff6b7a;
@@ -30,7 +31,7 @@
   --color-ink: #2b2f33;
   /* #8a9299 daba 3.0:1 sobre blanco; #5d6670 da 5.8:1 (AA). */
   --color-ink-soft: #5d6670;
-  /* Panel admin Fruppy Helados (mockups) */
+  /* Tonos auxiliares del panel */
   --color-navy: #1e2a52;
   --color-wine: #a01755;
   --color-chip-green: #d6f5e1;
@@ -60,14 +61,12 @@
   text-wrap: pretty;
 }
 
-/* Panel del comercio: la identidad Fruppy (teal, rosa) con contraste AA para
-   texto. Solo aquí: las tarjetas del cliente final conservan sus colores.
-   brand-dark #0f9c8c daba 3.0:1 sobre menta → #0b7a6f (4.6:1; blanco 5.2:1).
+/* Panel del comercio: tokens con contraste AA para texto.
    accent #e91e63 daba 4.3:1 sobre blanco → #c2185b (5.9:1 con blanco).
    chip-green-ink #159a55 daba 3.1:1 sobre su chip → #0f7a42 (4.6:1). */
 .pl-panel {
-  --color-brand-dark: #0b7a6f;
-  --color-brand-deeper: #08635a;
+  --color-brand-dark: #0b3d25;
+  --color-brand-deeper: #08281a;
   --color-accent: #c2185b;
   --color-chip-green-ink: #0f7a42;
 }

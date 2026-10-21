@@ -1,4 +1,4 @@
-# CHECKLIST — SaaS Fidelización Fruppy
+# CHECKLIST — PineappleLoyalty
 
 > Seguimiento de ejecución del plan `plan_saas_fidelizacion_crm_wallet.md`.
 > **Actualización automática:** no editar el bloque de progreso a mano.

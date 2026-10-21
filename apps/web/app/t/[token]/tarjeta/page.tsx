@@ -1,3 +1,4 @@
+import { RewardThumb } from "../_components/brand";
 import Link from "next/link";
 import { getCardAppData } from "../_components/data";
 import { Section, TitleBar } from "../_components/chrome";
@@ -39,6 +40,8 @@ export default async function MiTarjeta({
 
       <div className="mt-2">
         <LoyaltyCard
+          brand={card}
+          active={card.card_status === "active"}
           firstName={card.first_name}
           current={current}
           goal={isStamps ? goal : null}
@@ -117,7 +120,7 @@ export default async function MiTarjeta({
         <>
           <Section title="Mis recompensas" actionHref={`${base}/bonos`} />
           <div className="flex gap-3 overflow-x-auto px-5 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {card.rewards.slice(0, 6).map((r, i) => {
+            {card.rewards.slice(0, 6).map((r) => {
               const g = r.cost_stamps ?? r.cost_points ?? 0;
               const pct = g > 0 ? Math.min(100, Math.round((current / g) * 100)) : 0;
               return (
@@ -126,12 +129,7 @@ export default async function MiTarjeta({
                   href={`${base}/bonos/${r.id}`}
                   className="flex w-40 shrink-0 items-center gap-2.5 rounded-2xl bg-neutral-50 p-3"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={`/brand/bono-icon-${(i % 5) + 1}.jpg`}
-                    alt=""
-                    className="size-10 shrink-0 rounded-full object-cover"
-                  />
+                  <RewardThumb className="size-10 shrink-0 rounded-full" />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[13px] font-medium leading-tight text-ink">
                       {r.name}

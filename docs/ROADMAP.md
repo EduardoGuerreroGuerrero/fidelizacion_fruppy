@@ -1,4 +1,4 @@
-# ROADMAP — SaaS Fidelización Fruppy
+# ROADMAP — PineappleLoyalty
 
 > Seguimiento operativo en `CHECKLIST.md` (auto-actualizable con
 > `scripts/checklist.py`). Este documento resume estado, criterios de salida y

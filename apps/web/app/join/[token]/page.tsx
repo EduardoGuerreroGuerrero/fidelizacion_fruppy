@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { RememberForm } from "@/app/_components/remember-form";
+import { SubmitButton } from "@/app/_components/submit-button";
 
 export const instant = false;
 
@@ -52,7 +54,9 @@ export default async function JoinPage({
         <p className="rounded-2xl bg-neutral-50 p-8 text-center text-sm text-ink-soft">
           {info.reason === "no_program"
             ? "Este comercio aún no tiene un programa de fidelización activo."
-            : "El registro por QR no está disponible en este momento."}
+            : info.reason === "no_privacy_channel"
+              ? "Este comercio aún está terminando de configurar su política de privacidad. Vuelve a intentarlo más tarde o pide ayuda en el local."
+              : "El registro por QR no está disponible en este momento."}
         </p>
       </main>
     );
@@ -91,7 +95,7 @@ export default async function JoinPage({
         </p>
       ) : null}
 
-      <form method="post" action={`/join/${token}/register`} className="mt-6 space-y-4">
+      <RememberForm storageKey="join-register" method="post" action={`/join/${token}/register`} className="mt-6 space-y-4">
         <div>
           <label htmlFor="first_name" className="mb-1.5 block text-sm font-medium text-ink">
             Nombre <span className="text-ink-soft">(obligatorio)</span>
@@ -221,14 +225,12 @@ export default async function JoinPage({
           </p>
         </fieldset>
 
-        <button
-          type="submit"
+        <SubmitButton
           className="w-full rounded-2xl py-3.5 text-[15px] font-semibold text-white shadow-sm transition active:scale-[0.99]"
-          style={{ backgroundColor: brand }}
-        >
+          style={{ backgroundColor: brand }}>
           Crear mi tarjeta
-        </button>
-      </form>
+        </SubmitButton>
+      </RememberForm>
 
       <p className="mt-6 flex items-center justify-center gap-1.5 text-[11px] text-neutral-300">
         Powered by

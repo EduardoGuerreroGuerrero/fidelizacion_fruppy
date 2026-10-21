@@ -3,9 +3,6 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { scanCard } from "@/lib/loyalty/actions";
 import { ScanForm } from "./scan-form";
-import { FruppyScanForm } from "../_fruppy/scan-form";
-import { BottomBanner, PageHead } from "../_fruppy/ui";
-import { FRUPPY_SLUG } from "../_fruppy/config";
 
 export const instant = false;
 
@@ -34,41 +31,6 @@ export default async function ScanPage({
   if (!org) notFound();
 
   const action = scanCard.bind(null, slug);
-
-  if (slug === FRUPPY_SLUG) {
-    return (
-      <div>
-        <PageHead
-          orgName={org.name}
-          base={`/dashboard/${slug}`}
-          current="Escanear tarjeta"
-          title="Registrar visita"
-          subtitle="Escanea la tarjeta del cliente para sumar sellos de forma rápida y segura"
-          art="/brand/card-photo.jpg"
-        />
-
-        {error && (
-          <p className="mb-4 rounded-2xl bg-accent-soft px-4 py-3 text-sm font-medium text-accent">
-            ✕ {error}
-          </p>
-        )}
-        {ok && (
-          <p className="mb-4 rounded-2xl bg-pastel-mint px-4 py-3 text-sm font-medium text-brand-dark">
-            ✓ {ok}
-          </p>
-        )}
-
-        <FruppyScanForm slug={slug} action={action} initialToken={token} />
-
-        <BottomBanner
-          title="Cada visita nos endulza más"
-          text="Clientes más felices, visita tras visita"
-          image="/brand/card-photo.jpg"
-          tone="pink"
-        />
-      </div>
-    );
-  }
 
   return (
     <div className="mx-auto max-w-xl">

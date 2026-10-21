@@ -2,16 +2,24 @@ import Link from "next/link";
 import QRCode from "qrcode";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { findDuplicates, setMarketingConsent, updateCustomer } from "@/lib/customers/actions";
+import {
+  archiveCustomer,
+  findDuplicates,
+  setMarketingConsent,
+  updateCustomer,
+} from "@/lib/customers/actions";
 import { displayName } from "@/lib/format";
 import {
   issueCard,
   redeemReward,
   revokeCard,
+  reissueCard,
   rotateCardToken,
   sendCardEmail,
 } from "@/lib/loyalty/actions";
 import { syncWalletFormAction } from "@/lib/wallet/sync";
+import { SubmitButton } from "@/app/_components/submit-button";
+import { reasonLabel, statusLabel, visitSourceLabel } from "@/lib/labels";
 
 export const instant = false;
 
@@ -98,7 +106,7 @@ export default async function CustomerPage({
       at: v.created_at,
       kind: "visit" as const,
       text:
-        `Visita (${v.source})` +
+        `Visita (${visitSourceLabel(v.source)})` +
         (v.purchase_amount_minor ? ` — compra ${(v.purchase_amount_minor / 100).toFixed(2)}` : ""),
     })),
     ...(txs ?? []).map((t) => ({
@@ -112,14 +120,14 @@ export default async function CustomerPage({
         ]
           .filter(Boolean)
           .join(", ") +
-        (t.reason ? ` — ${t.reason}` : ""),
+        (reasonLabel(t.reason) ? ` — ${reasonLabel(t.reason)}` : ""),
     })),
     ...(redemptions ?? []).map((r) => {
       const rw = Array.isArray(r.rewards) ? r.rewards[0] : r.rewards;
       return {
         at: r.created_at,
         kind: "redemption" as const,
-        text: `Recompensa: ${rw?.name ?? "?"} (${r.status})`,
+        text: `Recompensa: ${rw?.name ?? "?"} (${statusLabel(r.status)})`,
       };
     }),
   ].sort((a, b) => (a.at < b.at ? 1 : -1));
@@ -176,9 +184,26 @@ export default async function CustomerPage({
         </Link>{" "}
         / {displayName(`${customer.first_name} ${customer.last_name ?? ""}`)}
       </p>
-      <h1 className="mb-6 mt-1 text-2xl font-semibold">
-        {displayName(`${customer.first_name} ${customer.last_name ?? ""}`)}
-      </h1>
+      <div className="mb-6 mt-1 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold">
+          {displayName(`${customer.first_name} ${customer.last_name ?? ""}`)}
+        </h1>
+        {customer.status === "active" ? (
+          <form action={archiveCustomer.bind(null, slug, customer.id)}>
+            <SubmitButton
+              confirm="¿Archivar este cliente? Se revocan sus tarjetas y deja de aparecer entre los activos. Su historial de sellos se conserva."
+              pendingText="Archivando…"
+              className="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-950"
+            >
+              Archivar cliente
+            </SubmitButton>
+          </form>
+        ) : (
+          <span className="rounded bg-neutral-100 px-2 py-1 text-xs text-ink-soft dark:bg-neutral-800">
+            archivado
+          </span>
+        )}
+      </div>
 
       {error && (
         <p className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-900/30 dark:text-red-300">
@@ -283,12 +308,10 @@ export default async function CustomerPage({
                 />
               </div>
             </div>
-            <button
-              type="submit"
-              className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
-            >
+            <SubmitButton
+              className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper">
               Guardar cambios
-            </button>
+            </SubmitButton>
           </form>
 
           <h2 id="tarjetas" className="mb-3 mt-8 scroll-mt-20 text-lg font-medium">
@@ -322,43 +345,46 @@ export default async function CustomerPage({
                             revocada
                           </span>
                         )}
-                        <form action={rotateCardToken.bind(null, slug, customer.id, card.id)}>
-                          <button
-                            type="submit"
-                            className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-                          >
-                            Rotar QR
-                          </button>
-                        </form>
+                        {card.status === "revoked" && (
+                          <form action={reissueCard.bind(null, slug, customer.id, card.id)}>
+                            <SubmitButton
+                              className="rounded-full bg-brand-dark px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
+                              confirm="¿Reemitir la tarjeta? El enlace y el QR anteriores dejarán de funcionar.">
+                              Reemitir tarjeta
+                            </SubmitButton>
+                          </form>
+                        )}
                         {card.status === "active" && (
                           <>
-                            <form action={syncWalletFormAction.bind(null, slug, customer.id)}>
-                              <button
-                                type="submit"
+                            <form action={rotateCardToken.bind(null, slug, customer.id, card.id)}>
+                              <SubmitButton
                                 className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-                              >
+                                confirm="¿Rotar el QR de esta tarjeta? El enlace y el QR actuales dejarán de funcionar.">
+                                Rotar QR
+                              </SubmitButton>
+                            </form>
+                            <form action={syncWalletFormAction.bind(null, slug, customer.id)}>
+                              <SubmitButton
+                                className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
                                 Wallet
-                              </button>
+                              </SubmitButton>
                             </form>
                             <form action={revokeCard.bind(null, slug, customer.id, card.id)}>
-                              <button
-                                type="submit"
+                              <SubmitButton
                                 className="rounded border border-red-300 px-2 py-1 text-xs text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-950"
-                              >
+                                confirm="¿Revocar esta tarjeta? El cliente no podrá usarla hasta que la reemitas.">
                                 Revocar
-                              </button>
+                              </SubmitButton>
                             </form>
                           </>
                         )}
                       </div>
                     ) : (
                       <form action={issueCard.bind(null, slug, customer.id, p.id)}>
-                        <button
-                          type="submit"
-                          className="rounded-full bg-brand-dark px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
-                        >
+                        <SubmitButton
+                          className="rounded-full bg-brand-dark px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-deeper">
                           Emitir tarjeta
-                        </button>
+                        </SubmitButton>
                       </form>
                     )}
                   </div>
@@ -384,12 +410,10 @@ export default async function CustomerPage({
                             action={sendCardEmail.bind(null, slug, customer.id, card.id)}
                             className="mt-2"
                           >
-                            <button
-                              type="submit"
-                              className="rounded-full border border-brand-dark px-3 py-1 font-semibold text-brand-dark transition hover:bg-brand-dark hover:text-white"
-                            >
+                            <SubmitButton
+                              className="rounded-full border border-brand-dark px-3 py-1 font-semibold text-brand-dark transition hover:bg-brand-dark hover:text-white">
                               Enviar por email a {customer.email}
-                            </button>
+                            </SubmitButton>
                           </form>
                         ) : (
                           <p className="mt-2 text-ink-soft">
@@ -409,7 +433,27 @@ export default async function CustomerPage({
             )}
           </ul>
 
-          <h2 className="mb-3 mt-8 text-lg font-medium">Consentimiento</h2>
+          <h2 className="mb-3 mt-8 text-lg font-medium">Consentimientos</h2>
+          <div className="mb-2 flex items-center justify-between rounded-md border border-neutral-200 px-4 py-3 text-sm dark:border-neutral-800">
+            <div>
+              <p className="font-medium">Tratamiento de datos (Ley 1581)</p>
+              <p className="text-xs text-ink-soft">
+                {customer.data_consent_at
+                  ? `Autorizado el ${new Date(customer.data_consent_at).toLocaleString("es-CO")}`
+                  : "Pendiente: el cliente la acepta desde su tarjeta"}
+              </p>
+            </div>
+            <span
+              className={`rounded px-2 py-1 text-xs ${
+                customer.data_consent_at
+                  ? "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300"
+                  : "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"
+              }`}
+            >
+              {customer.data_consent_at ? "autorizado" : "pendiente"}
+            </span>
+          </div>
+          <p className="mb-1 text-xs font-medium text-ink-soft">Marketing por correo</p>
           <form
             action={customer.marketing_consent_at ? consentOff : consentOn}
             className="flex items-center justify-between rounded-md border border-neutral-200 px-4 py-3 dark:border-neutral-800"
@@ -423,15 +467,18 @@ export default async function CustomerPage({
                   </span>
                 </>
               ) : (
-                <span className="text-ink-soft">Sin consentimiento</span>
+                <span className="text-ink-soft">Sin autorización de marketing</span>
               )}
             </div>
-            <button
-              type="submit"
-              className="rounded-md border border-neutral-300 px-3 py-1 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-            >
-              {customer.marketing_consent_at ? "Revocar" : "Registrar"}
-            </button>
+            <SubmitButton
+              confirm={
+                customer.marketing_consent_at
+                  ? "¿Retirar la autorización de marketing de este cliente?"
+                  : "¿Registrar la autorización de marketing en nombre del cliente? Hazlo solo si el titular la dio expresamente (por ejemplo, en caja). Queda auditado como acción del equipo."
+              }
+              className="rounded-md border border-neutral-300 px-3 py-1 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
+              {customer.marketing_consent_at ? "Retirar marketing" : "Registrar autorización"}
+            </SubmitButton>
           </form>
         </section>
 
@@ -483,13 +530,12 @@ export default async function CustomerPage({
                                 action={redeemReward.bind(null, slug, customer.id, r.id)}
                               >
                                 <input type="hidden" name="idem" value={idem} />
-                                <button
-                                  type="submit"
+                                <SubmitButton
                                   disabled={!affordable}
                                   className="rounded bg-green-700 px-2 py-1 text-white hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-neutral-300 dark:disabled:bg-neutral-700"
-                                >
+                                  confirm="¿Canjear esta recompensa? Descuenta el saldo del cliente y no se puede deshacer.">
                                   Canjear
-                                </button>
+                                </SubmitButton>
                               </form>
                             </li>
                           );

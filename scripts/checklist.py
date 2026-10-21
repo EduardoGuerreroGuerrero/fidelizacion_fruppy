@@ -9,8 +9,16 @@ Uso:
     python scripts/checklist.py blocked F0-T1     # marcar bloqueado
     python scripts/checklist.py refresh           # recalcular bloque de progreso
     python scripts/checklist.py note F0-T1 "txt"  # hecho + nota al final de la línea
+    python scripts/checklist.py sync [REF]        # marca hechas las tareas cerradas en commits
 
-Tras cada cambio se regenera el bloque <!-- PROGRESS --> de CHECKLIST.md.
+Con --file se opera sobre otro checklist con el mismo formato, p. ej.:
+    python scripts/checklist.py --file docs/QA_CHECKLIST.md status
+
+`sync` recorre `git log REF` (por defecto origin/main, o main si no hay
+remoto) y marca como hecha cada tarea citada con una palabra de cierre en el
+mensaje del commit: "Closes QA-C1", "fixes QA-A5", "resuelve QA-M12"…
+
+Tras cada cambio se regenera el bloque <!-- PROGRESS --> del checklist.
 Solo usa la librería estándar (compatible con el env conda F_FRUPPY).
 """
 
@@ -18,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import re
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -27,6 +36,12 @@ if sys.stdout.encoding and sys.stdout.encoding.lower() not in ("utf-8", "utf8"):
 
 ROOT = Path(__file__).resolve().parent.parent
 CHECKLIST = ROOT / "CHECKLIST.md"
+
+CLOSE_RE = re.compile(
+    r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?|resuelve|cierra|corrige)\b"
+    r"[:\s]+(?P<ids>[A-Z0-9._-]+(?:\s*(?:,|y|and)\s*[A-Z0-9._-]+)*)",
+    re.IGNORECASE,
+)
 
 TASK_RE = re.compile(
     r"^(?P<indent>\s*)- \[(?P<mark>[ x~!])\]\s*<!--\s*(?P<tid>[A-Z0-9._-]+)\s*-->\s*(?P<text>.*)$"
@@ -46,7 +61,8 @@ def load() -> list[str]:
 
 
 def save(lines: list[str]) -> None:
-    CHECKLIST.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    # newline="\n": en Windows write_text convertiría a CRLF.
+    CHECKLIST.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
 
 def parse(lines: list[str]):
@@ -149,8 +165,59 @@ def cmd_status(lines: list[str]) -> None:
     print()
 
 
+def default_ref() -> str:
+    has_remote = subprocess.run(
+        ["git", "rev-parse", "--verify", "--quiet", "origin/main"],
+        cwd=ROOT,
+        capture_output=True,
+        check=False,
+    )
+    return "origin/main" if has_remote.returncode == 0 else "main"
+
+
+def closed_ids(ref: str) -> dict[str, str]:
+    """IDs cerrados en los commits de `ref` → hash corto del commit más antiguo."""
+    log = subprocess.run(
+        ["git", "log", ref, "--reverse", "--format=%h%x00%B%x01"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=False,
+    )
+    if log.returncode != 0:
+        sys.exit(f"git log {ref} falló: {log.stderr.strip()}")
+    found: dict[str, str] = {}
+    for entry in log.stdout.split("\x01"):
+        if "\x00" not in entry:
+            continue
+        sha, body = entry.strip().split("\x00", 1)
+        for m in CLOSE_RE.finditer(body):
+            for tid in re.split(r"\s*(?:,|\by\b|\band\b)\s*", m.group("ids")):
+                found.setdefault(tid.strip().upper(), sha)
+    return found
+
+
+def cmd_sync(lines: list[str], ref: str) -> tuple[list[str], list[str]]:
+    closed = closed_ids(ref)
+    tasks, _ = parse(lines)
+    marked = []
+    for t in tasks:
+        if t["mark"] != "x" and t["id"] in closed:
+            lines = set_mark(lines, t["id"], "x", note=f"commit {closed[t['id']]}")
+            marked.append(t["id"])
+    return lines, marked
+
+
 def main() -> None:
+    global CHECKLIST
     p = argparse.ArgumentParser(description="Gestor del CHECKLIST del proyecto")
+    p.add_argument(
+        "--file",
+        type=Path,
+        default=CHECKLIST,
+        help="checklist a operar (relativo a la raíz del repo); por defecto CHECKLIST.md",
+    )
     sub = p.add_subparsers(dest="cmd", required=True)
     sub.add_parser("status")
     sub.add_parser("refresh")
@@ -160,7 +227,10 @@ def main() -> None:
     sp = sub.add_parser("note")
     sp.add_argument("task_id")
     sp.add_argument("note")
+    sp = sub.add_parser("sync")
+    sp.add_argument("ref", nargs="?", default=None)
     args = p.parse_args()
+    CHECKLIST = args.file if args.file.is_absolute() else ROOT / args.file
 
     lines = load()
     if args.cmd == "status":
@@ -169,6 +239,13 @@ def main() -> None:
     if args.cmd == "refresh":
         save(refresh(lines))
         print("Bloque de progreso actualizado.")
+        return
+    if args.cmd == "sync":
+        lines, marked = cmd_sync(lines, args.ref or default_ref())
+        save(refresh(lines))
+        print(
+            f"{CHECKLIST.name}: {len(marked)} tarea(s) cerradas → {', '.join(marked) or '—'}"
+        )
         return
     if args.cmd == "note":
         lines = set_mark(lines, args.task_id, "x", note=args.note)

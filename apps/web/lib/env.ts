@@ -12,8 +12,16 @@ export function optionalEnv(name: string): string | undefined {
   return value && value.length > 0 ? value : undefined;
 }
 
+// APP_ENV manda; si no está definida se infiere del hosting (Vercel expone
+// VERCEL_ENV = production | preview | development) y, en último caso, de
+// NODE_ENV. Evita que producción se reporte como "local".
+const appEnv =
+  process.env.APP_ENV ??
+  process.env.VERCEL_ENV ??
+  (process.env.NODE_ENV === "production" ? "production" : "local");
+
 export const env = {
-  appEnv: process.env.APP_ENV ?? "local",
+  appEnv,
   appUrl: process.env.APP_URL ?? "http://localhost:3000",
-  isProd: process.env.APP_ENV === "production",
+  isProd: appEnv === "production",
 } as const;

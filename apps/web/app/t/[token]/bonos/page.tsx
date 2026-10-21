@@ -50,12 +50,6 @@ export default async function MisBonos({
 
       {!historial ? (
         <>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/brand/banner-bonos.jpg"
-            alt="Acumula sellos y canjea deliciosas recompensas"
-            className="mx-auto mt-4 w-[calc(100%-2.5rem)] rounded-3xl"
-          />
           <div className="mt-5">
             {card.rewards.length > 0 ? (
               card.rewards.map((r, i) => (

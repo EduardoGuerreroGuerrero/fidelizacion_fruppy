@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { displayName } from "@/lib/format";
 
@@ -32,7 +33,11 @@ export type CardRedemption = {
 };
 
 export type CardAppData = {
+  org_id: string;
+  org_slug: string;
   org_name: string;
+  brand_color?: string | null;
+  has_logo?: boolean;
   first_name: string;
   program_name: string;
   program_type: "stamps" | "points";
@@ -56,13 +61,16 @@ export type CardAppData = {
 
 // Una sola RPC por render — la página del cliente es pública (el token ES
 // la credencial) y la proyección no contiene PII sensible.
-export async function getCardAppData(token: string): Promise<CardAppData | null> {
+// cache(): el layout y la página comparten UNA llamada por request.
+export const getCardAppData = cache(async function getCardAppData(
+  token: string,
+): Promise<CardAppData | null> {
   const supabase = await createClient();
   const { data } = await supabase.rpc("get_card_app_data", { p_token: token });
   if (!data) return null;
   const card = data as CardAppData;
   return { ...card, first_name: displayName(card.first_name) };
-}
+});
 
 export function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString("es-CO", {
