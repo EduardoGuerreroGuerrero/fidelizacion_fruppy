@@ -7,9 +7,9 @@ export const instant = false;
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; next?: string; notice?: string }>;
+  searchParams: Promise<{ error?: string; next?: string; notice?: string; email?: string }>;
 }) {
-  const { error, next, notice } = await searchParams;
+  const { error, next, notice, email } = await searchParams;
 
   return (
     <>
@@ -32,6 +32,7 @@ export default async function LoginPage({
             name="email"
             type="email"
             required
+            defaultValue={email}
             autoComplete="email"
             className="rounded-xl bg-neutral-100 px-4 py-3 outline-none focus:ring-2 focus:ring-pl-green/50"
           />
@@ -47,6 +48,12 @@ export default async function LoginPage({
             className="rounded-xl bg-neutral-100 px-4 py-3 outline-none focus:ring-2 focus:ring-pl-green/50"
           />
         </label>
+        <Link
+          href="/recuperar"
+          className="-mt-2 self-end text-xs font-medium text-pl-green hover:underline"
+        >
+          ¿Olvidaste tu contraseña?
+        </Link>
         <button
           type="submit"
           className="rounded-full bg-pl-green py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green/90"

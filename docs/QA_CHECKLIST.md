@@ -81,7 +81,7 @@
   - **Hecho cuando:** test unitario de normalización + E2E con el código tal como lo muestra `/escanear/codigo`.
 - [ ] <!-- QA-A4 --> Tarjeta revocada no se puede reemplazar ("Emitir tarjeta" no aparece)
   - **Dónde:** `app/dashboard/[org]/customers/[id]/page.tsx:355`, `issueCard`.
-  - **Cómo:** si la tarjeta del programa está revocada, mostrar "Emitir nueva tarjeta" (nuevo token; el saldo sigue en el ledger del cliente/programa). En la tarjeta revocada, ocultar "Cliente activo".
+  - **Cómo:** `reissueCard` (reutiliza `rotate_card_token`, que ya reactiva con token nuevo; el saldo vive en la cuenta). En la ficha: tarjeta revocada → solo "Reemitir tarjeta"; activa → Rotar QR / Wallet / Revocar. (El badge "Cliente activo" de la tarjeta revocada va en QA-B8.)
   - **Hecho cuando:** E2E: revocar → emitir nueva → sello con el token nuevo ok; el token viejo sigue rechazado.
 - [ ] <!-- QA-A5 --> Plazos legales invertidos en Derechos (Ley 1581: consultas 10 días hábiles, reclamos 15)
   - **Dónde:** `app/dashboard/[org]/rights/page.tsx`.
@@ -109,7 +109,7 @@
   - **Hecho cuando:** `curl -I` en producción muestra las cabeceras y health responde `production`.
 - [ ] <!-- QA-A11 --> No se puede eliminar ningún usuario que haya operado (ledger append-only bloquea `on delete set null`)
   - **Dónde:** FKs `performed_by`/`actor_user_id` → `auth.users` con `on delete set null` en tablas append-only (`loyalty_transactions`…).
-  - **Cómo:** cambiar esas FKs a `on delete restrict` y definir un proceso de baja de cuentas del panel: anonimizar perfil y email en `auth.users`, banear, conservar el id en el ledger. Documentarlo en `docs/SECURITY.md`.
+  - **Cómo:** (mejor que `restrict`) el trigger append-only tolera SOLO desvincular `performed_by`/`location_id` a NULL: borrar un usuario del panel conserva el ledger sin su identidad. Un único owner sigue sin poder borrarse (QA-C3).
   - **Hecho cuando:** existe un flujo (script o acción admin) que da de baja una cuenta con historial sin violar el ledger; test SQL.
 - [ ] <!-- QA-A12 --> El correo de confirmación de cuenta llega a "Correo no deseado" (Outlook)
   - **Dónde:** Supabase → Auth → SMTP y plantillas; DNS de `pineappleloyalty.com`.

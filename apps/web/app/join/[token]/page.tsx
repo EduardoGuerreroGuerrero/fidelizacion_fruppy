@@ -51,7 +51,9 @@ export default async function JoinPage({
         <p className="rounded-2xl bg-neutral-50 p-8 text-center text-sm text-ink-soft">
           {info.reason === "no_program"
             ? "Este comercio aún no tiene un programa de fidelización activo."
-            : "El registro por QR no está disponible en este momento."}
+            : info.reason === "no_privacy_channel"
+              ? "Este comercio aún está terminando de configurar su política de privacidad. Vuelve a intentarlo más tarde o pide ayuda en el local."
+              : "El registro por QR no está disponible en este momento."}
         </p>
       </main>
     );

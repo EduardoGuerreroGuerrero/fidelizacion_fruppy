@@ -94,9 +94,9 @@ function Field({
 export default async function SignupPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; email?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, email } = await searchParams;
 
   return (
     <main className="grid min-h-screen bg-white lg:grid-cols-2">
@@ -201,6 +201,7 @@ export default async function SignupPage({
                   name="email"
                   type="email"
                   required
+                  defaultValue={email}
                   autoComplete="email"
                   className={inputCls}
                 />

@@ -1,7 +1,43 @@
 import type { NextConfig } from "next";
 
+const isDev = process.env.NODE_ENV !== "production";
+
+// CSP en modo "report-only": se observa en la consola del navegador sin
+// romper nada. Pasar a `Content-Security-Policy` cuando no haya reportes.
+// 'unsafe-inline' hace falta mientras Next inyecte scripts/estilos en línea
+// (sin nonce); 'unsafe-eval' solo en desarrollo (HMR).
+const csp = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data:",
+  "media-src 'self' blob:",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://fcm.googleapis.com",
+  "worker-src 'self' blob:",
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  "object-src 'none'",
+].join("; ");
+
+const securityHeaders = [
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  // Cámara solo del propio sitio (escáner de QR); geolocalización para
+  // "sedes cercanas"; nada de micrófono ni pagos.
+  {
+    key: "Permissions-Policy",
+    value: "camera=(self), geolocation=(self), microphone=(), payment=(), usb=()",
+  },
+  { key: "Content-Security-Policy-Report-Only", value: csp },
+];
+
 const nextConfig: NextConfig = {
   /* config options here */
+  async headers() {
+    return [{ source: "/:path*", headers: securityHeaders }];
+  },
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {

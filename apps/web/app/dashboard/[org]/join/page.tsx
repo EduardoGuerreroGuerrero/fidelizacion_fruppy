@@ -23,13 +23,15 @@ export default async function JoinQrPage({
 
   const { data: org } = await supabase
     .from("organizations")
-    .select("id, name, join_token, features")
+    .select("id, name, join_token, features, legal")
     .eq("slug", slug)
     .maybeSingle();
   if (!org) notFound();
 
   const selfReg =
     ((org.features ?? {}) as Record<string, unknown>).self_registration !== false;
+  const hasPrivacyChannel =
+    String(((org.legal ?? {}) as Record<string, unknown>).privacy_email ?? "").trim() !== "";
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
   const joinUrl = `${baseUrl}/join/${org.join_token}`;
 
@@ -47,6 +49,17 @@ export default async function JoinQrPage({
           {ok}
         </p>
       )}
+
+      {!hasPrivacyChannel ? (
+        <p className="mb-4 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+          El QR está <strong>deshabilitado</strong> hasta que configures un correo de
+          privacidad en{" "}
+          <a className="underline" href={`/dashboard/${slug}/settings`}>
+            Configuración → Privacidad y funciones
+          </a>
+          . La Ley 1581 exige que el titular pueda contactar al responsable de sus datos.
+        </p>
+      ) : null}
 
       {!selfReg ? (
         <p className="mb-4 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">

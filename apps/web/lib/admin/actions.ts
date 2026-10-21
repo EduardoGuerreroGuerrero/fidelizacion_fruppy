@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { enqueueEmail, trySendOutbox } from "@/lib/email/outbox";
 import { logoToDataUri } from "@/lib/organizations/logo";
 import { processPushQueue, pushConfigured } from "@/lib/push/send";
 import { pushCampaignToWallets } from "@/lib/wallet/push";
@@ -333,8 +334,33 @@ export async function inviteMember(orgSlug: string, formData: FormData) {
   await audit(orgId, user.id, "member.invited", "organization_invite", email, {
     role: inviteRole,
   });
+
+  // Correo de invitación vía outbox (reintentable por cron). Un id nuevo por
+  // invitación: reinvitar al mismo correo reenvía el mensaje.
+  const { data: org } = await supabase
+    .from("organizations")
+    .select("name")
+    .eq("id", orgId)
+    .maybeSingle();
+  const queued = await enqueueEmail({
+    orgId,
+    kind: "team_invite",
+    toEmail: email,
+    payload: { org_name: org?.name ?? "tu comercio", role: inviteRole, invited_email: email },
+    idempotencyKey: `team_invite:${crypto.randomUUID()}`,
+  });
+  const sent = queued.id ? await trySendOutbox(queued.id) : false;
+
   revalidatePath(back);
-  redirect(back + "?ok=" + encodeURIComponent(`Invitación enviada a ${email}.`));
+  redirect(
+    back +
+      "?ok=" +
+      encodeURIComponent(
+        sent
+          ? `Invitación enviada a ${email}.`
+          : `Invitación creada para ${email}, pero el correo aún no salió (quedó en cola y se reintenta). Puedes avisarle tú: se activa al iniciar sesión con ese correo.`,
+      ),
+  );
 }
 
 export async function cancelInvite(orgSlug: string, inviteId: string) {
@@ -648,24 +674,97 @@ export async function cancelPushCampaign(orgSlug: string, campaignId: string) {
 
 // ---------- Derechos del titular ----------------------------------------------
 
+const RIGHTS_STATUSES = ["in_progress", "resolved", "rejected"] as const;
+
+// Gestión de una solicitud de derechos (Ley 1581). Todo pasa por la RPC
+// resolve_rights_request: valida la transición, exige respuesta al cerrar y,
+// si es supresión/retiro de autorización, ejecuta la acción sobre los datos.
 export async function updateRightsRequest(
   orgSlug: string,
   requestId: string,
-  status: "in_progress" | "resolved" | "rejected",
+  formData: FormData,
 ) {
-  const { supabase, user, orgId, role } = await requireMembership(orgSlug);
+  const { supabase, user, orgId } = await requireMembership(orgSlug);
   const back = `/dashboard/${orgSlug}/rights`;
-  if (!["owner", "admin", "manager"].includes(role))
-    fail(back, "Solo manager+ puede gestionar solicitudes.");
+  const status = String(formData.get("status") ?? "");
+  const response = String(formData.get("response") ?? "").trim();
+  if (!(RIGHTS_STATUSES as readonly string[]).includes(status)) fail(back, "Acción inválida.");
 
-  const { error } = await supabase
-    .from("data_rights_requests")
-    .update({ status, resolved_at: new Date().toISOString() })
-    .eq("id", requestId)
-    .eq("organization_id", orgId)
-    .eq("status", "open");
-  if (error) fail(back, "No se pudo actualizar la solicitud.");
+  const { data, error } = await supabase.rpc("resolve_rights_request", {
+    p_request_id: requestId,
+    p_status: status,
+    p_response: response || null,
+  });
+  if (error) {
+    const m = error.message;
+    fail(
+      back,
+      m.includes("response_required")
+        ? "Escribe una respuesta para el titular (mínimo 10 caracteres) antes de cerrar la solicitud."
+        : m.includes("invalid_transition")
+          ? "Esa solicitud ya fue cerrada o ya está en trámite."
+          : m.includes("forbidden_destructive")
+            ? "Solo un owner o admin puede ejecutar una supresión o retiro de autorización."
+            : m.includes("forbidden")
+              ? "Solo manager+ puede gestionar solicitudes."
+              : "No se pudo actualizar la solicitud.",
+    );
+  }
 
-  await audit(orgId, user.id, `rights_request.${status}`, "data_rights_request", requestId);
+  const r = data as {
+    request_type: string;
+    org_name: string;
+    notify_email: string | null;
+    first_name: string | null;
+  } | null;
+
+  await audit(orgId, user.id, `rights_request.${status}`, "data_rights_request", requestId, {
+    request_type: r?.request_type,
+  });
+
+  // Respuesta al titular por correo (el email se capturó antes de anonimizar).
+  let notified: boolean | null = null;
+  if (status !== "in_progress" && r?.notify_email) {
+    const { data: orgRow } = await supabase
+      .from("organizations")
+      .select("legal")
+      .eq("id", orgId)
+      .maybeSingle();
+    const queued = await enqueueEmail({
+      orgId,
+      kind: "rights_response",
+      toEmail: r.notify_email,
+      payload: {
+        org_name: r.org_name,
+        first_name: r.first_name ?? undefined,
+        request_type: r.request_type,
+        status,
+        response,
+        privacy_email: ((orgRow?.legal ?? {}) as Record<string, string>).privacy_email,
+      },
+      idempotencyKey: `rights_response:${requestId}`,
+    });
+    notified = queued.id ? await trySendOutbox(queued.id, { scrubRecipient: true }) : false;
+  }
+
   revalidatePath(back);
+  const base =
+    status === "in_progress"
+      ? "Solicitud en trámite."
+      : status === "rejected"
+        ? "Solicitud rechazada."
+        : r?.request_type === "erasure"
+          ? "Solicitud resuelta: los datos del titular fueron eliminados (el historial de sellos se conserva sin datos personales)."
+          : r?.request_type === "revocation"
+            ? "Solicitud resuelta: autorización retirada y tarjeta cerrada."
+            : "Solicitud resuelta.";
+  const mail =
+    notified === true
+      ? " Respuesta enviada al titular."
+      : notified === false
+        ? " El correo al titular quedó en cola (se reintenta); si no sale, contáctalo tú."
+        : status !== "in_progress"
+          ? " El titular no tiene correo registrado: contáctalo por otro medio."
+          : "";
+  redirect(back + "?ok=" + encodeURIComponent(base + mail));
 }

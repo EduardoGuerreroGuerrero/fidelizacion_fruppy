@@ -8,6 +8,7 @@ import {
   issueCard,
   redeemReward,
   revokeCard,
+  reissueCard,
   rotateCardToken,
   sendCardEmail,
 } from "@/lib/loyalty/actions";
@@ -322,16 +323,26 @@ export default async function CustomerPage({
                             revocada
                           </span>
                         )}
-                        <form action={rotateCardToken.bind(null, slug, customer.id, card.id)}>
-                          <button
-                            type="submit"
-                            className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-                          >
-                            Rotar QR
-                          </button>
-                        </form>
+                        {card.status === "revoked" && (
+                          <form action={reissueCard.bind(null, slug, customer.id, card.id)}>
+                            <button
+                              type="submit"
+                              className="rounded-full bg-brand-dark px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
+                            >
+                              Reemitir tarjeta
+                            </button>
+                          </form>
+                        )}
                         {card.status === "active" && (
                           <>
+                            <form action={rotateCardToken.bind(null, slug, customer.id, card.id)}>
+                              <button
+                                type="submit"
+                                className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                              >
+                                Rotar QR
+                              </button>
+                            </form>
                             <form action={syncWalletFormAction.bind(null, slug, customer.id)}>
                               <button
                                 type="submit"

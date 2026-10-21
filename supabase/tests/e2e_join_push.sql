@@ -36,9 +36,11 @@ insert into auth.users (id) values
   ('00000000-0000-0000-0000-0000000000c2'),  -- admin  org C
   ('00000000-0000-0000-0000-0000000000c9');  -- staff  org D (cross-org)
 
-insert into public.organizations (id, name, slug, status, features) values
-  ('cccccccc-1111-0000-0000-000000000003', 'Org C Join', 'e2e-org-c', 'active', '{}'),
-  ('dddddddd-1111-0000-0000-000000000004', 'Org D Susp', 'e2e-org-d', 'suspended', '{}');
+insert into public.organizations (id, name, slug, status, features, legal) values
+  ('cccccccc-1111-0000-0000-000000000003', 'Org C Join', 'e2e-org-c', 'active', '{}',
+   '{"privacy_email":"privacidad@org-c.test"}'),
+  ('dddddddd-1111-0000-0000-000000000004', 'Org D Susp', 'e2e-org-d', 'suspended', '{}',
+   '{"privacy_email":"privacidad@org-d.test"}');
 
 insert into public.organization_members (organization_id, user_id, role, status) values
   ('cccccccc-1111-0000-0000-000000000003', '00000000-0000-0000-0000-0000000000c1', 'staff', 'active'),
