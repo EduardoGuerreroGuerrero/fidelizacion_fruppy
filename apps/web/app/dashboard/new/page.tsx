@@ -85,19 +85,19 @@ export default async function NewOrganizationPage({
             <IconUpload className="size-5" />
           </span>
           <label htmlFor="logo" className="font-semibold text-ink">
-            Logo (PNG sin fondo, opcional)
+            Logo (opcional)
           </label>
         </div>
         <input
           id="logo"
           name="logo"
           type="file"
-          accept="image/png"
+          accept="image/png,image/jpeg,image/webp,image/avif,image/gif,image/svg+xml"
           className="mt-3 w-full rounded-xl border border-neutral-300 px-4 py-3 text-sm text-ink-soft file:mr-3 file:rounded-full file:border-0 file:bg-pl-cream file:px-4 file:py-1.5 file:text-xs file:font-semibold file:text-pl-green"
         />
         <p className="mt-2 text-xs text-ink-soft">
-          Debe ser PNG sin fondo — es el logo que se mostrará en el panel de
-          organizaciones.
+          PNG, JPG, WebP o SVG, máx. 10 MB — si el fondo es de un solo color
+          se quita automáticamente.
         </p>
 
         <SubmitButton

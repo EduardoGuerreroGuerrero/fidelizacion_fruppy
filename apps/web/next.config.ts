@@ -38,6 +38,11 @@ const nextConfig: NextConfig = {
   // La vista previa del IDE proxifica localhost bajo 127.0.0.1: sin esto,
   // Next dev bloquea /_next/hmr y la página nunca se hidrata.
   allowedDevOrigins: ["127.0.0.1"],
+  experimental: {
+    // El logo del comercio acepta imágenes de hasta 10 MB (se convierten y
+    // normalizan a PNG ≤256 KB en el servidor).
+    serverActions: { bodySizeLimit: "12mb" },
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

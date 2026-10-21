@@ -446,7 +446,8 @@ export async function updateOrgSettings(orgSlug: string, formData: FormData) {
   let newLogoUrl: string | null | undefined;
   if (logoFile instanceof File && logoFile.size > 0) {
     newLogoUrl = await logoToDataUri(logoFile);
-    if (!newLogoUrl) fail(back, "El logo debe ser un PNG sin fondo de máximo 256 KB.");
+    if (!newLogoUrl)
+      fail(back, "No se pudo usar ese archivo como logo: debe ser una imagen (PNG, JPG, WebP o SVG) de máximo 10 MB.");
   } else if (removeLogo) {
     newLogoUrl = null;
   }
