@@ -24,7 +24,7 @@ const STEPS: {
     title: "Abre Analítica",
     body: (
       <>
-        En el menú <strong>Más → Analítica</strong> tienes todas las cifras de tu programa en una
+        En el menú <strong>Marketing → Analítica</strong> tienes todas las cifras de tu programa en una
         sola pantalla. Todo se calcula en tu zona horaria (<em>America/Bogota</em>), así que los
         números cuadran con tu jornada real.
       </>

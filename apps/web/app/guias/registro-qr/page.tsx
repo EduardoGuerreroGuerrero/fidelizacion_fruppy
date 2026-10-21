@@ -25,7 +25,7 @@ const STEPS: {
     title: "Pon el QR donde el cliente lo vea",
     body: (
       <>
-        En <strong>Más → QR registro</strong> está el código único de tu negocio. Imprímelo y
+        En <strong>Marketing → QR registro</strong> está el código único de tu negocio. Imprímelo y
         pégalo en la caja, la vitrina o las mesas. El cliente lo escanea con la cámara de su
         celular — no necesita instalar nada. Si el código se filtra o aparecen registros raros,
         usa <strong>Rotar QR</strong>: el anterior deja de funcionar y tus clientes ya registrados

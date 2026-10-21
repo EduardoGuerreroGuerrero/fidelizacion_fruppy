@@ -34,7 +34,7 @@ const FILES: {
     file: "afiche-qr.pdf",
     icon: "arrow",
     title: "Afiche QR imprimible",
-    desc: "Cartel «¡Regístrate aquí!» para tu caja o vitrina. Descarga tu QR en el panel (Más → QR registro) y pégalo en el espacio marcado.",
+    desc: "Cartel «¡Regístrate aquí!» para tu caja o vitrina. Descarga tu QR en el panel (Marketing → QR registro) y pégalo en el espacio marcado.",
     meta: "PDF · 1 página · para imprimir",
   },
 ];
