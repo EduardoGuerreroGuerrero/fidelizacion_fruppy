@@ -171,6 +171,21 @@ begin
                        'J07c el QR viejo muere al instante');
   select join_token into v_join_c from public.organizations where id = ORG_C;
 
+  -- --- J07d marca del comercio en la proyección de la tarjeta (QA-C4) ---
+  r := public.get_card_app_data(v_card_tok)::jsonb;
+  perform pg_temp.t_ok(
+    r->>'org_slug' = 'e2e-org-c' and r->>'org_id' = ORG_C::text,
+    'J07d get_card_app_data expone org_id y org_slug');
+  perform pg_temp.t_ok((r->>'has_logo')::boolean = false and r->>'brand_color' is null,
+                       'J07e sin logo ni color → has_logo=false, brand_color nulo');
+  update public.organizations
+     set brand = '{"color":"#112233","logo_url":"https://x.test/l.png"}'
+   where id = ORG_C;
+  r := public.get_card_app_data(v_card_tok)::jsonb;
+  perform pg_temp.t_ok((r->>'has_logo')::boolean and r->>'brand_color' = '#112233',
+                       'J07f con logo y color → has_logo=true, brand_color');
+  update public.organizations set brand = '{}' where id = ORG_C;
+
   -- --- J08 consentimiento desde la tarjeta ---
   r := public.get_card_consents(v_card_tok);
   perform pg_temp.t_ok(r->'consents'->>'marketing_email' = 'withdrawn',

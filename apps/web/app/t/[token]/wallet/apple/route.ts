@@ -21,7 +21,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ token: string 
   return new Response(new Uint8Array(applePkpass), {
     headers: {
       "Content-Type": APPLE_PASS_CONTENT_TYPE,
-      "Content-Disposition": 'attachment; filename="fruppy-card.pkpass"',
+      "Content-Disposition": 'attachment; filename="tarjeta-fidelidad.pkpass"',
       "Cache-Control": "no-store",
     },
   });

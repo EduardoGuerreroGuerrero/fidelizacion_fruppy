@@ -66,6 +66,19 @@ function fail(path: string, msg: string): never {
   redirect(path + "?error=" + encodeURIComponent(msg));
 }
 
+// Errores estables del trigger guard_org_owners (migración 0017).
+function memberChangeError(
+  error: { code?: string; message: string },
+  fallback: string,
+): string {
+  if (error.message.includes("last_owner"))
+    return "La organización debe conservar al menos un owner activo. Asciende a otra persona primero.";
+  if (error.message.includes("owner_required"))
+    return "Solo un owner puede ascender, degradar, suspender o eliminar a un owner.";
+  if (error.code === "42501") return "Sin permiso para esta acción.";
+  return fallback;
+}
+
 // ---------- Programas --------------------------------------------------------
 
 export async function saveProgram(orgSlug: string, formData: FormData) {
@@ -351,11 +364,7 @@ export async function setMemberRole(orgSlug: string, memberId: string, formData:
     .update({ role })
     .eq("id", memberId)
     .eq("organization_id", orgId);
-  if (error)
-    fail(
-      back,
-      error.code === "42501" ? "Sin permiso para cambiar roles." : "No se pudo cambiar el rol.",
-    );
+  if (error) fail(back, memberChangeError(error, "No se pudo cambiar el rol."));
 
   await audit(orgId, user.id, "member.role_changed", "organization_member", memberId, { role });
   revalidatePath(back);
@@ -373,8 +382,9 @@ export async function setMemberStatus(
     .eq("id", memberId)
     .eq("organization_id", orgId);
   if (error)
-    redirect(
-      `/dashboard/${orgSlug}/team?error=` + encodeURIComponent("No se pudo cambiar el estado."),
+    fail(
+      `/dashboard/${orgSlug}/team`,
+      memberChangeError(error, "No se pudo cambiar el estado."),
     );
   await audit(orgId, user.id, `member.${status}`, "organization_member", memberId);
   revalidatePath(`/dashboard/${orgSlug}/team`);

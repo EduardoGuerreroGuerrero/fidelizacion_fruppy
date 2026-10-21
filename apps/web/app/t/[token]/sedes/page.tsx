@@ -1,3 +1,4 @@
+import { SectionBanner, isFruppy } from "../_components/brand";
 import Link from "next/link";
 import { getCardAppData } from "../_components/data";
 import { TitleBar } from "../_components/chrome";
@@ -24,6 +25,7 @@ export default async function NuestrasSedes({
     );
   }
 
+  const fruppy = isFruppy(card);
   const query = (q ?? "").trim().toLowerCase();
   const locations = query
     ? card.locations.filter(
@@ -37,8 +39,8 @@ export default async function NuestrasSedes({
     <>
       <TitleBar title="Nuestras sedes" href={base} />
 
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <SectionBanner
+        fruppy={fruppy}
         src="/brand/banner-sedes.jpg"
         alt="Encuentra la sede más cercana a ti"
         className="mx-auto mt-2 w-[calc(100%-2.5rem)] rounded-3xl"
@@ -55,23 +57,20 @@ export default async function NuestrasSedes({
         />
       </form>
 
-      {/* Mapa */}
-      <div className="mx-5 mt-3 overflow-hidden rounded-3xl">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/brand/mapa-sedes.jpg" alt="Mapa de sedes" className="w-full" />
-      </div>
 
       {/* Lista de sedes — orden por cercanía opcional (geolocalización
           en el dispositivo, sin persistir ni enviar la posición) */}
       {card.location_enabled ? (
         <NearbySort
           locations={locations}
-          renderRow={(l, i) => <LocationRow key={l.id} location={l} index={i} distanceKm={l._km} />}
+          renderRow={(l, i) => (
+            <LocationRow key={l.id} location={l} index={i} distanceKm={l._km} fruppy={fruppy} />
+          )}
         />
       ) : (
         <ul className="mt-4">
           {locations.map((l, i) => (
-            <LocationRow key={l.id} location={l} index={i} />
+            <LocationRow key={l.id} location={l} index={i} fruppy={fruppy} />
           ))}
         </ul>
       )}

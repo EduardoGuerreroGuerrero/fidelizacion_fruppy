@@ -1,3 +1,4 @@
+import { RewardThumb, isFruppy } from "../../_components/brand";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCardAppData } from "../../_components/data";
@@ -41,12 +42,7 @@ export default async function BonoDetalle({
       <TitleBar title="Detalle del bono" href={`${base}/bonos`} />
 
       <div className={`relative mx-5 mt-2 overflow-hidden rounded-[28px] ${style.bg} p-6`}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={`/brand/bono-icon-${n}.jpg`}
-          alt=""
-          className="size-24 rounded-full object-cover shadow-md"
-        />
+        <RewardThumb fruppy={isFruppy(card)} n={n} className="size-24 rounded-full shadow-md" />
         <h2 className="mt-4 text-xl font-semibold text-ink">{reward.name}</h2>
         {reward.description ? (
           <p className="mt-1 text-sm leading-snug text-ink-soft">

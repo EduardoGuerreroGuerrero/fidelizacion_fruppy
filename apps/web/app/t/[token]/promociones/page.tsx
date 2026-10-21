@@ -1,3 +1,4 @@
+import { isFruppy } from "../_components/brand";
 import Link from "next/link";
 import { getCardAppData } from "../_components/data";
 import { TitleBar } from "../_components/chrome";
@@ -20,6 +21,28 @@ export default async function Promociones({
       <p className="m-8 rounded-2xl bg-neutral-50 p-8 text-center text-sm text-ink-soft">
         Tarjeta no encontrada.
       </p>
+    );
+  }
+
+  // El catálogo de /promociones es contenido estático de Fruppy Helados: otros
+  // comercios no lo muestran (sería publicidad ajena). Estado vacío honesto.
+  if (!isFruppy(card)) {
+    return (
+      <>
+        <TitleBar title="Promociones" href={base} />
+        <div className="mx-5 mt-6 rounded-3xl border border-dashed border-neutral-200 p-8 text-center">
+          <p className="font-semibold text-ink">Aún no hay promociones</p>
+          <p className="mt-2 text-sm text-ink-soft">
+            {card.org_name} te avisará aquí de sus novedades y descuentos.
+          </p>
+          <Link
+            href={`${base}/bonos`}
+            className="mt-4 inline-block rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white"
+          >
+            Ver mis recompensas
+          </Link>
+        </div>
+      </>
     );
   }
 

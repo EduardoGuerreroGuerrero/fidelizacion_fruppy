@@ -14,7 +14,6 @@ import {
   IconWallet,
   IconGift,
   IconBell,
-  IconPin,
   IconMap,
   IconBars,
   IconBag,
@@ -36,7 +35,6 @@ import {
   IconBriefcase,
 } from "./_landing/icons";
 import {
-  FakeQr,
   HeroPhone,
   ScanCard,
   Confetti,
@@ -47,7 +45,6 @@ import {
   VisWallet,
   VisSellos,
   VisNotif,
-  VisMap,
   VisSedes,
   VisCampana,
   VisReporte,
@@ -384,12 +381,6 @@ const FEATURES: {
     title: "Notificaciones push",
     desc: "Envía promociones directo al celular de tus clientes.",
     Visual: VisNotif,
-  },
-  {
-    icon: IconPin,
-    title: "Ubicación en el mapa",
-    desc: "Los clientes ven tus comercios cercanos directo desde el mapa.",
-    Visual: VisMap,
   },
   {
     icon: IconMap,
@@ -748,11 +739,19 @@ function Pricing() {
 /* ------------------------------------------------------------------ */
 
 // Sin href = contenido aún no publicado: se muestra como "Próximamente".
-const RESOURCE_CARDS: { icon: Icon; title: string; desc: string; href?: string }[] = [
+const RESOURCE_CARDS: {
+  icon: Icon;
+  title: string;
+  desc: string;
+  href?: string;
+  cta?: string;
+}[] = [
   {
     icon: IconBook,
     title: "Guías paso a paso",
     desc: "Aprende a configurar tu programa de fidelización en minutos.",
+    href: "/guias",
+    cta: "Ver guías",
   },
   {
     icon: IconVideo,
@@ -769,149 +768,8 @@ const RESOURCE_CARDS: { icon: Icon; title: string; desc: string; href?: string }
     title: "Preguntas frecuentes",
     desc: "Encuentra respuestas rápidas a dudas comunes.",
     href: "/preguntas",
+    cta: "Ver preguntas",
   },
-];
-
-const FEATURED_RESOURCES: {
-  tag: string;
-  tagBg: string;
-  title: string;
-  desc: string;
-  Thumb: ComponentType;
-}[] = [
-  {
-    tag: "GUÍA",
-    tagBg: "bg-pl-action text-white",
-    title: "Cómo configurar tu programa de fidelización",
-    desc: "Aprende paso a paso a crear tu programa desde el panel.",
-    Thumb: ThumbAdmin,
-  },
-  {
-    tag: "VIDEO",
-    tagBg: "bg-pl-yellow text-ink",
-    title: "Cómo tus clientes se registran con el QR",
-    desc: "Mira cómo tus clientes se unen en menos de un minuto.",
-    Thumb: ThumbVideo,
-  },
-  {
-    tag: "PLANTILLA",
-    tagBg: "bg-violet-600 text-white",
-    title: "Mensajes listos para campañas",
-    desc: "Usa plantillas para promocionar tus productos.",
-    Thumb: ThumbPlantilla,
-  },
-  {
-    tag: "GUÍA",
-    tagBg: "bg-pl-action text-white",
-    title: "Cómo interpretar tus reportes",
-    desc: "Aprende a usar tus métricas para tomar decisiones.",
-    Thumb: ThumbReporte,
-  },
-];
-
-/* Miniaturas de los recursos destacados */
-function ThumbAdmin() {
-  return (
-    <div className="flex h-full items-center justify-center">
-      <div className="w-40 overflow-hidden rounded-lg border-2 border-neutral-700 bg-white shadow-md">
-        <div className="flex">
-          <div className="w-8 space-y-1 bg-pl-green p-1">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <span key={i} className="block h-1 rounded-sm bg-white/50" />
-            ))}
-          </div>
-          <div className="flex-1 space-y-1 p-1.5">
-            <span className="block h-1 w-3/4 rounded bg-neutral-200" />
-            <span className="block h-1.5 w-full rounded-sm border border-neutral-200 bg-neutral-50" />
-            <span className="block h-1.5 w-full rounded-sm border border-neutral-200 bg-neutral-50" />
-            <span className="block h-1.5 w-2/3 rounded-sm border border-neutral-200 bg-neutral-50" />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ThumbVideo() {
-  return (
-    <div className="relative flex h-full items-center justify-center">
-      {/* Marco del teléfono: el relleno va en un div interno */}
-      <div className="w-16 rounded-[0.9rem] border-[3px] border-neutral-800 bg-white">
-        <div className="p-1.5">
-          <div className="mx-auto w-10 p-0.5">
-            <FakeQr />
-          </div>
-          <span className="mt-1 block h-1 rounded bg-neutral-200" />
-          <span className="mt-0.5 block h-1 w-2/3 rounded bg-neutral-200" />
-          <div className="mt-1 rounded-sm bg-pl-action py-0.5 text-center text-[4px] font-bold text-white">
-            Registrarme
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ThumbPlantilla() {
-  return (
-    <div className="flex h-full items-center justify-center gap-2">
-      <div className="w-24 -rotate-3 rounded-lg bg-white shadow-md">
-        <div className="p-2">
-          <Image
-            src="/pineapple/isotipo-trans.png"
-            alt=""
-            width={14}
-            height={14}
-            className="h-3.5 w-3.5 object-contain"
-          />
-          <p className="mt-1 text-[7px] font-bold text-ink">¡Vuelve y disfruta!</p>
-          <p className="text-[5.5px] text-neutral-500">Gracias por tu visita</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ThumbReporte() {
-  return (
-    <div className="relative flex h-full items-end justify-center gap-2 pb-4">
-      <div className="flex h-16 items-end gap-1">
-        {[35, 55, 45, 70, 90].map((h, i) => (
-          <span
-            key={i}
-            className={`w-3 rounded-t-sm ${i === 4 ? "bg-pl-green-2" : "bg-pl-green-2/40"}`}
-            style={{ height: `${h}%` }}
-          />
-        ))}
-      </div>
-      <div className="absolute right-6 top-3">
-        <svg viewBox="0 0 36 36" className="h-12 w-12 -rotate-90">
-          <circle cx="18" cy="18" r="14" fill="none" stroke="#e2e8f0" strokeWidth="6" />
-          <circle
-            cx="18"
-            cy="18"
-            r="14"
-            fill="none"
-            stroke="#22c55e"
-            strokeWidth="6"
-            strokeDasharray="70 100"
-            strokeLinecap="round"
-          />
-        </svg>
-      </div>
-    </div>
-  );
-}
-
-const HOT_TOPICS = [
-  "¿Necesito una app para mis clientes?",
-  "¿Cómo creo un programa de sellos?",
-  "¿Cómo funciona la tarjeta en Google Wallet?",
-  "¿Puedo enviar promociones automáticas?",
-  "¿Cómo funcionan los puntos?",
-  "¿Puedo usarlo en varias sedes?",
-  "¿Cómo ven mis clientes su tarjeta?",
-  "¿Puedo cancelar cuando quiera?",
 ];
 
 function Resources() {
@@ -938,7 +796,7 @@ function Resources() {
 
         {/* 4 tarjetas rápidas */}
         <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {RESOURCE_CARDS.map(({ icon: Ic, title, desc, href }) => {
+          {RESOURCE_CARDS.map(({ icon: Ic, title, desc, href, cta }) => {
             const body = (
               <>
                 <h3 className="flex items-center gap-2.5 font-bold text-ink">
@@ -959,7 +817,7 @@ function Resources() {
                   >
                     {body}
                     <span className="mt-4 flex items-center gap-1 text-sm font-semibold text-pl-action">
-                      Ver preguntas
+                      {cta}
                       <IconArrowRight className="h-3.5 w-3.5" />
                     </span>
                   </Link>
@@ -976,95 +834,37 @@ function Resources() {
           })}
         </ul>
 
-        {/* Recursos destacados */}
-        <div className="mt-16 flex flex-wrap items-baseline justify-between gap-2">
+        {/* Bloque de ayuda */}
+        <div className="mx-auto mt-14 max-w-2xl rounded-3xl border border-ink/5 bg-white p-8 text-center shadow-sm">
           <h3 className="text-xl font-extrabold text-ink">
-            Recursos destacados
+            ¿Necesitas ayuda?
           </h3>
-          <p className="text-sm text-ink-soft">
-            Estamos preparando estas guías; te avisaremos al publicarlas.
+          <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+            Estamos aquí para apoyarte en cada paso de tu programa de
+            fidelización.
           </p>
-        </div>
-        <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {FEATURED_RESOURCES.map(({ tag, tagBg, title, desc, Thumb }) => (
-            <li key={title}>
-              <div className="h-full">
-                <div className="relative h-36 border-b border-pl-green/10">
-                  <span
-                    className={`absolute left-3 top-3 z-10 rounded px-2 py-0.5 text-[11px] font-bold tracking-wider ${tagBg}`}
-                  >
-                    {tag}
-                  </span>
-                  <div aria-hidden className="h-full">
-                    <Thumb />
-                  </div>
-                </div>
-                <div className="px-1 pt-3">
-                  <h4 className="text-sm font-bold leading-snug text-ink">
-                    {title}
-                  </h4>
-                  <p className="mt-1.5 text-xs leading-relaxed text-ink-soft">
-                    {desc}
-                  </p>
-                  <span className="mt-3 inline-block rounded-full bg-pl-cream px-2.5 py-0.5 text-[11px] font-semibold text-pl-green">
-                    Próximamente
-                  </span>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-
-        {/* Bloque de ayuda + temas consultados */}
-        <div className="mt-14 grid gap-8 lg:grid-cols-2">
-          <div className="rounded-3xl border border-ink/5 bg-white p-8 shadow-sm">
-            <h3 className="text-xl font-extrabold text-ink">
-              ¿Necesitas ayuda?
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-              Estamos aquí para apoyarte en cada paso de tu programa de
-              fidelización.
-            </p>
-            <p className="mt-4 font-script text-xl text-pl-action">
-              Te respondemos en español, desde Barranquilla
-            </p>
-            <a
-              href="mailto:soporte@pineappleloyalty.com"
-              className="mt-1 inline-block text-sm font-semibold text-pl-green underline decoration-pl-green-2 underline-offset-4 hover:text-pl-action"
+          <p className="mt-4 font-script text-xl text-pl-action">
+            Te respondemos en español
+          </p>
+          <a
+            href="mailto:soporte@pineappleloyalty.com"
+            className="mt-1 inline-block text-sm font-semibold text-pl-green underline decoration-pl-green-2 underline-offset-4 hover:text-pl-action"
+          >
+            soporte@pineappleloyalty.com
+          </a>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <Link
+              href="/preguntas"
+              className="flex items-center gap-2 rounded-full bg-pl-action px-6 py-3 text-sm font-semibold text-white shadow-md shadow-pl-action/25 transition hover:bg-pl-green"
             >
-              soporte@pineappleloyalty.com
-            </a>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link
-                href="/preguntas"
-                className="flex items-center gap-2 rounded-full bg-pl-action px-6 py-3 text-sm font-semibold text-white shadow-md shadow-pl-action/25 transition hover:bg-pl-green"
-              >
-                Ir a preguntas frecuentes
-              </Link>
-              <Link
-                href="/contacto"
-                className="rounded-full border-2 border-ink/15 px-6 py-3 text-sm font-semibold text-ink transition hover:border-pl-green-2 hover:text-pl-green"
-              >
-                Contactar soporte
-              </Link>
-            </div>
-          </div>
-          <div className="rounded-3xl border border-ink/5 bg-white p-8 shadow-sm">
-            <h3 className="text-xl font-extrabold text-ink">
-              Temas más consultados
-            </h3>
-            <ul className="mt-5 grid gap-x-6 gap-y-3 sm:grid-cols-2">
-              {HOT_TOPICS.map((t) => (
-                <li key={t}>
-                  <Link
-                    href="/preguntas"
-                    className="text-sm text-pl-green transition-colors hover:text-pl-green-2"
-                  >
-                    {t}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+              Ir a preguntas frecuentes
+            </Link>
+            <Link
+              href="/contacto"
+              className="rounded-full border-2 border-ink/15 px-6 py-3 text-sm font-semibold text-ink transition hover:border-pl-green-2 hover:text-pl-green"
+            >
+              Contactar soporte
+            </Link>
           </div>
         </div>
       </div>
@@ -1236,8 +1036,7 @@ function Footer() {
           </nav>
         </div>
         <p className="mt-10 border-t border-ink/5 pt-6 text-center text-xs text-ink-soft">
-          Copyright © 2026 PineappleLoyalty · Hecho con dedicación en
-          Barranquilla, Colombia
+          Copyright © 2026 PineappleLoyalty
         </p>
       </div>
     </footer>

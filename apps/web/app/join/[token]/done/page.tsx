@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export const instant = false;
 
 // Pantalla neutra post-registro duplicado: no revela si el correo existía,
@@ -17,6 +19,11 @@ export default function JoinDone() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/pineapple/isotipo.png" alt="" className="h-3.5 w-auto" />
         PineappleLoyalty — fidelización digital
+      </p>
+      <p className="mt-2 text-center">
+        <Link href="/" className="text-[11px] text-neutral-300 underline-offset-2 hover:underline">
+          ← Volver al inicio
+        </Link>
       </p>
     </main>
   );

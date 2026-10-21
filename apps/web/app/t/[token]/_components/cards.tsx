@@ -7,6 +7,7 @@ import {
   IconGift,
   IconStore,
 } from "./icons";
+import { LocationThumb, RewardThumb } from "./brand";
 import { StampMini } from "./stamps";
 
 // ---------- tarjeta "Siguiente recompensa" (menta) ---------------------------
@@ -60,12 +61,14 @@ export function RewardCard({
   index,
   base,
   stampIcon,
+  fruppy,
 }: {
   reward: CardReward;
   current: number;
   index: number;
   base: string;
   stampIcon?: string | null;
+  fruppy: boolean;
 }) {
   const style = BONO_STYLES[index % BONO_STYLES.length];
   const n = (index % 5) + 1;
@@ -79,12 +82,7 @@ export function RewardCard({
       className={`relative mx-5 mb-4 overflow-hidden rounded-[26px] ${style.bg} p-4 pl-3`}
     >
       <div className="relative flex items-center gap-3">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={`/brand/bono-icon-${n}.jpg`}
-          alt=""
-          className="size-20 shrink-0 rounded-full object-cover shadow-sm"
-        />
+        <RewardThumb fruppy={fruppy} n={n} className="size-20 shrink-0 rounded-full shadow-sm" />
         <div className="min-w-0 flex-1">
           <p className="font-semibold leading-tight text-ink">{reward.name}</p>
           <p className="mt-1 text-[13px] leading-snug text-ink-soft">
@@ -207,23 +205,19 @@ export function LocationRow({
   location,
   index,
   distanceKm,
+  fruppy,
 }: {
   location: CardLocation;
   index: number;
   distanceKm?: number;
+  fruppy: boolean;
 }) {
-  const photo = `/brand/loc-${(index % 3) + 1}.jpg`;
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     `${location.name} ${location.address ?? ""}`,
   )}`;
   return (
     <li className="mx-5 mb-4 flex gap-3 rounded-3xl bg-white p-3 shadow-sm ring-1 ring-neutral-100">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={photo}
-        alt={location.name}
-        className="size-24 shrink-0 rounded-2xl object-cover"
-      />
+      <LocationThumb fruppy={fruppy} index={index} name={location.name} className="size-24 shrink-0 rounded-2xl" />
       <div className="min-w-0 flex-1 py-0.5">
         <p className="font-semibold leading-tight text-ink">
           {location.name}
@@ -236,12 +230,6 @@ export function LocationRow({
         <p className="mt-0.5 line-clamp-1 text-xs text-ink-soft">
           {location.address}
         </p>
-        <div className="mt-1.5 flex items-center gap-2 text-[11px]">
-          <span className="rounded-full bg-[#dcf5ec] px-2 py-0.5 font-semibold text-[#1d9e6c]">
-            Abierto
-          </span>
-          <span className="text-ink-soft">Lun-Dom: 12:00 - 21:00</span>
-        </div>
         <a
           href={mapsUrl}
           target="_blank"

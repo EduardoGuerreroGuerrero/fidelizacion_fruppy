@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { BrandLogo, type BrandInfo } from "./brand";
 import { IconQr } from "./icons";
 
 // La tarjeta de lealtad teal del mockup, simplificada: marca, nombre del
 // cliente, badge y UN solo contador grande con su unidad. Sin foto de
 // producto ni decoraciones pesadas — el saldo se entiende en segundos.
 export function LoyaltyCard({
+  brand,
   firstName,
   current,
   goal,
@@ -13,6 +15,7 @@ export function LoyaltyCard({
   qrHref,
   qrLabel,
 }: {
+  brand: BrandInfo;
   firstName: string;
   current: number;
   goal: number | null;
@@ -32,12 +35,7 @@ export function LoyaltyCard({
 
       <div className="relative z-10 p-5 pb-6 text-white">
         <div className="flex items-start justify-between">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/brand/logo.png"
-            alt="Fruppy Helados"
-            className="h-16 w-auto object-contain drop-shadow-md"
-          />
+          <BrandLogo brand={brand} className="h-16" />
           <Link
             href={qrHref}
             className="relative z-20 flex w-[84px] flex-col items-center gap-1 rounded-2xl bg-white px-2.5 py-2.5 text-brand shadow-md"
