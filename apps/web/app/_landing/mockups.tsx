@@ -131,7 +131,7 @@ export function HeroPhone() {
             <MiniBrand />
           </div>
           <div className="px-3.5">
-            <StampCard title="Fruppy Helados" sub="Tu tarjeta de fidelización" />
+            <StampCard title="Tu negocio" sub="Tu tarjeta de fidelización" />
           </div>
           <div className="px-5 pb-2 pt-3">
             <div className="mx-auto w-24 rounded-lg border border-neutral-100 bg-white p-1.5">
@@ -207,7 +207,7 @@ export function Confetti() {
 export function AdminLaptop() {
   const menu = ["Inicio", "Clientes", "Programa", "Campañas", "Reportes", "Configuración"];
   const fields: [string, string][] = [
-    ["Nombre del programa", "Fruppy Club"],
+    ["Nombre del programa", "Tu negocio"],
     ["Tipo de programa", "Sellos"],
     ["Beneficio", "Producto gratis al completar"],
     ["Cantidad de sellos", "10"],
@@ -218,7 +218,20 @@ export function AdminLaptop() {
         <div className="flex">
           {/* Sidebar */}
           <div className="w-[70px] shrink-0 space-y-0.5 bg-pl-green px-1.5 py-2.5">
-            <MiniBrand light />
+            {/* Lockup apilado: en 58px de ancho "PineappleLoyalty" en línea se
+                sale de la barra; apilado y centrado cabe sin desbordar. */}
+            <div className="flex flex-col items-center gap-0.5 pb-1">
+              <Image
+                src="/pineapple/isotipo-trans.png"
+                alt=""
+                width={14}
+                height={14}
+                className="h-3.5 w-3.5 object-contain"
+              />
+              <span className="text-center text-[5.5px] font-bold leading-tight text-white">
+                Pineapple<span className="text-pl-green-2">Loyalty</span>
+              </span>
+            </div>
             {menu.map((m) => (
               <div
                 key={m}
@@ -283,7 +296,7 @@ export function AdminLaptop() {
               <p className="mb-1 text-[5.5px] text-neutral-400">Vista previa</p>
               <div className="rounded-lg bg-gradient-to-br from-pl-green to-[#0b3d24] p-1.5">
                 <div className="flex justify-between">
-                  <p className="text-[6px] font-bold text-white">Fruppy Club</p>
+                  <p className="text-[6px] font-bold text-white">Club</p>
                   <IceCream className="h-4 w-3" />
                 </div>
                 <div className="mt-1.5 flex gap-px">
@@ -335,7 +348,7 @@ export function FormPhone() {
               </span>
               <span className="text-[5px] leading-snug text-neutral-500">
                 Acepto la política de tratamiento de datos y quiero recibir
-                notificaciones de Fruppy Helados.
+                notificaciones de tu negocio.
               </span>
             </div>
           </div>
@@ -363,7 +376,7 @@ function PushCard() {
           height={12}
           className="h-3 w-3 object-contain"
         />
-        <p className="text-[7px] font-bold text-ink">Fruppy Helados</p>
+        <p className="text-[7px] font-bold text-ink">Tu negocio</p>
         <p className="ml-auto text-[6px] text-neutral-400">ahora</p>
       </div>
       <p className="mt-1 text-[7px] font-semibold text-ink">
@@ -388,7 +401,7 @@ export function StatsPanel() {
   return (
     <div className="relative mx-auto w-full max-w-xs">
       <div className="relative z-10 mx-auto w-40">
-        <StampCard title="Fruppy Helados" sub="Fruppy Club" />
+        <StampCard title="Tu negocio" sub="Club" />
       </div>
       <div className="relative z-20 ml-auto -mt-2 w-fit sm:absolute sm:-right-1 sm:top-10">
         <PushCard />
@@ -455,7 +468,7 @@ export function VisWallet() {
     <div className="p-2">
       <div className="mx-auto w-24 rounded-md border border-neutral-800 bg-neutral-900 p-1">
         <div className="rounded-sm bg-gradient-to-br from-pl-green to-[#0b3d24] p-1.5">
-          <p className="text-[5.5px] font-bold text-white">Fruppy Club</p>
+          <p className="text-[5.5px] font-bold text-white">Tu negocio</p>
           <div className="mt-1 flex gap-px">
             {Array.from({ length: 8 }).map((_, i) => (
               <span key={i} className={`h-0.5 flex-1 rounded-full ${i < 6 ? "bg-pl-yellow" : "bg-white/25"}`} />
@@ -501,24 +514,6 @@ export function VisNotif() {
       </div>
       <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-pl-yellow" />
       <span className="absolute -left-0.5 bottom-1 h-1.5 w-1.5 rounded-full bg-pl-green-2" />
-    </div>
-  );
-}
-
-export function VisMap() {
-  return (
-    <div className="relative h-[74px] overflow-hidden rounded-lg border border-emerald-100 bg-[#e8f5e9]">
-      {/* Calles */}
-      <div className="absolute left-0 top-1/3 h-1 w-full bg-white" />
-      <div className="absolute left-1/4 top-0 h-full w-1 bg-white" />
-      <div className="absolute bottom-1/4 left-0 h-1 w-full bg-white/70" />
-      {/* Pin del comercio */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full">
-        <IconPin className="h-5 w-5 fill-pl-green-2 text-pl-green-2" />
-      </div>
-      <span className="absolute bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-white/90 px-1.5 py-0.5 text-[5.5px] font-medium text-ink shadow-sm">
-        Comercios cercanos
-      </span>
     </div>
   );
 }
