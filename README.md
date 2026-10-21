@@ -1,4 +1,4 @@
-# Fruppy — SaaS de fidelización, CRM y tarjetas digitales
+# PineappleLoyalty — SaaS de fidelización, CRM y tarjetas digitales
 
 Plataforma SaaS multiempresa para que comercios locales gestionen programas de
 fidelización (sellos/puntos), CRM de clientes y tarjetas digitales para

@@ -44,5 +44,5 @@ No se implementó porque exige **decisiones de negocio** y una cuenta de pagos.
 
 - La landing no debería prometer "Pago seguro" ni topes que no se aplican
   (item QA-B11, rama de landing).
-- Cuidado con activar topes sin revisar el uso actual: Fruppy puede superar
-  50 clientes.
+- Cuidado con activar topes sin revisar el uso actual: algún comercio puede
+  superar ya los 50 clientes.

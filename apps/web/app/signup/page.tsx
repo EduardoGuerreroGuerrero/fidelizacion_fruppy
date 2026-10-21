@@ -218,7 +218,7 @@ export default async function SignupPage({
                 type="text"
                 required
                 autoComplete="organization"
-                placeholder="Ej. Fruppy Helados"
+                placeholder="Ej. Heladería La Esquina"
                 className={inputCls}
               />
             </Field>

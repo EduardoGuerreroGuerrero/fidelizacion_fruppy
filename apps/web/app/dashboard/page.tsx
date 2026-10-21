@@ -5,7 +5,7 @@ import {
   IconPlus,
   IconStore,
 } from "@/app/t/[token]/_components/icons";
-import { initials, FRUPPY_SLUG } from "./[org]/_fruppy/config";
+import { initials } from "@/lib/format";
 import { OrgLogo } from "./org-logo";
 
 const STATUS_BADGE: Record<string, { label: string; chip: string; dot: string }> =
@@ -101,17 +101,12 @@ export default async function DashboardPage({
             };
             // brand.logo_url puede contener assets de Wallet (SVG en data
             // URI), no el logo del comercio: se aceptan URLs y PNGs subidos
-            // (data:image/png); para Fruppy el logo de /brand (convención ya
-            // usada por el shell del panel).
+            // (data:image/png).
             const servable =
               brand.logo_url &&
               (!brand.logo_url.startsWith("data:") ||
                 brand.logo_url.startsWith("data:image/png"));
-            const logoUrl = servable
-              ? brand.logo_url!
-              : org.slug === FRUPPY_SLUG
-                ? "/brand/logo-sm.png"
-                : null;
+            const logoUrl = servable ? brand.logo_url! : null;
             const badge = STATUS_BADGE[org.status] ?? STATUS_BADGE.active;
             return (
               <li key={org.id}>

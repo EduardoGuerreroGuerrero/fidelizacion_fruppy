@@ -1,4 +1,3 @@
-import { SectionBanner, isFruppy } from "../_components/brand";
 import Link from "next/link";
 import { getCardAppData } from "../_components/data";
 import { TitleBar } from "../_components/chrome";
@@ -51,12 +50,6 @@ export default async function MisBonos({
 
       {!historial ? (
         <>
-          <SectionBanner
-            fruppy={isFruppy(card)}
-            src="/brand/banner-bonos.jpg"
-            alt="Acumula sellos y canjea deliciosas recompensas"
-            className="mx-auto mt-4 w-[calc(100%-2.5rem)] rounded-3xl"
-          />
           <div className="mt-5">
             {card.rewards.length > 0 ? (
               card.rewards.map((r, i) => (
@@ -67,7 +60,6 @@ export default async function MisBonos({
                   index={i}
                   base={base}
                   stampIcon={card.stamp_icon}
-                  fruppy={isFruppy(card)}
                 />
               ))
             ) : (

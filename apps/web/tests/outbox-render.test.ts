@@ -25,24 +25,24 @@ test("invitación sin datos mínimos no se renderiza (queda como error, no se en
 
 test("respuesta a derechos: tipo, resultado y respuesta escapada", () => {
   const r = renderOutboxEmail("rights_response", {
-    org_name: "Fruppy",
+    org_name: "La Esquina",
     first_name: "ana",
     request_type: "erasure",
     status: "resolved",
     response: "Listo <script>alert(1)</script>\nSaludos",
-    privacy_email: "privacidad@fruppy.test",
+    privacy_email: "privacidad@laesquina.test",
   });
   assert.ok(r);
   assert.match(r.subject, /Respuesta a tu solicitud/);
   assert.match(r.html, /eliminación de tus datos/);
   assert.match(r.html, /fue atendida/);
   assert.ok(!r.html.includes("<script>"), "la respuesta debe ir escapada");
-  assert.match(r.html, /mailto:privacidad@fruppy\.test/);
+  assert.match(r.html, /mailto:privacidad@laesquina\.test/);
 });
 
 test("respuesta rechazada lo dice", () => {
   const r = renderOutboxEmail("rights_response", {
-    org_name: "Fruppy",
+    org_name: "La Esquina",
     request_type: "access",
     status: "rejected",
     response: "No encontramos datos asociados.",
@@ -53,12 +53,12 @@ test("respuesta rechazada lo dice", () => {
 
 test("tarjeta de bienvenida conserva su formato (regresión)", () => {
   const r = renderOutboxEmail("welcome_card", {
-    org_name: "Fruppy",
+    org_name: "La Esquina",
     program_name: "Club",
     card_token: "a".repeat(32),
     first_name: "luis",
   });
   assert.ok(r);
-  assert.match(r.subject, /Bienvenido a Fruppy/);
+  assert.match(r.subject, /Bienvenido a La Esquina/);
   assert.match(r.html, /https:\/\/app\.example\.test\/t\/a{32}/);
 });

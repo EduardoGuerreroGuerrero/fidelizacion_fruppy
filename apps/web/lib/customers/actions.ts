@@ -259,7 +259,7 @@ export type CsvRow = {
   phone?: string;
 };
 
-// Importación masiva desde CSV (botón "Importar CSV" del panel Fruppy).
+// Importación masiva desde CSV (botón "Importar CSV" de Clientes).
 // Omite duplicados por email/teléfono ya registrados en la organización.
 export async function importCustomers(orgSlug: string, rows: CsvRow[]) {
   const { supabase, user, orgId } = await requireMembership(orgSlug);

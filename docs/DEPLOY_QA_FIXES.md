@@ -11,7 +11,7 @@ de CI).
 | # | Archivo | Qué hace | Riesgo |
 |---|---|---|---|
 | 0017 | `20261021000017_org_bootstrap_and_owner_guard.sql` | `create_organization`, política de membresía corregida (QA-C1/C2), guardia de owners (C3) | Cierra el alta directa en `organizations`: **el código nuevo es obligatorio** (el viejo no podría crear orgs; hoy tampoco puede) |
-| 0018 | `20261021000018_card_app_data_brand.sql` | La tarjeta del cliente expone logo/color/slug del comercio (C4) | Sin ella, Fruppy pierde su logo en la app del cliente |
+| 0018 | `20261021000018_card_app_data_brand.sql` | La tarjeta del cliente expone logo/color/slug del comercio (C4) | Sin ella, la tarjeta del cliente muestra iniciales en vez del logo del comercio |
 | 0019 | `20261021000019_rights_invites_privacy_ledger.sql` | Derechos de titulares, correos de equipo, canal de privacidad obligatorio, baja de usuarios (A2, A5-A8, A11) | **Ver aviso de privacidad abajo** |
 | 0020 | `20261021000020_member_directory.sql` | Equipo con correo y nombre (B2) | Sin ella, Equipo funciona pero sin correos |
 | 0021 | `20261021000021_org_close_delete_and_column_grants.sql` | Cerrar/eliminar organizaciones y columnas protegidas (P2) | Un admin ya no puede editar `status`/`limits` |
@@ -23,7 +23,7 @@ de CI).
 
 Desde la 0019 el QR `/join/...` solo funciona si el comercio tiene
 `Configuración → Privacidad y funciones → Correo de privacidad`. **Antes de
-aplicarla, confirma que Fruppy Helados (y cualquier comercio con QR activo) lo
+aplicarla, confirma que cada comercio con QR activo lo
 tenga configurado**; si no, su QR mostrará "terminando de configurar su política
 de privacidad" hasta que lo agregue.
 
@@ -48,7 +48,7 @@ marca las tareas cerradas en `docs/QA_CHECKLIST.md`.
 
 1. Registro nuevo → confirmar correo → `/dashboard/new` (nombre prellenado) →
    crear organización → **debe funcionar**.
-2. `/t/<token>` de un comercio que no es Fruppy: sin textos ni fotos de Fruppy.
+2. `/t/<token>` de cualquier comercio: solo su logo/color, sin contenido de otros comercios.
 3. `/login` → "¿Olvidaste tu contraseña?" → correo → `/nueva-clave`.
 4. Equipo: invitar un correo → llega el correo de invitación.
 5. Derechos: una solicitud de supresión → resolver con respuesta → el cliente

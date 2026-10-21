@@ -77,7 +77,7 @@ function MiniBrand({ light = false }: { light?: boolean }) {
   );
 }
 
-/** Tarjeta de sellos verde reutilizable (Fruppy Helados). */
+/** Tarjeta de sellos verde reutilizable (comercio de ejemplo). */
 function StampCard({ title, sub }: { title: string; sub: string }) {
   return (
     <div className="overflow-hidden rounded-xl bg-gradient-to-br from-pl-green to-[#0b3d24] p-3">
@@ -120,7 +120,7 @@ function WalletButton() {
   );
 }
 
-/** Teléfono del hero: tarjeta Wallet "Fruppy Helados" + QR + botón wallet. */
+/** Teléfono del hero: tarjeta Wallet "Heladería La Esquina" + QR + botón wallet. */
 export function HeroPhone() {
   return (
     <div className="relative mx-auto w-52 sm:w-64">
@@ -591,7 +591,7 @@ export function SignupVisual() {
   );
 }
 
-/** Tarjeta de testimonio del signup (Fruppy Helados). */
+/** Tarjeta de testimonio del signup (comercio de ejemplo). */
 export function TestimonialCard() {
   return (
     <div className="relative rounded-2xl bg-white p-5 shadow-xl shadow-pl-green/10">
@@ -607,7 +607,7 @@ export function TestimonialCard() {
           <IceCream className="h-7 w-6" />
         </span>
         <div>
-          <p className="text-xs font-bold text-ink">Fruppy Helados</p>
+          <p className="text-xs font-bold text-ink">Heladería La Esquina</p>
           <p className="text-[10px] text-ink-soft">
             Heladería · Barranquilla, Colombia
           </p>

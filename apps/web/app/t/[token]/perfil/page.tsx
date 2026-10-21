@@ -1,4 +1,4 @@
-import { BrandLogo, isFruppy } from "../_components/brand";
+import { BrandLogo } from "../_components/brand";
 import Link from "next/link";
 import { createElement } from "react";
 import { getCardAppData } from "../_components/data";
@@ -58,17 +58,6 @@ export default async function MiPerfil({
       {/* Tarjeta de perfil */}
       <div className="relative mx-5 mt-2 overflow-hidden rounded-[28px] bg-gradient-to-br from-brand to-[#f0a040]">
         <span className="absolute -left-14 -top-16 size-52 rounded-full bg-white/10" />
-        {isFruppy(card) ? (
-          <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/brand/profile-photo.jpg"
-              alt=""
-              className="absolute inset-y-0 right-0 h-full w-[38%] object-cover"
-            />
-            <span className="absolute inset-y-0 right-[28%] w-14 bg-gradient-to-r from-black/0 to-black/10" />
-          </>
-        ) : null}
         <div className="relative z-10 p-5 pb-14">
           <BrandLogo brand={card} className="h-20" />
           <p className="mt-3 text-xl font-semibold text-white">
