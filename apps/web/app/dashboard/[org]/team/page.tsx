@@ -43,6 +43,9 @@ export default async function TeamPage({
       .order("created_at", { ascending: false }),
   ]);
 
+  const myRole = (members ?? []).find((m) => m.user_id === user.id)?.role;
+  const iAmOwner = myRole === "owner";
+
   return (
     <div className="mx-auto max-w-3xl">
       <h1 className="mb-4 text-2xl font-semibold">Equipo</h1>
@@ -108,17 +111,21 @@ export default async function TeamPage({
                 <select
                   name="role"
                   defaultValue={m.role}
+                  disabled={m.role === "owner" && !iAmOwner}
                   className="rounded border border-neutral-300 px-2 py-1 text-xs dark:border-neutral-700 dark:bg-transparent"
                 >
-                  {ROLES.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
-                  ))}
+                  {ROLES.filter((r) => r !== "owner" || iAmOwner || m.role === "owner").map(
+                    (r) => (
+                      <option key={r} value={r}>
+                        {r}
+                      </option>
+                    ),
+                  )}
                 </select>
                 <button
                   type="submit"
-                  className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                  disabled={m.role === "owner" && !iAmOwner}
+                  className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 disabled:opacity-50 dark:border-neutral-700 dark:hover:bg-neutral-800"
                 >
                   OK
                 </button>
@@ -132,7 +139,7 @@ export default async function TeamPage({
               >
                 {m.status}
               </span>
-              {m.user_id !== user.id && (
+              {m.user_id !== user.id && (m.role !== "owner" || iAmOwner) && (
                 <form
                   action={setMemberStatus.bind(
                     null,
