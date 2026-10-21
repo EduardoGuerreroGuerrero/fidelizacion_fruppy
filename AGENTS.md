@@ -59,3 +59,10 @@ ruff check scripts/                                                   # lint Pyt
 `CHECKLIST.md` se actualiza SOLO vía `scripts/checklist.py`
 (`done|doing|undone|blocked <ID>`). Nunca editar el bloque PROGRESS a mano.
 Marcar tareas al completarlas — el bloque de progreso se regenera solo.
+
+Hallazgos de QA: `docs/QA_CHECKLIST.md` (mismo formato, IDs `QA-*`). Al
+resolver uno, el commit/PR dice `Closes QA-C1` (o `fixes`/`resuelve`/
+`cierra`); el hook `.githooks/post-merge` (activar con
+`git config core.hooksPath .githooks`) ejecuta
+`scripts/checklist.py --file docs/QA_CHECKLIST.md sync` tras cada pull.
+El `python` del PATH puede ser Python 2: usar el del env `F_FRUPPY`.
