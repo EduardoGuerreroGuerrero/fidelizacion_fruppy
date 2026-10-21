@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { displayName } from "@/lib/format";
 import { FruppyHome, type ActivityItem } from "./_fruppy/home";
 import { FRUPPY_SLUG, pctDelta } from "./_fruppy/config";
+import { visitSourceLabel } from "@/lib/labels";
 
 export const instant = false;
 
@@ -238,7 +239,7 @@ export default async function OrgPage({ params }: { params: Promise<{ org: strin
                 Visita de {displayName(`${c?.first_name ?? ""} ${c?.last_name ?? ""}`)}
               </span>
               <span className="text-xs text-ink-soft">
-                {new Date(v.created_at).toLocaleString("es-CO")} · {v.source}
+                {new Date(v.created_at).toLocaleString("es-CO")} · {visitSourceLabel(v.source)}
               </span>
             </li>
           );

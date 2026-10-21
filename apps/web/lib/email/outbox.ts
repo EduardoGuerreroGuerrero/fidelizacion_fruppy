@@ -1,5 +1,6 @@
 import { optionalEnv } from "@/lib/env";
 import { displayName } from "@/lib/format";
+import { escapeHtml } from "@/lib/html";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { senderFor, sendEmail } from "./send";
 
@@ -95,12 +96,6 @@ function renderRightsResponse(p: OutboxPayload): { subject: string; html: string
 
 function cardUrl(token: string): string {
   return `${appBase()}/t/${token}`;
-}
-
-function escapeHtml(s: string): string {
-  return s.replace(/[&<>"']/g, (c) =>
-    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] ?? c,
-  );
 }
 
 export function renderOutboxEmail(kind: OutboxKind, p: OutboxPayload): { subject: string; html: string } | null {

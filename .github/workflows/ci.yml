@@ -48,7 +48,7 @@ jobs:
           # que crearlos (mismo stub que scripts/db_apply.py --stub-auth).
           docker exec -i pg psql -U postgres <<'SQL'
           create schema auth;
-          create table auth.users(id uuid primary key);
+          create table auth.users(id uuid primary key, email text, raw_user_meta_data jsonb default '{}'::jsonb);
           do $$ begin
             if not exists (select 1 from pg_roles where rolname='anon') then
               create role anon nologin;

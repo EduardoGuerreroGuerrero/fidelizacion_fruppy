@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { rotateJoinToken } from "@/lib/admin/actions";
 import { SubmitButton } from "@/app/_components/submit-button";
+import { PrintButton } from "@/app/_components/print-button";
 
 export const instant = false;
 
@@ -87,6 +88,16 @@ export default async function JoinQrPage({
           <code className="break-all rounded-md bg-neutral-100 px-3 py-2 text-xs dark:bg-neutral-800">
             {joinUrl}
           </code>
+          <div className="flex flex-wrap justify-center gap-2 print:hidden">
+            <a
+              href={`/dashboard/${slug}/join/qr`}
+              download={`qr-registro-${slug}.png`}
+              className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
+            >
+              Descargar QR (PNG)
+            </a>
+            <PrintButton />
+          </div>
         </div>
         <form action={rotateJoinToken.bind(null, slug)} className="mt-4">
           <SubmitButton

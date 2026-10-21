@@ -4,6 +4,7 @@ import { deleteReward, saveReward, setRewardStatus } from "@/lib/admin/actions";
 import { displayName } from "@/lib/format";
 import { RememberForm } from "@/app/_components/remember-form";
 import { SubmitButton } from "@/app/_components/submit-button";
+import { programTypeLabel, statusLabel } from "@/lib/labels";
 
 export const instant = false;
 
@@ -77,7 +78,7 @@ export default async function RewardsPage({
             <option value="">Programa…</option>
             {(programs ?? []).map((p) => (
               <option key={p.id} value={p.id}>
-                {p.name} ({p.program_type})
+                {p.name} ({programTypeLabel(p.program_type)})
               </option>
             ))}
           </select>
@@ -118,7 +119,7 @@ export default async function RewardsPage({
                 {r.name}
                 {r.status !== "active" && (
                   <span className="ml-2 rounded bg-neutral-100 px-2 py-0.5 text-xs text-ink-soft">
-                    {r.status}
+                    {statusLabel(r.status)}
                   </span>
                 )}
               </p>
@@ -172,7 +173,7 @@ export default async function RewardsPage({
                 {rw?.name ?? "?"} — {displayName(`${cu?.first_name ?? ""} ${cu?.last_name ?? ""}`)}
               </span>
               <span className="text-ink-soft">
-                {new Date(r.created_at).toLocaleString("es-CO")} · {r.status}
+                {new Date(r.created_at).toLocaleString("es-CO")} · {statusLabel(r.status)}
               </span>
             </li>
           );

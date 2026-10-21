@@ -14,7 +14,11 @@ export function SubmitButton({
   disabled,
   onClick,
   ...props
-}: ComponentProps<"button"> & { pendingText?: string; confirm?: string }) {
+}: ComponentProps<"button"> & {
+  // null = conservar el contenido mientras corre (interruptores, íconos).
+  pendingText?: string | null;
+  confirm?: string;
+}) {
   const { pending } = useFormStatus();
   return (
     <button
@@ -30,7 +34,7 @@ export function SubmitButton({
         onClick?.(e);
       }}
     >
-      {pending ? pendingText : children}
+      {pending && pendingText !== null ? pendingText : children}
     </button>
   );
 }

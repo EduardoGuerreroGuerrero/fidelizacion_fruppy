@@ -74,6 +74,8 @@ export default async function Notificaciones({
             <input type="hidden" name="granted" value={marketingOn ? "0" : "1"} />
             <SubmitButton
               role="switch"
+              aria-label="Promociones por correo"
+              pendingText={null}
               aria-checked={marketingOn}
               className={`h-7 w-12 shrink-0 rounded-full p-1 transition ${
                 marketingOn ? "bg-brand" : "bg-neutral-200"
@@ -106,6 +108,8 @@ export default async function Notificaciones({
               />
               <SubmitButton
                 role="switch"
+                aria-label="Ubicación para sedes cercanas"
+                pendingText={null}
                 aria-checked={consents.location === "granted"}
                 className={`h-7 w-12 shrink-0 rounded-full p-1 transition ${
                   consents.location === "granted" ? "bg-brand" : "bg-neutral-200"

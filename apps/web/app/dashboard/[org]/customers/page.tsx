@@ -6,6 +6,7 @@ import { FruppyCustomers, type CustomerRow, type PanelData } from "../_fruppy/cu
 import { PageHead } from "../_fruppy/ui";
 import { FRUPPY_SLUG } from "../_fruppy/config";
 import { ImportCsvButton } from "../_fruppy/import-csv";
+import { statusLabel } from "@/lib/labels";
 
 export const instant = false;
 
@@ -167,13 +168,13 @@ export default async function CustomersPage({
           </div>
         </div>
 
-        <form className="mb-4 flex gap-2" action="">
+        <form className="mb-4 flex flex-wrap gap-2" action="">
           <input
             type="search"
             name="q"
             defaultValue={q}
             placeholder="Buscar por nombre, email o teléfono…"
-            className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-transparent"
+            className="min-w-[12rem] flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-transparent"
           />
           <select
             name="status"
@@ -235,7 +236,7 @@ export default async function CustomersPage({
                           : "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300"
                       }`}
                     >
-                      {c.status}
+                      {statusLabel(c.status)}
                     </span>
                   </div>
                 </Link>

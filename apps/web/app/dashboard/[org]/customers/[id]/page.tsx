@@ -19,6 +19,7 @@ import {
 } from "@/lib/loyalty/actions";
 import { syncWalletFormAction } from "@/lib/wallet/sync";
 import { SubmitButton } from "@/app/_components/submit-button";
+import { reasonLabel, statusLabel, visitSourceLabel } from "@/lib/labels";
 
 export const instant = false;
 
@@ -105,7 +106,7 @@ export default async function CustomerPage({
       at: v.created_at,
       kind: "visit" as const,
       text:
-        `Visita (${v.source})` +
+        `Visita (${visitSourceLabel(v.source)})` +
         (v.purchase_amount_minor ? ` — compra ${(v.purchase_amount_minor / 100).toFixed(2)}` : ""),
     })),
     ...(txs ?? []).map((t) => ({
@@ -119,14 +120,14 @@ export default async function CustomerPage({
         ]
           .filter(Boolean)
           .join(", ") +
-        (t.reason ? ` — ${t.reason}` : ""),
+        (reasonLabel(t.reason) ? ` — ${reasonLabel(t.reason)}` : ""),
     })),
     ...(redemptions ?? []).map((r) => {
       const rw = Array.isArray(r.rewards) ? r.rewards[0] : r.rewards;
       return {
         at: r.created_at,
         kind: "redemption" as const,
-        text: `Recompensa: ${rw?.name ?? "?"} (${r.status})`,
+        text: `Recompensa: ${rw?.name ?? "?"} (${statusLabel(r.status)})`,
       };
     }),
   ].sort((a, b) => (a.at < b.at ? 1 : -1));

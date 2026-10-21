@@ -76,7 +76,7 @@ export default async function MiPerfil({
           </p>
           <p className="text-sm text-white/85">{card.org_name}</p>
           <span className="mt-1.5 inline-block rounded-full bg-white/90 px-3 py-0.5 text-[11px] font-semibold text-brand-dark">
-            Cliente activo
+            {card.card_status === "active" ? "Cliente activo" : "Tarjeta revocada"}
           </span>
         </div>
       </div>

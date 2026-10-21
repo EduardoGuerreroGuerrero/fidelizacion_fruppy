@@ -1,4 +1,5 @@
-import { brandVars } from "@/lib/brand";
+import { DEFAULT_BRAND_COLOR, brandVars } from "@/lib/brand";
+import { isFruppy } from "./_components/brand";
 import { TabBar } from "./_components/tab-bar";
 import { getCardAppData } from "./_components/data";
 
@@ -18,7 +19,7 @@ export default async function CardAppLayout({
   return (
     <div
       className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white"
-      style={brandVars(card?.brand_color)}
+      style={brandVars(card?.brand_color ?? (card && !isFruppy(card) ? DEFAULT_BRAND_COLOR : undefined))}
     >
       <main className="flex-1 pb-24">{children}</main>
       <TabBar base={base} />

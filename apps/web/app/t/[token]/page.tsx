@@ -60,6 +60,7 @@ export default async function CardHome({
       <div className="mt-5">
         <LoyaltyCard
           brand={card}
+          active={!revoked}
           firstName={card.first_name}
           current={current}
           goal={isStamps ? goal : null}

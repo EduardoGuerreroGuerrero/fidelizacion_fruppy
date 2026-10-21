@@ -14,6 +14,7 @@ export function LoyaltyCard({
   cardHref,
   qrHref,
   qrLabel,
+  active = true,
 }: {
   brand: BrandInfo;
   firstName: string;
@@ -23,6 +24,7 @@ export function LoyaltyCard({
   cardHref?: string;
   qrHref: string;
   qrLabel?: string;
+  active?: boolean;
 }) {
   return (
     <div className="relative mx-5 overflow-hidden rounded-[28px] bg-brand shadow-md shadow-brand/20">
@@ -48,7 +50,7 @@ export function LoyaltyCard({
         </div>
         <p className="mt-5 text-lg font-semibold">{firstName}</p>
         <span className="mt-1 inline-block rounded-full bg-white/90 px-3 py-0.5 text-[11px] font-semibold text-brand-dark">
-          Cliente activo
+          {active ? "Cliente activo" : "Tarjeta revocada"}
         </span>
         <p className="mt-5 text-4xl font-bold tabular-nums">
           {current}

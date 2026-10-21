@@ -1,5 +1,9 @@
 import type { CSSProperties } from "react";
 
+// Color de tarjeta cuando el comercio no eligió uno: verde PineappleLoyalty,
+// contraste con texto blanco ≥ 9:1 (WCAG AA exige 4.5:1).
+export const DEFAULT_BRAND_COLOR = "#0f5132";
+
 const HEX = /^#[0-9a-fA-F]{6}$/;
 
 function mix(hex: string, to: number, t: number): string {

@@ -6,6 +6,7 @@ import { STAMP_ICON_OPTIONS } from "@/app/t/[token]/_components/stamp-icons";
 import { ColorPicker } from "./color-picker";
 import { RememberForm } from "@/app/_components/remember-form";
 import { SubmitButton } from "@/app/_components/submit-button";
+import { DEFAULT_BRAND_COLOR } from "@/lib/brand";
 
 export const instant = false;
 
@@ -59,10 +60,22 @@ export default async function SettingsPage({
     logo_url?: string;
     stamp_icon?: string;
   };
-  const brandColor = brand.color ?? "#16a34a";
+  const brandColor = brand.color ?? DEFAULT_BRAND_COLOR;
   const brandContrast = /^#[0-9a-fA-F]{6}$/.test(brandColor)
     ? contrastWithWhite(brandColor)
     : 21;
+  // Vista previa con la meta del programa activo (no un "8 / 9" inventado).
+  const { data: activeProgram } = await supabase
+    .from("loyalty_programs")
+    .select("program_type, stamp_goal")
+    .eq("organization_id", org.id)
+    .eq("status", "active")
+    .order("created_at")
+    .limit(1)
+    .maybeSingle();
+  const previewGoal = activeProgram?.stamp_goal ?? 10;
+  const previewIsStamps = !activeProgram || activeProgram.program_type === "stamps";
+  const previewCurrent = Math.max(1, Math.round(previewGoal * 0.6));
   const stampIcon = brand.stamp_icon ?? "strawberry";
   const legal = (org.legal ?? {}) as {
     privacy_email?: string;
@@ -208,11 +221,13 @@ export default async function SettingsPage({
               />
             )}
             <p className="text-xs uppercase tracking-wide opacity-80">{org.name}</p>
-            <p className="mt-4 text-2xl font-semibold">8 / 9</p>
-            <p className="text-sm opacity-80">sellos</p>
+            <p className="mt-4 text-2xl font-semibold">
+              {previewIsStamps ? `${previewCurrent} / ${previewGoal}` : "1.250"}
+            </p>
+            <p className="text-sm opacity-80">{previewIsStamps ? "sellos" : "puntos"}</p>
           </div>
           <p className="mt-2 text-xs text-ink-soft">
-            Así ven la tarjeta tus clientes.
+            Así ven la tarjeta tus clientes (los números son un ejemplo).
           </p>
           {brandContrast < 4.5 && (
             <p

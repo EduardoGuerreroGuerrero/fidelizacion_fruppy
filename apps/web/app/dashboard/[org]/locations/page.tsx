@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { saveLocation, setLocationStatus } from "@/lib/admin/actions";
 import { RememberForm } from "@/app/_components/remember-form";
 import { SubmitButton } from "@/app/_components/submit-button";
+import { statusLabel } from "@/lib/labels";
 
 export const instant = false;
 
@@ -97,7 +98,7 @@ export default async function LocationsPage({
                   {l.name}
                   {l.status !== "active" && (
                     <span className="ml-2 rounded bg-neutral-100 px-2 py-0.5 text-xs text-ink-soft">
-                      {l.status}
+                      {statusLabel(l.status)}
                     </span>
                   )}
                 </p>

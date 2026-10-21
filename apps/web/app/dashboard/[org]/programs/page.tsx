@@ -6,6 +6,7 @@ import { PageHead } from "../_fruppy/ui";
 import { FRUPPY_SLUG } from "../_fruppy/config";
 import { RememberForm } from "@/app/_components/remember-form";
 import { SubmitButton } from "@/app/_components/submit-button";
+import { programTypeLabel, statusLabel } from "@/lib/labels";
 
 export const instant = false;
 
@@ -156,11 +157,11 @@ export default async function ProgramsPage({
                 <p className="font-medium">
                   {p.name}
                   <span className="ml-2 rounded bg-neutral-100 px-2 py-0.5 text-xs dark:bg-neutral-800">
-                    {p.program_type}
+                    {programTypeLabel(p.program_type)}
                   </span>
                   {p.status !== "active" && (
                     <span className="ml-2 rounded bg-neutral-100 px-2 py-0.5 text-xs text-ink-soft">
-                      {p.status}
+                      {statusLabel(p.status)}
                     </span>
                   )}
                 </p>

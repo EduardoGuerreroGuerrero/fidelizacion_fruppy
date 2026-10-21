@@ -23,6 +23,8 @@ ROOT = Path(__file__).resolve().parent.parent
 STUB_AUTH = """
 create schema if not exists auth;
 create table if not exists auth.users(id uuid primary key);
+alter table auth.users add column if not exists email text;
+alter table auth.users add column if not exists raw_user_meta_data jsonb default '{}'::jsonb;
 do $$ begin
   if not exists (select 1 from pg_roles where rolname='anon') then
     create role anon nologin;

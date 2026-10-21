@@ -41,6 +41,7 @@ export default async function MiTarjeta({
       <div className="mt-2">
         <LoyaltyCard
           brand={card}
+          active={card.card_status === "active"}
           firstName={card.first_name}
           current={current}
           goal={isStamps ? goal : null}

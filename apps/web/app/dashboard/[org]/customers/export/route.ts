@@ -80,7 +80,8 @@ export async function GET(_req: Request, ctx: { params: Promise<{ org: string }>
     // auditoría best-effort — no bloquea la descarga
   }
 
-  return new NextResponse(csv, {
+  // BOM UTF-8: sin él Excel abre el CSV en ANSI y rompe tildes y ñ.
+  return new NextResponse("\uFEFF" + csv, {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
       "Content-Disposition": `attachment; filename="customers-${slug}.csv"`,
