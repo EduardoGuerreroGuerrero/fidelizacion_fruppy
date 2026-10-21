@@ -2,99 +2,108 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-// Píldoras de navegación del org — resalta la sección activa en teal.
-// `secondary` son opciones de baja frecuencia (analítica, config, auditoría):
-// se ocultan tras el botón "Más" del menú principal y solo se despliegan
-// al hacer clic (o cuando la página actual es una de ellas).
+type Item = readonly [path: string, label: string];
+export type NavGroup = { label: string; items: readonly Item[] };
+
+// Píldoras de navegación del org — resalta la sección activa.
+// `items` son las tareas frecuentes (enlaces directos). `groups` agrupa el
+// resto por tema en menús desplegables; un grupo con un solo ítem se muestra
+// como enlace directo. El panel se cierra con clic fuera, Esc o al navegar.
 export function OrgNav({
   base,
   items,
-  secondary = [],
+  groups = [],
 }: {
   base: string;
-  items: readonly (readonly [string, string])[];
-  secondary?: readonly (readonly [string, string])[];
+  items: readonly Item[];
+  groups?: readonly NavGroup[];
 }) {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
+  const [openLabel, setOpenLabel] = useState<string | null>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
   const hrefFor = (path: string) => `${base}${path ? `/${path}` : ""}`;
-  const isOn = (path: string, href: string) =>
-    path === "" ? pathname === base : pathname.startsWith(href);
-  const secondaryActive = secondary.some(([path]) =>
-    isOn(path, hrefFor(path)),
+  const isOn = (path: string) =>
+    path === "" ? pathname === base : pathname.startsWith(hrefFor(path));
+
+  useEffect(() => {
+    if (!openLabel) return;
+    const onDown = (e: PointerEvent) => {
+      if (!wrapRef.current?.contains(e.target as Node)) setOpenLabel(null);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpenLabel(null);
+    };
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [openLabel]);
+
+  const pill = (on: boolean) =>
+    `rounded-full px-4 py-1.5 text-sm font-medium transition ${
+      on
+        ? "bg-brand-dark text-white shadow-sm"
+        : "text-ink-soft hover:bg-neutral-100 hover:text-ink"
+    }`;
+
+  const link = ([path, label]: Item, onClick?: () => void) => (
+    <Link
+      key={path}
+      href={hrefFor(path)}
+      onClick={onClick}
+      aria-current={isOn(path) ? "page" : undefined}
+      className={pill(isOn(path))}
+    >
+      {label}
+    </Link>
   );
-  const showSecondary = open || secondaryActive;
+
+  const openGroup = groups.find((g) => g.label === openLabel);
 
   return (
-    <div className="relative mb-6">
-      <nav className="flex items-center gap-1.5 overflow-x-auto rounded-2xl bg-white p-1.5 shadow-sm ring-1 ring-neutral-100 [scrollbar-width:none] sm:flex-wrap [&>*]:shrink-0">
-        {items.map(([path, label]) => {
-          const href = hrefFor(path);
-          const on = isOn(path, href);
+    <div ref={wrapRef} className="relative mb-6">
+      <nav className="flex flex-wrap items-center gap-1.5 rounded-2xl bg-white p-1.5 shadow-sm ring-1 ring-neutral-100">
+        {items.map((it) => link(it, () => setOpenLabel(null)))}
+        {groups.map((g) => {
+          if (g.items.length === 1) return link(g.items[0], () => setOpenLabel(null));
+          const active = g.items.some(([p]) => isOn(p));
+          const open = openLabel === g.label;
           return (
-            <Link
-              key={path}
-              href={href}
-              aria-current={on ? "page" : undefined}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
-                on
-                  ? "bg-brand-dark text-white shadow-sm"
+            <button
+              key={g.label}
+              type="button"
+              onClick={() => setOpenLabel(open ? null : g.label)}
+              aria-expanded={open}
+              aria-haspopup="true"
+              className={`flex items-center gap-1 rounded-full px-4 py-1.5 text-sm font-medium transition ${
+                active
+                  ? "bg-brand-soft font-semibold text-brand-dark"
                   : "text-ink-soft hover:bg-neutral-100 hover:text-ink"
               }`}
             >
-              {label}
-            </Link>
+              {g.label}
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`size-3.5 transition-transform ${open ? "rotate-180" : ""}`}
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
           );
         })}
-        {secondary.length > 0 && (
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            aria-expanded={showSecondary}
-            className={`flex items-center gap-1 rounded-full px-4 py-1.5 text-sm font-medium transition ${
-              secondaryActive
-                ? "bg-brand-soft font-semibold text-brand-dark"
-                : "text-ink-soft hover:bg-neutral-100 hover:text-ink"
-            }`}
-          >
-            Más
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className={`size-3.5 transition-transform ${showSecondary ? "rotate-180" : ""}`}
-            >
-              <path d="m6 9 6 6 6-6" />
-            </svg>
-          </button>
-        )}
       </nav>
-      {secondary.length > 0 && showSecondary && (
+      {openGroup && (
         <div className="absolute inset-x-0 top-full z-20 mt-1.5 flex flex-wrap gap-1.5 rounded-2xl bg-white p-1.5 shadow-md ring-1 ring-neutral-100">
-          {secondary.map(([path, label]) => {
-            const href = hrefFor(path);
-            const on = isOn(path, href);
-            return (
-              <Link
-                key={path}
-                href={href}
-                onClick={() => setOpen(false)}
-                aria-current={on ? "page" : undefined}
-                className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
-                  on
-                    ? "bg-brand-dark text-white shadow-sm"
-                    : "text-ink-soft hover:bg-neutral-100 hover:text-ink"
-                }`}
-              >
-                {label}
-              </Link>
-            );
-          })}
+          {openGroup.items.map((it) => link(it, () => setOpenLabel(null)))}
         </div>
       )}
     </div>

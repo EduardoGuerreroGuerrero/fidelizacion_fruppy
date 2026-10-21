@@ -9,30 +9,44 @@ export const instant = false;
 
 // Navegación por rol. La autorización real va server-side en cada página y
 // en las policies/RPCs — ocultar opciones aquí es solo UX (defensa ya existe).
-// Menú principal: máx. 4 tareas frecuentes. El resto va a la línea "Más".
+// Menú principal: tareas frecuentes como enlaces directos; el resto agrupado
+// por tema en menús desplegables (Programa / Marketing / Administración).
 const NAV_BASE = [
   ["", "Inicio"],
   ["scan", "Registrar visita"],
   ["customers", "Clientes"],
 ] as const;
 
-const NAV_ADMIN_PRIMARY = [["programs", "Programa"]] as const;
+type Entry = readonly [path: string, label: string];
+type Gated = { item: Entry; min: "all" | "manager" | "admin" };
 
-const NAV_SECONDARY_BASE = [["analytics", "Analítica"]] as const;
-
-const NAV_SECONDARY_MANAGER = [
-  ["campaigns", "Campañas"],
-  ["join", "QR registro"],
-  ["rights", "Derechos"],
-  ["team", "Equipo"],
-] as const;
-
-const NAV_SECONDARY_ADMIN = [
-  ["rewards", "Recompensas"],
-  ["locations", "Sedes"],
-  ["audit", "Auditoría"],
-  ["settings", "Config"],
-] as const;
+const NAV_GROUPS: readonly { label: string; items: readonly Gated[] }[] = [
+  {
+    label: "Programa",
+    items: [
+      { item: ["programs", "Programa"], min: "admin" },
+      { item: ["rewards", "Recompensas"], min: "admin" },
+      { item: ["rights", "Derechos"], min: "manager" },
+    ],
+  },
+  {
+    label: "Marketing",
+    items: [
+      { item: ["analytics", "Analítica"], min: "all" },
+      { item: ["campaigns", "Campañas"], min: "manager" },
+      { item: ["join", "QR registro"], min: "manager" },
+    ],
+  },
+  {
+    label: "Administración",
+    items: [
+      { item: ["team", "Equipo"], min: "manager" },
+      { item: ["locations", "Sedes"], min: "admin" },
+      { item: ["audit", "Auditoría"], min: "admin" },
+      { item: ["settings", "Config"], min: "admin" },
+    ],
+  },
+];
 
 
 export default async function OrgLayout({
@@ -80,12 +94,12 @@ export default async function OrgLayout({
   const isManager = role === "manager" || role === "admin" || role === "owner";
   const isAdmin = role === "admin" || role === "owner";
 
-  const nav = [...NAV_BASE, ...(isAdmin ? NAV_ADMIN_PRIMARY : [])];
-  const secondary = [
-    ...NAV_SECONDARY_BASE,
-    ...(isManager ? NAV_SECONDARY_MANAGER : []),
-    ...(isAdmin ? NAV_SECONDARY_ADMIN : []),
-  ];
+  const allowed = (min: Gated["min"]) =>
+    min === "all" || (min === "manager" ? isManager : isAdmin);
+  const groups = NAV_GROUPS.map((g) => ({
+    label: g.label,
+    items: g.items.filter((i) => allowed(i.min)).map((i) => i.item),
+  })).filter((g) => g.items.length > 0);
 
   return (
     // Las vars --color-brand se fijan a la paleta PineappleLoyalty en el panel
@@ -117,7 +131,7 @@ export default async function OrgLayout({
           </button>
         </form>
       </div>
-      <OrgNav base={`/dashboard/${org}`} items={nav} secondary={secondary} />
+      <OrgNav base={`/dashboard/${org}`} items={NAV_BASE} groups={groups} />
       {children}
     </div>
   );

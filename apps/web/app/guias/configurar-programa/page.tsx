@@ -27,7 +27,7 @@ const STEPS: {
       <>
         Inicia sesión en PineappleLoyalty y abre tu negocio desde{" "}
         <strong>Mis organizaciones</strong>. Verás el menú con Inicio, Registrar visita, Clientes,
-        Programa y Más.
+        Programa, Marketing y Administración.
       </>
     ),
     img: "/recursos/guias/paso-inicio.webp",
@@ -63,7 +63,7 @@ const STEPS: {
     title: "Define la recompensa",
     body: (
       <>
-        Ve a <strong>Más → Recompensas</strong> y pulsa <strong>Nueva recompensa</strong>: escribe
+        Ve a <strong>Programa → Recompensas</strong> y pulsa <strong>Nueva recompensa</strong>: escribe
         qué gana el cliente (ej. «Producto gratis»), elige el programa y pon el costo en sellos o
         puntos — normalmente igual a la meta del programa. Guarda con{" "}
         <strong>Crear recompensa</strong>.
@@ -76,7 +76,7 @@ const STEPS: {
     title: "Obtén tu código QR",
     body: (
       <>
-        En <strong>Más → QR registro</strong> tienes el código de tu negocio. Imprímelo y ponlo
+        En <strong>Marketing → QR registro</strong> tienes el código de tu negocio. Imprímelo y ponlo
         donde tus clientes lo vean: caja, vitrina o mesas. Al escanearlo, cada cliente se registra
         solo y recibe su tarjeta digital por correo. Si el QR se filtra, puedes{" "}
         <strong>rotarlo</strong> desde la misma página — los clientes ya registrados conservan su

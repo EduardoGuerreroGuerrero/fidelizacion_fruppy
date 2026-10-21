@@ -25,7 +25,7 @@ const STEPS: {
     title: "Abre Campañas",
     body: (
       <>
-        En el menú <strong>Más → Campañas</strong> verás el formulario{" "}
+        En el menú <strong>Marketing → Campañas</strong> verás el formulario{" "}
         <strong>Nueva campaña</strong> y la lista de campañas anteriores. Arriba del formulario
         hay un dato clave: la <strong>audiencia elegible</strong> — cuántos clientes tienen las
         notificaciones activadas y pueden recibir tu mensaje.
