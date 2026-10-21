@@ -15,9 +15,13 @@ function extractToken(decoded: string): string {
 export function ScanForm({
   action,
   initialToken,
+  hasStamps,
+  hasPoints,
 }: {
   action: (formData: FormData) => void | Promise<void>;
   initialToken: string;
+  hasStamps: boolean;
+  hasPoints: boolean;
 }) {
   const [token, setToken] = useState(initialToken);
   // Clave de idempotencia por render: reintentos/doble-clic no duplican visitas.
@@ -117,20 +121,48 @@ export function ScanForm({
           className="w-full rounded-xl bg-neutral-100 px-4 py-3 font-mono text-sm outline-none focus:ring-2 focus:ring-brand/50"
         />
       </div>
-      <div>
-        <label htmlFor="stamps" className="mb-1 block text-sm font-medium text-ink">
-          Sellos a otorgar
-        </label>
-        <input
-          id="stamps"
-          name="stamps"
-          type="number"
-          min={0}
-          max={20}
-          defaultValue={1}
-          className="w-24 rounded-xl bg-neutral-100 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-brand/50"
-        />
-      </div>
+      {hasStamps && (
+        <div>
+          <label htmlFor="stamps" className="mb-1 block text-sm font-medium text-ink">
+            Sellos a otorgar
+          </label>
+          <input
+            id="stamps"
+            name="stamps"
+            type="number"
+            min={0}
+            max={20}
+            defaultValue={1}
+            className="w-24 rounded-xl bg-neutral-100 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-brand/50"
+          />
+          {hasPoints && (
+            <p className="mt-1 text-xs text-ink-soft">
+              Se usa si la tarjeta es de un programa por sellos.
+            </p>
+          )}
+        </div>
+      )}
+      {hasPoints && (
+        <div>
+          <label htmlFor="amount" className="mb-1 block text-sm font-medium text-ink">
+            Monto de la compra
+          </label>
+          <input
+            id="amount"
+            name="amount"
+            type="number"
+            inputMode="decimal"
+            min={0}
+            step="any"
+            placeholder="Ej. 15000"
+            className="w-40 rounded-xl bg-neutral-100 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-brand/50"
+          />
+          <p className="mt-1 text-xs text-ink-soft">
+            Se convierte en puntos según la regla del programa
+            {hasStamps ? " (si la tarjeta es de un programa por puntos)" : ""}.
+          </p>
+        </div>
+      )}
       <button
         type="submit"
         className="w-full rounded-full bg-brand-dark px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"

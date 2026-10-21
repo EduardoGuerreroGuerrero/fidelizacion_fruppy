@@ -176,12 +176,31 @@ begin
     'select public.scan_card(''token-inexistente-e2e'', 1, null, ''e2e-bad'')',
     'card_not_found', 'T11 token inválido → card_not_found');
 
+  -- --- T11c scan_card en programa de PUNTOS (sub-bloque con rollback para
+  --     no alterar los saldos que afirman los tests siguientes) ---
+  begin
+    r := public.scan_card(v_token_p, 1, null, 'e2e-scan-pts', 25.5);
+    perform pg_temp.t_ok(
+      r->>'program_type' = 'points' and (r->>'points_earned')::int = 25
+        and (r->>'current_points')::int = 145,
+      'T11c scan puntos: floor(25.5 x 1) = 25 pts, saldo 120 -> 145');
+    select amount_minor into nb from public.loyalty_transactions
+     where organization_id = ORG_A and idempotency_key = 'e2e-scan-pts';
+    perform pg_temp.t_ok(nb = 2550, 'T11d monto guardado en unidades menores');
+    perform pg_temp.t_err(
+      format('select public.scan_card(%L, 1, null, %L)', v_token_p, 'e2e-scan-pts2'),
+      'amount_required', 'T11e programa por puntos exige monto');
+    raise exception 'E2E_ROLLBACK';
+  exception when others then
+    if sqlerrm <> 'E2E_ROLLBACK' then raise; end if;
+  end;
+
   -- --- T12 rate limit (60 escaneos/min por empleado) ---
   insert into public.customer_visits (organization_id, customer_id, performed_by, source)
   select ORG_A, CUST_S, U_STAFF, 'manual' from generate_series(1, 60);
   perform set_config('app.user_id', U_STAFF::text, false);
   perform pg_temp.t_err(
-    format('select public.scan_card(%L, 1, null, %L)', v_token_p, 'e2e-scan-rl'),
+    format('select public.scan_card(%L, 1, null, %L, 10)', v_token_p, 'e2e-scan-rl'),
     'rate_limited', 'T12 rate limit bloquea el escaneo 61');
   select current_points into nb from public.loyalty_accounts where id = v_acc_p;
   perform pg_temp.t_ok(nb = 120, 'T12b el rechazo por rate limit no mutó saldo');
@@ -231,7 +250,7 @@ begin
 
   -- --- T16 permisos de ejecución ---
   perform pg_temp.t_ok(
-    not has_function_privilege('anon', 'public.scan_card(text,int,uuid,text)', 'execute')
+    not has_function_privilege('anon', 'public.scan_card(text,int,uuid,text,numeric)', 'execute')
     and not has_function_privilege('anon', 'public.earn(uuid,bigint,int,bigint,uuid,text,text)', 'execute')
     and not has_function_privilege('anon', 'public.redeem_reward(uuid,uuid,uuid,text)', 'execute'),
     'T16a anon no ejecuta RPCs del motor');
