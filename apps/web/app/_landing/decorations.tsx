@@ -61,7 +61,7 @@ export function UnderlineSwoosh({ className = "" }: { className?: string }) {
       viewBox="0 0 220 14"
       fill="none"
       aria-hidden
-      className={`absolute -bottom-2 left-0 w-full ${className}`}
+      className={`absolute -bottom-3.5 left-0 w-full ${className}`}
       preserveAspectRatio="none"
     >
       <path
