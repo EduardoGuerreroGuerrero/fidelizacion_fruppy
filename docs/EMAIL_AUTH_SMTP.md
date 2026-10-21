@@ -1,5 +1,9 @@
 # Correo de autenticación (Supabase Auth) — SMTP propio y plantillas
 
+> **Estado (21/10/2026): no se aplica.** El dueño mantiene el remitente actual
+> `notificaciones@pineappleloyalty.com`, ya configurado y desplegado. Este documento
+> queda solo como referencia si el correo de confirmación vuelve a caer en spam.
+
 > Resuelve **QA-A12**: el correo de confirmación de cuenta llegaba a "Correo no
 > deseado". Es una configuración del **panel de Supabase** (no vive en el repo):
 > requiere que el dueño del proyecto la aplique.
