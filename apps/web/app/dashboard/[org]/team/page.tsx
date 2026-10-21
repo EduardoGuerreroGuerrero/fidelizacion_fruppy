@@ -60,7 +60,7 @@ export default async function TeamPage({
 
       <section className="mb-8 rounded-lg border border-neutral-200 p-5 dark:border-neutral-800">
         <h2 className="mb-1 font-medium">Invitar por email</h2>
-        <p className="mb-3 text-xs text-neutral-500">
+        <p className="mb-3 text-xs text-ink-soft">
           La invitación se activa automáticamente cuando esa persona inicia sesión con el email
           indicado.
         </p>
@@ -79,7 +79,7 @@ export default async function TeamPage({
           </select>
           <button
             type="submit"
-            className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
+            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
           >
             Invitar
           </button>
@@ -94,8 +94,8 @@ export default async function TeamPage({
             className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-neutral-200 px-4 py-3 text-sm dark:border-neutral-800"
           >
             <div>
-              <p className="font-mono text-xs text-neutral-500">{m.user_id}</p>
-              <p className="text-xs text-neutral-400">
+              <p className="font-mono text-xs text-ink-soft">{m.user_id}</p>
+              <p className="text-xs text-ink-soft">
                 {m.user_id === user.id ? "(tú) · " : ""}
                 desde {new Date(m.created_at).toLocaleDateString("es-CO")}
               </p>
@@ -127,7 +127,7 @@ export default async function TeamPage({
                 className={`rounded px-2 py-1 text-xs ${
                   m.status === "active"
                     ? "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300"
-                    : "bg-neutral-100 text-neutral-500 dark:bg-neutral-800"
+                    : "bg-neutral-100 text-ink-soft dark:bg-neutral-800"
                 }`}
               >
                 {m.status}
@@ -163,7 +163,7 @@ export default async function TeamPage({
           >
             <div>
               <p className="font-medium">{i.email}</p>
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs text-ink-soft">
                 {i.role} · {i.status}
               </p>
             </div>
@@ -180,7 +180,7 @@ export default async function TeamPage({
           </li>
         ))}
         {(invites ?? []).length === 0 && (
-          <li className="text-sm text-neutral-500">Sin invitaciones.</li>
+          <li className="text-sm text-ink-soft">Sin invitaciones.</li>
         )}
       </ul>
     </div>

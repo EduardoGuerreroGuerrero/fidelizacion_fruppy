@@ -115,7 +115,7 @@ export function FruppyPrograms({
             </IconTile>
             <div>
               <p className="text-xl font-bold tabular-nums text-navy">{k.value}</p>
-              <p className="text-[11px] font-medium text-ink-soft">{k.label}</p>
+              <p className="text-xs font-medium text-ink-soft">{k.label}</p>
             </div>
           </Card>
         ))}
@@ -125,10 +125,10 @@ export function FruppyPrograms({
         <div>
           {/* ===== Crear nuevo programa ===== */}
           <Card className="p-5">
-            <h3 className="flex items-center gap-2 font-bold text-navy">
-              <IconPlusCircle className="size-5 text-brand" />
+            <h2 className="flex items-center gap-2 font-bold text-navy">
+              <IconPlusCircle className="size-5 text-brand-dark" />
               Crear nuevo programa
-            </h3>
+            </h2>
             <p className="mt-1 text-xs text-ink-soft">
               Define cómo tus clientes acumulan beneficios en cada visita.
             </p>
@@ -175,7 +175,7 @@ export function FruppyPrograms({
                     />
                     <span>
                       <span className="flex items-center gap-1.5 text-sm font-semibold text-navy">
-                        <IconCoins className="size-4 text-[#d98a2b]" /> Puntos
+                        <IconCoins className="size-4 text-[#8f5a1c]" /> Puntos
                       </span>
                       <span className="mt-0.5 block text-xs text-ink-soft">
                         Puntos por cada unidad de moneda gastada.
@@ -216,7 +216,7 @@ export function FruppyPrograms({
 
               <button
                 type="submit"
-                className="rounded-full bg-gradient-to-r from-brand to-brand-dark px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-105 sm:col-span-2"
+                className="rounded-full bg-brand-dark px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper sm:col-span-2"
               >
                 Crear programa
               </button>
@@ -224,7 +224,7 @@ export function FruppyPrograms({
           </Card>
 
           {/* ===== Lista de programas ===== */}
-          <h3 className="mb-3 mt-6 font-bold text-navy">Tus programas</h3>
+          <h2 className="mb-3 mt-6 font-bold text-navy">Tus programas</h2>
           <ul className="space-y-3">
             {programs.map((p) => (
               <li key={p.id} className="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-black/[0.04]">
@@ -276,7 +276,7 @@ export function FruppyPrograms({
 
                 {/* Edición inline: se despliega sin JS. */}
                 <details className="group mt-3 border-t border-neutral-100 pt-3">
-                  <summary className="flex cursor-pointer list-none items-center gap-1.5 text-xs font-semibold text-brand [&::-webkit-details-marker]:hidden">
+                  <summary className="flex cursor-pointer list-none items-center gap-1.5 text-xs font-semibold text-brand-dark [&::-webkit-details-marker]:hidden">
                     <IconPencil className="size-3.5" />
                     Editar programa
                   </summary>
@@ -317,7 +317,7 @@ export function FruppyPrograms({
                     )}
                     <button
                       type="submit"
-                      className="rounded-full bg-brand px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-dark"
+                      className="rounded-full bg-brand-dark px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-deeper"
                     >
                       Guardar
                     </button>
@@ -336,10 +336,10 @@ export function FruppyPrograms({
         {/* ===== Columna lateral ===== */}
         <div className="space-y-4 lg:sticky lg:top-28">
           <Card className="p-5">
-            <h3 className="flex items-center gap-2 font-bold text-navy">
-              <IconGrid className="size-5 text-[#7c5cd6]" />
+            <h2 className="flex items-center gap-2 font-bold text-navy">
+              <IconGrid className="size-5 text-[#6545c4]" />
               Tipos de programa
-            </h3>
+            </h2>
             <ul className="mt-3 space-y-3">
               {types.map((t) => (
                 <li key={t.name} className="flex items-start gap-3">
@@ -359,10 +359,10 @@ export function FruppyPrograms({
           </Card>
 
           <Card className="p-5">
-            <h3 className="flex items-center gap-2 font-bold text-navy">
-              <IconTarget className="size-5 text-brand" />
+            <h2 className="flex items-center gap-2 font-bold text-navy">
+              <IconTarget className="size-5 text-brand-dark" />
               Resumen
-            </h3>
+            </h2>
             <dl className="mt-3 space-y-2.5 text-sm">
               <div className="flex items-center justify-between">
                 <dt className="text-ink-soft">Programas de sellos</dt>
@@ -384,10 +384,10 @@ export function FruppyPrograms({
           </Card>
 
           <div className="rounded-3xl bg-pastel-pink/60 p-5">
-            <h3 className="flex items-center gap-2 font-bold text-navy">
+            <h2 className="flex items-center gap-2 font-bold text-navy">
               <IconBulb className="size-5 text-accent" />
               Consejos Fruppy
-            </h3>
+            </h2>
             <ul className="mt-3 space-y-2.5">
               {tips.map((t) => (
                 <li key={t} className="flex items-start gap-2 text-xs leading-relaxed text-navy/80">

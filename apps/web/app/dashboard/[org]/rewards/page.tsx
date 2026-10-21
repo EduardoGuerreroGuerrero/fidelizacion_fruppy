@@ -100,7 +100,7 @@ export default async function RewardsPage({
           />
           <button
             type="submit"
-            className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark sm:col-span-2"
+            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper sm:col-span-2"
           >
             Crear recompensa
           </button>
@@ -117,12 +117,12 @@ export default async function RewardsPage({
               <p className="font-medium">
                 {r.name}
                 {r.status !== "active" && (
-                  <span className="ml-2 rounded bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500">
+                  <span className="ml-2 rounded bg-neutral-100 px-2 py-0.5 text-xs text-ink-soft">
                     {r.status}
                   </span>
                 )}
               </p>
-              <p className="text-sm text-neutral-500">
+              <p className="text-sm text-ink-soft">
                 {programName.get(r.program_id) ?? "?"} ·{" "}
                 {r.cost_stamps ? `${r.cost_stamps} sellos` : `${r.cost_points} puntos`}
               </p>
@@ -155,7 +155,7 @@ export default async function RewardsPage({
           </li>
         ))}
         {(rewards ?? []).length === 0 && (
-          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-neutral-500 dark:border-neutral-700">
+          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-ink-soft dark:border-neutral-700">
             Sin recompensas todavía.
           </li>
         )}
@@ -174,17 +174,17 @@ export default async function RewardsPage({
               <span>
                 {rw?.name ?? "?"} — {displayName(`${cu?.first_name ?? ""} ${cu?.last_name ?? ""}`)}
               </span>
-              <span className="text-neutral-500">
+              <span className="text-ink-soft">
                 {new Date(r.created_at).toLocaleString("es-CO")} · {r.status}
               </span>
             </li>
           );
         })}
         {(redemptions ?? []).length === 0 && (
-          <li className="text-sm text-neutral-500">Sin canjes todavía.</li>
+          <li className="text-sm text-ink-soft">Sin canjes todavía.</li>
         )}
       </ul>
-      <p className="mt-4 text-xs text-neutral-400">{programType.size} programa(s) activo(s)</p>
+      <p className="mt-4 text-xs text-ink-soft">{programType.size} programa(s) activo(s)</p>
     </div>
   );
 }

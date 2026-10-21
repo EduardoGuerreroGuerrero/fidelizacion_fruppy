@@ -20,6 +20,16 @@ const TIMEZONES = [
   "Europe/Madrid",
 ];
 
+// Contraste WCAG del texto blanco de la tarjeta sobre el color de marca.
+function contrastWithWhite(hex: string): number {
+  const ch = [1, 3, 5].map((i) => {
+    const v = parseInt(hex.slice(i, i + 2), 16) / 255;
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  });
+  const lum = 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2];
+  return 1.05 / (lum + 0.05);
+}
+
 export default async function SettingsPage({
   params,
   searchParams,
@@ -48,6 +58,9 @@ export default async function SettingsPage({
     stamp_icon?: string;
   };
   const brandColor = brand.color ?? "#16a34a";
+  const brandContrast = /^#[0-9a-fA-F]{6}$/.test(brandColor)
+    ? contrastWithWhite(brandColor)
+    : 21;
   const stampIcon = brand.stamp_icon ?? "strawberry";
   const legal = (org.legal ?? {}) as {
     privacy_email?: string;
@@ -125,7 +138,7 @@ export default async function SettingsPage({
                   alt="Logo actual"
                   className="h-10 w-auto rounded border border-neutral-200 bg-white object-contain p-1 dark:border-neutral-700"
                 />
-                <label className="flex items-center gap-1.5 text-xs text-neutral-500">
+                <label className="flex items-center gap-1.5 text-xs text-ink-soft">
                   <input type="checkbox" name="remove_logo" className="accent-brand" />
                   Quitar logo actual
                 </label>
@@ -138,7 +151,7 @@ export default async function SettingsPage({
               accept="image/png"
               className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm text-neutral-600 file:mr-3 file:rounded-full file:border-0 file:bg-neutral-100 file:px-3 file:py-1 file:text-xs file:font-semibold dark:border-neutral-700 dark:bg-transparent dark:text-neutral-400"
             />
-            <p className="mt-1 text-xs text-neutral-400">
+            <p className="mt-1 text-xs text-ink-soft">
               Máx. 256 KB. Este mismo logo se usa en el panel, el formulario
               de registro por QR, la tarjeta del cliente y el pase de Google
               Wallet.
@@ -161,20 +174,20 @@ export default async function SettingsPage({
                     className="sr-only"
                   />
                   <Icon filled className="size-6" />
-                  <span className="text-[11px] leading-tight text-neutral-600 dark:text-neutral-400">
+                  <span className="text-xs leading-tight text-neutral-600 dark:text-neutral-400">
                     {l}
                   </span>
                 </label>
               ))}
             </div>
-            <p className="mt-1 text-xs text-neutral-400">
+            <p className="mt-1 text-xs text-ink-soft">
               {STAMP_ICON_OPTIONS.find((o) => o.key === stampIcon)?.hint}
             </p>
           </div>
 
           <button
             type="submit"
-            className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
+            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
           >
             Guardar configuración
           </button>
@@ -198,9 +211,19 @@ export default async function SettingsPage({
             <p className="mt-4 text-2xl font-semibold">8 / 9</p>
             <p className="text-sm opacity-80">sellos</p>
           </div>
-          <p className="mt-2 text-xs text-neutral-400">
-            Así se ve la tarjeta web del cliente en /t/…
+          <p className="mt-2 text-xs text-ink-soft">
+            Así ven la tarjeta tus clientes.
           </p>
+          {brandContrast < 4.5 && (
+            <p
+              role="status"
+              className="mt-2 rounded-xl bg-pastel-cream px-3 py-2 text-xs text-[#8f5a1c]"
+            >
+              Con este color el texto blanco de la tarjeta se lee con dificultad
+              (contraste {brandContrast.toFixed(1)}:1; lo recomendado es 4.5:1).
+              Prueba un tono más oscuro.
+            </p>
+          )}
         </div>
       </div>
 
@@ -256,7 +279,7 @@ export default async function SettingsPage({
           <label htmlFor="policy_text" className={label}>
             Política de tratamiento de datos
           </label>
-          <p className="mb-2 text-xs text-neutral-500">
+          <p className="mb-2 max-w-prose text-xs text-ink-soft">
             Se precarga un texto base que reconoce a {org.name || "tu comercio"}{" "}
             como responsable del tratamiento y a PineappleLoyalty como
             encargado técnico (Ley 1581 de 2012). Puedes editarlo libremente
@@ -284,7 +307,7 @@ export default async function SettingsPage({
             />
             <span>
               Autorregistro por QR{" "}
-              <span className="text-xs text-neutral-500">
+              <span className="text-xs text-ink-soft">
                 (los clientes se dan de alta desde el QR del local)
               </span>
             </span>
@@ -298,7 +321,7 @@ export default async function SettingsPage({
             />
             <span>
               Notificaciones push{" "}
-              <span className="text-xs text-neutral-500">
+              <span className="text-xs text-ink-soft">
                 (el cliente las activa por separado en su tarjeta)
               </span>
             </span>
@@ -312,7 +335,7 @@ export default async function SettingsPage({
             />
             <span>
               Sedes cercanas{" "}
-              <span className="text-xs text-neutral-500">
+              <span className="text-xs text-ink-soft">
                 (ubicación opcional del cliente, nunca se guarda)
               </span>
             </span>
@@ -321,7 +344,7 @@ export default async function SettingsPage({
 
         <button
           type="submit"
-          className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
+          className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
         >
           Guardar privacidad y funciones
         </button>

@@ -34,15 +34,15 @@ export function Breadcrumb({
 }) {
   return (
     <nav className="flex items-center gap-1.5 text-sm" aria-label="Migas de pan">
-      <Link href={base} aria-label="Inicio" className="text-ink-soft transition hover:text-brand">
+      <Link href={base} aria-label="Inicio" className="text-ink-soft transition hover:text-brand-dark">
         <IconHome className="size-4" />
       </Link>
       <span className="text-neutral-300">/</span>
-      <Link href={base} className="font-medium text-ink-soft transition hover:text-brand">
+      <Link href={base} className="font-medium text-ink-soft transition hover:text-brand-dark">
         {orgName}
       </Link>
       <span className="text-neutral-300">/</span>
-      <span className="font-semibold text-brand">{current}</span>
+      <span className="font-semibold text-brand-dark">{current}</span>
     </nav>
   );
 }
@@ -124,14 +124,14 @@ export function Chip({
 }) {
   const tones = {
     green: "bg-chip-green text-chip-green-ink",
-    teal: "bg-brand text-white",
+    teal: "bg-brand-dark text-white",
     pink: "bg-pastel-pink text-accent",
-    lav: "bg-pastel-lav text-[#7c5cd6]",
+    lav: "bg-pastel-lav text-[#6545c4]",
     gray: "bg-neutral-100 text-ink-soft",
   } as const;
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${tones[tone]} ${className}`}
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${tones[tone]} ${className}`}
     >
       {children}
     </span>
@@ -173,9 +173,9 @@ export function IconTile({
     teal: "bg-brand-soft text-brand-dark",
     mint: "bg-pastel-mint text-brand-dark",
     pink: "bg-pastel-pink text-accent",
-    lav: "bg-pastel-lav text-[#7c5cd6]",
-    sky: "bg-pastel-sky text-[#3f8fd2]",
-    peach: "bg-pastel-cream text-[#d98a2b]",
+    lav: "bg-pastel-lav text-[#6545c4]",
+    sky: "bg-pastel-sky text-[#2a6fae]",
+    peach: "bg-pastel-cream text-[#8f5a1c]",
   } as const;
   return (
     <span
@@ -211,7 +211,7 @@ export function BottomBanner({
         {highlight ? (
           <p className="font-script text-2xl leading-tight text-accent">{highlight}</p>
         ) : null}
-        <p className="mt-1 text-sm text-navy/70">{text}</p>
+        <p className="mt-1 text-sm text-navy/85">{text}</p>
         <IconHeart className="mt-2 size-5 text-accent" />
       </div>
       {/* eslint-disable-next-line @next/next/no-img-element */}

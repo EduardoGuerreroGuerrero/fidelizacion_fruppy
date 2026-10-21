@@ -4,11 +4,11 @@ export const FRUPPY_SLUG = "fruppy-helados";
 
 // Paleta de avatares con iniciales (cicla por índice de cliente).
 export const AVATAR_STYLES = [
-  "bg-pastel-lav text-[#7c5cd6]",
+  "bg-pastel-lav text-[#6545c4]",
   "bg-pastel-pink text-accent",
   "bg-pastel-mint text-brand-dark",
-  "bg-pastel-sky text-[#3f8fd2]",
-  "bg-pastel-cream text-[#d98a2b]",
+  "bg-pastel-sky text-[#2a6fae]",
+  "bg-pastel-cream text-[#8f5a1c]",
 ] as const;
 
 export function initials(name: string): string {
@@ -36,7 +36,8 @@ export function timeAgo(iso: string): string {
 }
 
 export function pctDelta(current: number, previous: number): string {
-  if (previous <= 0) return current > 0 ? "+100%" : "0%";
+  // Sin período anterior no hay porcentaje real que mostrar.
+  if (previous <= 0) return current > 0 ? "Nuevo" : "0%";
   const d = Math.round(((current - previous) / previous) * 100);
   return `${d >= 0 ? "+" : ""}${d}%`;
 }
