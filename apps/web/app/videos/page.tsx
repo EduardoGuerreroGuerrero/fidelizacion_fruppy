@@ -21,13 +21,13 @@ const VIDEOS: {
     slug: "registro-qr",
     title: "Cómo se registran tus clientes con el QR",
     desc: "El cliente escanea el código, llena un formulario corto y recibe su tarjeta digital al instante — sin instalar nada.",
-    secs: 27,
+    secs: 26,
   },
   {
     slug: "programa",
     title: "Crea tu programa de fidelización en minutos",
     desc: "Elige sellos o puntos, define la recompensa y obtén tu código QR. Así de simple, sin conocimientos técnicos.",
-    secs: 46,
+    secs: 39,
   },
 ];
 
@@ -52,10 +52,10 @@ export default function VideosPage() {
                 controls
                 playsInline
                 preload="none"
-                poster={`${VIDEOS_BASE}/poster-${v.slug}.webp`}
+                poster={`${VIDEOS_BASE}/poster-${v.slug}.webp?v=2`}
                 className="absolute inset-0 h-full w-full object-cover"
               >
-                <source src={`${VIDEOS_BASE}/${v.slug}.mp4`} type="video/mp4" />
+                <source src={`${VIDEOS_BASE}/${v.slug}.mp4?v=2`} type="video/mp4" />
               </video>
               <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-pl-green px-2.5 py-1 text-[11px] font-bold tracking-wide text-white shadow-sm">
                 VIDEO
