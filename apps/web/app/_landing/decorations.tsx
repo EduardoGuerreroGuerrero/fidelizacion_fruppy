@@ -1,5 +1,6 @@
 // Elementos decorativos de marca de los mockups: hojas, círculos crema,
 // onda verde, subrayado amarillo y flecha manuscrita.
+// (Sin cambios visuales — commit de prueba para verificar el webhook de Vercel.)
 
 
 /** Hoja estilizada de piña (rellena, sin borde). */
