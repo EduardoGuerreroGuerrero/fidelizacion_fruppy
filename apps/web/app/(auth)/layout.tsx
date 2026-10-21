@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function AuthLayout({
   children,
@@ -19,6 +20,14 @@ export default function AuthLayout({
           className="mx-auto mb-6 w-96 max-w-full sm:w-[22rem]"
         />
         {children}
+        <p className="mt-6 text-center">
+          <Link
+            href="/"
+            className="text-sm font-semibold text-ink-soft transition-colors hover:text-pl-green"
+          >
+            ← Volver al inicio
+          </Link>
+        </p>
       </div>
     </main>
   );

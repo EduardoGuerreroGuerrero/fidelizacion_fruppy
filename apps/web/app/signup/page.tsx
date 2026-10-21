@@ -215,7 +215,7 @@ export default async function SignupPage({
                 type="text"
                 required
                 autoComplete="organization"
-                placeholder="Ej. Fruppy Helados"
+                placeholder="Ej. Tu Negocio"
                 className={inputCls}
               />
             </Field>
@@ -245,7 +245,7 @@ export default async function SignupPage({
                   type="text"
                   required
                   autoComplete="address-level2"
-                  placeholder="Ej. Barranquilla"
+                  placeholder="Ej. Tu ciudad"
                   className={inputCls}
                 />
               </Field>
@@ -311,6 +311,14 @@ export default async function SignupPage({
           <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-[11px] text-neutral-400">
             <IconCheckCircle className="h-3.5 w-3.5 text-pl-green-2" />
             Sin tarjeta de crédito · Cancela cuando quieras
+          </p>
+          <p className="mt-6 text-center">
+            <Link
+              href="/"
+              className="text-sm font-semibold text-ink-soft transition-colors hover:text-pl-green"
+            >
+              ← Volver al inicio
+            </Link>
           </p>
         </div>
       </section>
