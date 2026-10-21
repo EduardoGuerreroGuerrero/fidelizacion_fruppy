@@ -6,18 +6,12 @@ se pegan en *Supabase → SQL Editor*, en orden). Cada una ya pasó los tests de
 `supabase/tests/*.sql` sobre Postgres real (rama temporal de Neon + job `sql`
 de CI).
 
-## Estado de aplicación en producción (2026-10-21)
+## Estado de aplicación en producción (21/10/2026)
 
-Aplicado por MCP en `fidelizacion-fruppy`: 0017, 0018, 0020 y casi toda la 0019
-y la 0021 (constraint de correos, `status = closed`, permisos por columna,
-`resolve_join`, trigger del ledger, columna `response`).
-
-**Falta pegar a mano** `supabase/manual_pendiente_qa.sql` en el SQL Editor: 4
-funciones (`resolve_rights_request`, `register_customer_via_join`,
-`close_organization`, `delete_organization`). El MCP rechaza cualquier migración
-cuyo texto contenga `delete from`, incluso dentro de una función. Hasta
-pegarlas: la pantalla de derechos (resolver) y Configuración → Zona de peligro
-no funcionan. Fruppy ya tiene `privacy_email` configurado.
+**Todo aplicado** en `fidelizacion-fruppy`: migraciones 0017 a 0021 completas, incluidas las 4
+funciones con `delete from` (el MCP de Supabase las rechaza; se pegaron en el SQL Editor y ya
+están en `supabase/migrations/`). Fruppy ya tiene `privacy_email` configurado. PR #56 mergeado y
+desplegado en `pineappleloyalty.com`.
 
 ## 1. Aplicar migraciones (en orden)
 

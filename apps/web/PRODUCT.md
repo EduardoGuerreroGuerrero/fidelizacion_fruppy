@@ -45,8 +45,8 @@ capacidades reales, pero no son el argumento que lidera.
   push y campañas por segmento; reportes.
 - Planes publicados en la landing: Gratis ($0), Pro ($29.000 COP/mes),
   Business ($59.000 COP/mes).
-- Apple Wallet se habilita solo con credenciales válidas; la landing promete
-  Google Wallet.
+- Apple Wallet: fuera de alcance por ahora (decisión del dueño, 21/10/2026).
+  Solo Google Wallet; la landing no menciona Apple.
 - Fuera del MVP: campañas masivas por WhatsApp/SMS/email, integración POS, IA.
 
 ## Brand Commitments
