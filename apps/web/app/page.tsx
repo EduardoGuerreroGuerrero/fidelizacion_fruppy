@@ -739,11 +739,19 @@ function Pricing() {
 /* ------------------------------------------------------------------ */
 
 // Sin href = contenido aún no publicado: se muestra como "Próximamente".
-const RESOURCE_CARDS: { icon: Icon; title: string; desc: string; href?: string }[] = [
+const RESOURCE_CARDS: {
+  icon: Icon;
+  title: string;
+  desc: string;
+  href?: string;
+  cta?: string;
+}[] = [
   {
     icon: IconBook,
     title: "Guías paso a paso",
     desc: "Aprende a configurar tu programa de fidelización en minutos.",
+    href: "/guias",
+    cta: "Ver guías",
   },
   {
     icon: IconVideo,
@@ -760,6 +768,7 @@ const RESOURCE_CARDS: { icon: Icon; title: string; desc: string; href?: string }
     title: "Preguntas frecuentes",
     desc: "Encuentra respuestas rápidas a dudas comunes.",
     href: "/preguntas",
+    cta: "Ver preguntas",
   },
 ];
 
@@ -787,7 +796,7 @@ function Resources() {
 
         {/* 4 tarjetas rápidas */}
         <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {RESOURCE_CARDS.map(({ icon: Ic, title, desc, href }) => {
+          {RESOURCE_CARDS.map(({ icon: Ic, title, desc, href, cta }) => {
             const body = (
               <>
                 <h3 className="flex items-center gap-2.5 font-bold text-ink">
@@ -808,7 +817,7 @@ function Resources() {
                   >
                     {body}
                     <span className="mt-4 flex items-center gap-1 text-sm font-semibold text-pl-action">
-                      Ver preguntas
+                      {cta}
                       <IconArrowRight className="h-3.5 w-3.5" />
                     </span>
                   </Link>
