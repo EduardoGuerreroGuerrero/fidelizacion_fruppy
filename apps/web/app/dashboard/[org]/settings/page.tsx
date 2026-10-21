@@ -157,7 +157,7 @@ export default async function SettingsPage({
           </div>
           <div>
             <label htmlFor="logo" className={label}>
-              Logo (PNG sin fondo)
+              Logo del comercio
             </label>
             {brand.logo_url && (
               <div className="mb-2 flex items-center gap-2">
@@ -177,13 +177,14 @@ export default async function SettingsPage({
               id="logo"
               name="logo"
               type="file"
-              accept="image/png"
+              accept="image/png,image/jpeg,image/webp,image/avif,image/gif,image/svg+xml"
               className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm text-neutral-600 file:mr-3 file:rounded-full file:border-0 file:bg-neutral-100 file:px-3 file:py-1 file:text-xs file:font-semibold dark:border-neutral-700 dark:bg-transparent dark:text-neutral-400"
             />
             <p className="mt-1 text-xs text-ink-soft">
-              Máx. 256 KB. Este mismo logo se usa en el panel, el formulario
-              de registro por QR, la tarjeta del cliente y el pase de Google
-              Wallet.
+              PNG, JPG, WebP o SVG — máx. 10 MB. Si el fondo es de un solo
+              color se quita automáticamente. Este mismo logo se usa en el
+              panel, el formulario de registro por QR, la tarjeta del cliente
+              y el pase de Google Wallet.
             </p>
           </div>
 
