@@ -49,3 +49,9 @@ coverage/
 
 # Artefactos de Playwright MCP (E2E manual)
 .playwright-mcp/
+
+.vercel
+.env*
+
+# Videos de referencia: superan el límite de 100 MB de GitHub
+Muckup/Recursos/*.mp4
