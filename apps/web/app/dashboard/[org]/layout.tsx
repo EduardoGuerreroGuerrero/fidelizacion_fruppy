@@ -118,7 +118,7 @@ export default async function OrgLayout({
   return (
     // Las vars --color-brand se sobreescriben a la paleta PineappleLoyalty
     // solo para el panel genérico: el shell Fruppy retorna antes y conserva
-    // su teal de marca. Así los utilities bg/text-brand internos se ven PL.
+    // su teal de marca. Así los utilities bg/text-brand-dark internos se ven PL.
     <div
       className="mx-auto max-w-5xl"
       style={

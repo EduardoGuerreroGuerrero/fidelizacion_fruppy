@@ -170,7 +170,7 @@ export default async function CustomerPage({
 
   return (
     <div className="mx-auto max-w-3xl">
-      <p className="text-sm text-neutral-500">
+      <p className="text-sm text-ink-soft">
         <Link href={`/dashboard/${slug}/customers`} className="hover:underline">
           Clientes
         </Link>{" "}
@@ -285,7 +285,7 @@ export default async function CustomerPage({
             </div>
             <button
               type="submit"
-              className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
+              className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
             >
               Guardar cambios
             </button>
@@ -355,7 +355,7 @@ export default async function CustomerPage({
                       <form action={issueCard.bind(null, slug, customer.id, p.id)}>
                         <button
                           type="submit"
-                          className="rounded-full bg-brand px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-dark"
+                          className="rounded-full bg-brand-dark px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
                         >
                           Emitir tarjeta
                         </button>
@@ -386,13 +386,13 @@ export default async function CustomerPage({
                           >
                             <button
                               type="submit"
-                              className="rounded-full border border-brand px-3 py-1 font-semibold text-brand transition hover:bg-brand hover:text-white"
+                              className="rounded-full border border-brand-dark px-3 py-1 font-semibold text-brand-dark transition hover:bg-brand-dark hover:text-white"
                             >
                               Enviar por email a {customer.email}
                             </button>
                           </form>
                         ) : (
-                          <p className="mt-2 text-neutral-400">
+                          <p className="mt-2 text-ink-soft">
                             Registra su email arriba para también enviarla por correo.
                           </p>
                         )}
@@ -403,7 +403,7 @@ export default async function CustomerPage({
               );
             })}
             {(programs ?? []).length === 0 && (
-              <li className="text-sm text-neutral-500">
+              <li className="text-sm text-ink-soft">
                 Sin programas activos — crea uno en Programas.
               </li>
             )}
@@ -418,12 +418,12 @@ export default async function CustomerPage({
               {customer.marketing_consent_at ? (
                 <>
                   <span className="font-medium text-green-700 dark:text-green-400">Aceptado</span>{" "}
-                  <span className="text-neutral-500">
+                  <span className="text-ink-soft">
                     el {new Date(customer.marketing_consent_at).toLocaleString("es-CO")}
                   </span>
                 </>
               ) : (
-                <span className="text-neutral-500">Sin consentimiento</span>
+                <span className="text-ink-soft">Sin consentimiento</span>
               )}
             </div>
             <button
@@ -501,7 +501,7 @@ export default async function CustomerPage({
               })}
             </ul>
           ) : (
-            <p className="mb-6 text-sm text-neutral-500">Sin cuentas de fidelización todavía.</p>
+            <p className="mb-6 text-sm text-ink-soft">Sin cuentas de fidelización todavía.</p>
           )}
 
           <h2 className="mb-3 text-lg font-medium">Historial</h2>
@@ -512,7 +512,7 @@ export default async function CustomerPage({
                   key={i}
                   className="rounded-md border border-neutral-200 px-4 py-2 text-sm dark:border-neutral-800"
                 >
-                  <span className="text-neutral-500">
+                  <span className="text-ink-soft">
                     {new Date(item.at).toLocaleString("es-CO")}
                   </span>
                   <span className="ml-2">{item.text}</span>
@@ -520,7 +520,7 @@ export default async function CustomerPage({
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-neutral-500">Sin actividad registrada todavía.</p>
+            <p className="text-sm text-ink-soft">Sin actividad registrada todavía.</p>
           )}
         </section>
       </div>

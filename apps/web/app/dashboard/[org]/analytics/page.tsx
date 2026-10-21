@@ -45,8 +45,8 @@ function Card({ label, value, hint }: { label: string; value: string; hint?: str
   return (
     <div className="rounded-lg border border-neutral-200 p-5 dark:border-neutral-800">
       <p className="text-2xl font-semibold tabular-nums">{value}</p>
-      <p className="mt-1 text-sm text-neutral-500">{label}</p>
-      {hint && <p className="mt-1 text-xs text-neutral-400">{hint}</p>}
+      <p className="mt-1 text-sm text-ink-soft">{label}</p>
+      {hint && <p className="mt-1 text-xs text-ink-soft">{hint}</p>}
     </div>
   );
 }
@@ -104,8 +104,8 @@ export default async function AnalyticsPage({
   return (
     <div className="mx-auto max-w-4xl">
       <h1 className="mb-1 text-2xl font-semibold">Analítica</h1>
-      <p className="mb-6 text-sm text-neutral-500">
-        Zona horaria {m.timezone} · definiciones en <code>docs/ANALYTICS.md</code>
+      <p className="mb-6 text-sm text-ink-soft">
+        Cifras calculadas en la zona horaria {m.timezone.replace("_", " ")}.
       </p>
 
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -149,7 +149,7 @@ export default async function AnalyticsPage({
                 href={filterLink(p.days, granularity)}
                 className={`px-3 py-1.5 font-medium transition ${
                   p.days === days
-                    ? "bg-brand text-white"
+                    ? "bg-brand-dark text-white"
                     : "hover:bg-neutral-100 dark:hover:bg-neutral-800"
                 }`}
               >
@@ -164,7 +164,7 @@ export default async function AnalyticsPage({
                 href={filterLink(days, g.value)}
                 className={`px-3 py-1.5 font-medium transition ${
                   g.value === granularity
-                    ? "bg-brand text-white"
+                    ? "bg-brand-dark text-white"
                     : "hover:bg-neutral-100 dark:hover:bg-neutral-800"
                 }`}
               >
@@ -176,7 +176,7 @@ export default async function AnalyticsPage({
       </div>
 
       <div className="rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
-        <div className="mb-3 flex items-center justify-between text-xs text-neutral-500">
+        <div className="mb-3 flex items-center justify-between text-xs text-ink-soft">
           <span>
             Total del período: <strong className="text-neutral-700 dark:text-neutral-300">{totalVisits}</strong>
           </span>
@@ -192,30 +192,45 @@ export default async function AnalyticsPage({
                 <div
                   key={d.day}
                   title={`${bucketLabel(d.day, granularity)}: ${d.count} visitas`}
-                  className="group relative flex-1 rounded-t bg-gradient-to-t from-brand to-brand/70 transition hover:from-brand-dark hover:to-brand"
+                  className="group relative flex-1 rounded-t bg-brand transition hover:bg-brand-dark"
                   style={{ height: `${Math.max(2, (d.count / maxVisits) * 100)}%` }}
                 >
                   {d.count > 0 && (
-                    <span className="pointer-events-none absolute -top-5 left-1/2 hidden -translate-x-1/2 text-[10px] font-semibold text-neutral-600 group-hover:block dark:text-neutral-300">
+                    <span className="pointer-events-none absolute -top-5 left-1/2 hidden -translate-x-1/2 text-[11px] font-semibold text-neutral-600 group-hover:block dark:text-neutral-300">
                       {d.count}
                     </span>
                   )}
                 </div>
               ))}
             </div>
-            <div className="mt-1.5 flex justify-between text-[10px] text-neutral-400">
-              {m.visits_daily.map((d, i) => (
-                <span
-                  key={d.day}
-                  className={i % labelEvery === 0 || i === m.visits_daily.length - 1 ? "" : "invisible"}
-                >
-                  {bucketLabel(d.day, granularity)}
-                </span>
-              ))}
+            <div className="mt-1.5 flex gap-[3px] text-[11px] text-ink-soft">
+              {m.visits_daily.map((d, i) => {
+                const last = i === m.visits_daily.length - 1;
+                // Escritorio: una fecha cada `labelEvery` barras. Móvil: solo
+                // caben tres (inicio, mitad y final).
+                const mid = Math.round((m.visits_daily.length - 1) / 2);
+                const onDesktop = i % labelEvery === 0 || last;
+                const onMobile = i === 0 || last || i === mid;
+                const show = onDesktop || onMobile;
+                const visibility = onDesktop && onMobile ? "" : onDesktop ? "max-sm:hidden " : "sm:hidden ";
+                return (
+                  <span key={d.day} className="relative h-4 min-w-0 flex-1">
+                    {show && (
+                      <span
+                        className={`absolute top-0 whitespace-nowrap ${visibility}${
+                          i === 0 ? "left-0" : last ? "right-0" : "left-1/2 -translate-x-1/2"
+                        }`}
+                      >
+                        {bucketLabel(d.day, granularity)}
+                      </span>
+                    )}
+                  </span>
+                );
+              })}
             </div>
           </>
         ) : (
-          <p className="py-10 text-center text-sm text-neutral-400">
+          <p className="py-10 text-center text-sm text-ink-soft">
             Sin visitas registradas en este período.
           </p>
         )}

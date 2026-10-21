@@ -35,7 +35,7 @@ export default async function NewCustomerPage({
 
   return (
     <div className="mx-auto max-w-xl">
-      <p className="text-sm text-neutral-500">
+      <p className="text-sm text-ink-soft">
         <Link href={`/dashboard/${slug}/customers`} className="hover:underline">
           Clientes
         </Link>{" "}
@@ -119,7 +119,7 @@ export default async function NewCustomerPage({
         <div className="flex gap-2 pt-2">
           <button
             type="submit"
-            className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
+            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
           >
             Crear cliente
           </button>

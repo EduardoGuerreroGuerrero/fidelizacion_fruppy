@@ -19,8 +19,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
   await supabase.rpc("claim_invites");
 
   return (
-    <DashboardChrome email={user.email ?? undefined} signOut={signOut}>
-      {children}
-    </DashboardChrome>
+    // .pl-panel: tokens con contraste AA solo para el panel (ver globals.css).
+    <div className="pl-panel contents">
+      <DashboardChrome email={user.email ?? undefined} signOut={signOut}>
+        {children}
+      </DashboardChrome>
+    </div>
   );
 }

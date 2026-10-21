@@ -100,7 +100,7 @@ export default async function CampaignsPage({
       <section className="mb-6 rounded-lg border border-neutral-200 p-5 dark:border-neutral-800">
         <div className="flex items-center justify-between">
           <h2 className="font-medium">Nueva campaña</h2>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-ink-soft">
             Audiencia elegible: <strong>{audience ?? 0}</strong> suscripciones ·{" "}
             {monthly}/{monthlyLimit} este mes
           </p>
@@ -133,7 +133,7 @@ export default async function CampaignsPage({
             className={input}
           />
           <div>
-            <label htmlFor="schedule" className="mb-1 block text-xs text-neutral-500">
+            <label htmlFor="schedule" className="mb-1 block text-xs text-ink-soft">
               Programar para (opcional, hora local)
             </label>
             <input
@@ -146,12 +146,12 @@ export default async function CampaignsPage({
           <button
             type="submit"
             disabled={!pushEnabled || !configured}
-            className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark disabled:opacity-50"
+            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper disabled:opacity-50"
           >
             Crear campaña
           </button>
         </form>
-        <p className="mt-2 text-xs text-neutral-500">
+        <p className="mt-2 text-xs text-ink-soft">
           Solo llega a clientes que activaron las notificaciones de {org.name}.
           Quien las desactive antes del envío no la recibe.
         </p>
@@ -168,8 +168,8 @@ export default async function CampaignsPage({
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="font-medium">{c.title}</p>
-                  <p className="mt-0.5 text-sm text-neutral-500">{c.body}</p>
-                  <p className="mt-1 text-xs text-neutral-400">
+                  <p className="mt-0.5 text-sm text-ink-soft">{c.body}</p>
+                  <p className="mt-1 text-xs text-ink-soft">
                     {STATUS_LABEL[c.status] ?? c.status}
                     {c.scheduled_at && c.status === "scheduled"
                       ? ` · ${new Date(c.scheduled_at).toLocaleString("es-CO")}`
@@ -184,7 +184,7 @@ export default async function CampaignsPage({
                     <form action={queuePushCampaign.bind(null, slug, c.id)}>
                       <button
                         type="submit"
-                        className="rounded-md bg-brand px-3 py-1 text-xs font-semibold text-white"
+                        className="rounded-md bg-brand-dark px-3 py-1 text-xs font-semibold text-white"
                       >
                         Enviar ahora
                       </button>
@@ -208,7 +208,7 @@ export default async function CampaignsPage({
           );
         })}
         {(campaigns ?? []).length === 0 && (
-          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-neutral-500 dark:border-neutral-700">
+          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-ink-soft dark:border-neutral-700">
             Aún no hay campañas.
           </li>
         )}

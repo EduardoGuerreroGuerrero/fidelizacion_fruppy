@@ -45,7 +45,7 @@ function RowMenu({
     <details className="group/menu relative">
       <summary
         aria-label={`Más acciones para ${name}`}
-        className="flex size-8 cursor-pointer list-none items-center justify-center rounded-lg text-neutral-400 transition hover:bg-neutral-100 hover:text-navy [&::-webkit-details-marker]:hidden"
+        className="flex size-8 cursor-pointer list-none items-center justify-center rounded-lg text-ink-soft transition hover:bg-neutral-100 hover:text-navy [&::-webkit-details-marker]:hidden"
       >
         <IconDotsV className="size-4" />
       </summary>
@@ -100,7 +100,7 @@ export type PanelData = {
 const inputCls =
   "w-full rounded-2xl border border-neutral-200 bg-white py-2.5 text-sm text-navy outline-none transition focus:border-brand";
 const iconBtn =
-  "flex size-9 items-center justify-center rounded-xl bg-pastel-sky/70 text-[#3f8fd2] transition hover:bg-pastel-sky";
+  "flex size-9 items-center justify-center rounded-xl bg-pastel-sky/70 text-[#2a6fae] transition hover:bg-pastel-sky";
 
 function pager(base: string, page: number, q: string, status: string, program: string) {
   const p = new URLSearchParams();
@@ -162,13 +162,13 @@ export function FruppyCustomers({
   })();
 
   return (
-    <div className={`grid items-start gap-5 ${panel ? "lg:grid-cols-[1fr_320px]" : ""}`}>
+    <div className={`grid grid-cols-1 items-start gap-5 [&>*]:min-w-0 ${panel ? "lg:grid-cols-[1fr_320px]" : ""}`}>
       <div>
         {/* ===== Barra de acciones ===== */}
         <div className="flex flex-wrap items-center gap-2.5">
           <Link
             href={`${customersBase}/new`}
-            className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-brand to-brand-dark px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-105"
+            className="flex items-center gap-1.5 rounded-full bg-brand-dark px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
           >
             <IconPlus className="size-4" />
             Nuevo cliente
@@ -325,7 +325,7 @@ export function FruppyCustomers({
                       <Link
                         href={panelUrl(c.id)}
                         aria-label="Panel rápido"
-                        className="rounded-lg p-1.5 text-neutral-400 transition hover:bg-neutral-100 hover:text-navy"
+                        className="rounded-lg p-1.5 text-ink-soft transition hover:bg-neutral-100 hover:text-navy"
                       >
                         <IconChevron className="size-4" />
                       </Link>
@@ -364,7 +364,7 @@ export function FruppyCustomers({
                   key={n}
                   href={pager(customersBase, n, q, status, program)}
                   className={`flex size-8 items-center justify-center rounded-lg text-sm font-semibold transition ${
-                    n === page ? "bg-brand text-white" : "text-navy hover:bg-neutral-100"
+                    n === page ? "bg-brand-dark text-white" : "text-navy hover:bg-neutral-100"
                   }`}
                 >
                   {n}
@@ -452,7 +452,7 @@ export function FruppyCustomers({
                 key={n}
                 href={pager(customersBase, n, q, status, program)}
                 className={`flex size-9 items-center justify-center rounded-xl text-sm font-semibold ${
-                  n === page ? "bg-brand text-white" : "bg-white text-navy"
+                  n === page ? "bg-brand-dark text-white" : "bg-white text-navy"
                 }`}
               >
                 {n}
@@ -548,7 +548,7 @@ function CustomerPanel({
         </Link>
         <Link
           href={`${base}/scan`}
-          className="flex items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-brand to-brand-dark px-3 py-2 text-xs font-semibold text-white transition hover:brightness-105"
+          className="flex items-center justify-center gap-1.5 rounded-full bg-brand-dark px-3 py-2 text-xs font-semibold text-white transition hover:bg-brand-deeper"
         >
           <IconScan className="size-3.5" />
           Registrar visita
@@ -591,7 +591,7 @@ function CustomerPanel({
               <s.icon className="size-4" />
             </IconTile>
             <p className="mt-2 text-sm font-bold text-navy">{s.value}</p>
-            <p className="text-[11px] text-ink-soft">{s.label}</p>
+            <p className="text-xs text-ink-soft">{s.label}</p>
           </div>
         ))}
       </div>

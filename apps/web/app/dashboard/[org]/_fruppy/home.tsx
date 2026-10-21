@@ -3,7 +3,6 @@ import {
   IconCalendar,
   IconChevron,
   IconClock,
-  IconDotsV,
   IconGift,
   IconHeart,
   IconScan,
@@ -88,15 +87,12 @@ export function FruppyHome({
       {/* ===== Hero ===== */}
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#fbd3e4] via-pastel-pink to-[#f9c2d9] p-6 sm:p-8">
         <div className="relative z-10 max-w-md">
-          <p className="text-xs font-bold tracking-[0.2em] text-accent">
-            {orgName.toUpperCase()}
-          </p>
-          <h1 className="mt-1 flex items-center gap-2 text-4xl font-bold text-wine sm:text-5xl">
+          <h1 className="flex items-center gap-2 text-4xl font-bold text-wine sm:text-5xl">
             ¡Bienvenido!
             <IconHeart className="size-8 text-accent sm:size-10" strokeWidth={2.4} />
           </h1>
-          <p className="mt-2 text-sm font-medium text-navy/75 sm:text-base">
-            Tu panel de fidelización para clientes más felices
+          <p className="mt-2 text-sm font-medium text-navy/90 sm:text-base">
+            Tu panel de fidelización de {orgName}
           </p>
           <Link
             href={`${base}/programs`}
@@ -122,7 +118,7 @@ export function FruppyHome({
       </section>
 
       {/* ===== Stats ===== */}
-      <section className="mt-5 grid grid-cols-3 gap-3 sm:gap-4">
+      <section className="mt-5 grid gap-3 sm:grid-cols-3 sm:gap-4">
         {stats.map((s) => {
           const Icon = ICONS[s.icon];
           return (
@@ -138,15 +134,18 @@ export function FruppyHome({
                 >
                   <Icon className="size-5" />
                 </IconTile>
-                <span className="inline-flex items-center gap-0.5 rounded-full bg-white/70 px-2 py-0.5 text-[11px] font-bold text-navy/70">
-                  <IconTrendUp className="size-3.5" />
+                <span
+                  className="inline-flex items-center gap-0.5 rounded-full bg-white/70 px-2 py-0.5 text-xs font-bold text-navy/85"
+                  title="Frente a los 30 días anteriores"
+                >
+                  {s.delta.startsWith("+") && <IconTrendUp className="size-3.5" />}
                   {s.delta}
                 </span>
               </div>
               <p className="mt-3 text-3xl font-bold tabular-nums text-navy sm:text-4xl">
                 {s.value}
               </p>
-              <p className="mt-0.5 text-[11px] font-medium text-navy/60 sm:text-sm">
+              <p className="mt-0.5 text-xs font-medium text-navy/85 sm:text-sm">
                 {s.label}
               </p>
               <Wave
@@ -173,17 +172,16 @@ export function FruppyHome({
             </h2>
             <Link
               href={`${base}/customers`}
-              className="flex items-center text-sm font-semibold text-brand transition hover:text-brand-dark"
+              className="flex items-center text-sm font-semibold text-brand-dark transition hover:text-brand-deeper"
             >
               Ver todo →
             </Link>
           </div>
 
-          <div className="hidden grid-cols-[2fr_2fr_1fr_auto] gap-3 px-2 pb-2 text-xs font-medium text-ink-soft md:grid">
+          <div className="hidden grid-cols-[2fr_2fr_1fr] gap-3 px-2 pb-2 text-xs font-medium text-ink-soft md:grid">
             <span>Cliente</span>
             <span>Actividad</span>
             <span>Fecha y hora</span>
-            <span className="text-right">Acciones</span>
           </div>
 
           <ul className="divide-y divide-neutral-100">
@@ -193,7 +191,7 @@ export function FruppyHome({
               return (
                 <li
                   key={a.id}
-                  className="grid grid-cols-[auto_1fr_auto] items-center gap-3 py-3 md:grid-cols-[2fr_2fr_1fr_auto]"
+                  className="grid grid-cols-[1fr_auto] items-center gap-3 py-3 md:grid-cols-[2fr_2fr_1fr]"
                 >
                   <span className="flex items-center gap-3">
                     <Avatar name={a.name} index={i} size="size-10" />
@@ -209,16 +207,9 @@ export function FruppyHome({
                   </span>
                   <span className="text-xs text-ink-soft md:text-sm">
                     {timeAgo(a.at)}
-                    <span className="block text-[11px] md:hidden">{k.label}</span>
+                    <span className="block text-xs md:hidden">{k.label}</span>
                   </span>
-                  <span className="flex items-center gap-1.5">
-                    <IconTile tone={k.tone} size="size-8">
-                      <KIcon className="size-4" />
-                    </IconTile>
-                    <span className="p-1 text-neutral-400">
-                      <IconDotsV className="size-4" />
-                    </span>
-                  </span>
+
                 </li>
               );
             })}
@@ -243,17 +234,17 @@ export function FruppyHome({
               {programName}
               <IconHeart className="size-5" />
             </h3>
-            <p className="mt-0.5 text-sm font-medium text-navy/75">
+            <p className="mt-0.5 text-sm font-medium text-navy/90">
               Cada visita nos endulza más
             </p>
-            <div className="mt-24 rounded-2xl bg-white p-4 shadow-sm">
+            <div className="mt-24 border-t border-wine/15 pt-4">
               <div className="flex items-start gap-3">
                 <IconTile tone="pink" size="size-10">
                   <IconGift className="size-5" />
                 </IconTile>
                 <div>
-                  <p className="font-bold text-accent">Premia la fidelidad</p>
-                  <p className="mt-0.5 text-xs text-ink-soft">
+                  <p className="font-bold text-wine">Premia la fidelidad</p>
+                  <p className="mt-0.5 text-xs text-navy/90">
                     Programas de sellos o puntos para tus clientes
                   </p>
                 </div>

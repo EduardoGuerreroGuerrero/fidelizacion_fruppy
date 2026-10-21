@@ -45,15 +45,6 @@ export default async function DashboardPage() {
 
   return (
     <div className="relative mx-auto max-w-2xl">
-      {/* Isotipo PineappleLoyalty decorativo de fondo */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/pineapple/isotipo.png"
-        alt=""
-        aria-hidden
-        className="pointer-events-none fixed -bottom-28 -left-28 w-[440px] select-none opacity-[0.07]"
-      />
-
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-ink">
@@ -66,7 +57,7 @@ export default async function DashboardPage() {
         </div>
         <Link
           href="/dashboard/new"
-          className="flex shrink-0 items-center gap-2 rounded-full bg-pl-green-2 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green"
+          className="flex shrink-0 items-center gap-2 rounded-full bg-pl-action px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green"
         >
           <IconPlus className="size-4" />
           Nueva organización
@@ -104,13 +95,6 @@ export default async function DashboardPage() {
                   href={`/dashboard/${org.slug}`}
                   className="group relative flex items-center gap-4 overflow-hidden rounded-3xl bg-white p-4 shadow-sm ring-1 ring-black/[0.04] transition hover:shadow-md"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/pineapple/isotipo.png"
-                    alt=""
-                    aria-hidden
-                    className="pointer-events-none absolute -right-8 -bottom-12 w-36 select-none opacity-[0.10]"
-                  />
                   <span
                     className={`flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl text-lg font-bold ${
                       brand.color ? "" : "bg-pl-cream text-pl-green"

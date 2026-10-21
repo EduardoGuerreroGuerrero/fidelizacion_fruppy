@@ -128,7 +128,7 @@ export function FruppyScanForm({
             onClick={() => setTab("camera")}
             className={`flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition ${
               tab === "camera"
-                ? "bg-gradient-to-r from-brand to-brand-dark text-white shadow-sm"
+                ? "bg-brand-dark text-white shadow-sm"
                 : "text-ink-soft hover:bg-neutral-100"
             }`}
           >
@@ -140,7 +140,7 @@ export function FruppyScanForm({
             onClick={() => setTab("manual")}
             className={`flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition ${
               tab === "manual"
-                ? "bg-gradient-to-r from-brand to-brand-dark text-white shadow-sm"
+                ? "bg-brand-dark text-white shadow-sm"
                 : "text-ink-soft hover:bg-neutral-100"
             }`}
           >
@@ -151,7 +151,7 @@ export function FruppyScanForm({
 
         {/* Área de escaneo (mint, borde punteado) */}
         {tab === "camera" && (
-          <div className="relative flex flex-col items-center rounded-2xl border-2 border-dashed border-brand/50 bg-gradient-to-b from-pastel-mint/70 to-[#e8faf4] px-4 py-8 text-center">
+          <div className="relative flex flex-col items-center rounded-2xl border-2 border-dashed border-brand/50 px-4 py-8 text-center">
             <div id={READER_ID} className="w-full overflow-hidden rounded-xl" />
             {!scanning && (
               <>
@@ -171,7 +171,7 @@ export function FruppyScanForm({
                 <button
                   type="button"
                   onClick={() => void startScanner()}
-                  className="mt-4 flex items-center gap-2 rounded-full bg-gradient-to-r from-brand to-brand-dark px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-105"
+                  className="mt-4 flex items-center gap-2 rounded-full bg-brand-dark px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
                 >
                   <IconCamera className="size-4" />
                   Escanear con cámara
@@ -204,7 +204,7 @@ export function FruppyScanForm({
             Token del QR
           </label>
           <div className="relative">
-            <IconTag className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-brand" />
+            <IconTag className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-brand-dark" />
             <input
               id="token"
               name="token"
@@ -249,7 +249,7 @@ export function FruppyScanForm({
 
         <button
           type="submit"
-          className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-brand to-brand-dark px-4 py-3.5 text-base font-semibold text-white shadow-sm transition hover:brightness-105"
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-dark px-4 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
         >
           <IconCheckCircle className="size-5" />
           Registrar visita
@@ -257,7 +257,7 @@ export function FruppyScanForm({
 
         {/* Hint (móvil) */}
         <p className="mt-4 flex items-start gap-2 rounded-2xl bg-pastel-lav/60 px-4 py-3 text-xs text-ink-soft lg:hidden">
-          <IconBulb className="mt-0.5 size-4 shrink-0 text-[#7c5cd6]" />
+          <IconBulb className="mt-0.5 size-4 shrink-0 text-[#6545c4]" />
           Usa la cámara, un lector USB que escriba el token, o pégalo manualmente.
         </p>
       </form>
@@ -266,7 +266,7 @@ export function FruppyScanForm({
       <div className="space-y-5">
         {/* Pasos (solo web — el mockup móvil no lo muestra) */}
         <div className="hidden rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/[0.04] lg:block">
-          <h3 className="font-bold text-navy">¿Cómo registrar una visita?</h3>
+          <h2 className="font-bold text-navy">¿Cómo registrar una visita?</h2>
           <ol className="relative mt-4 space-y-5">
             <span className="absolute bottom-5 left-[15px] top-5 w-px bg-pastel-pink" aria-hidden />
             {[
@@ -298,7 +298,7 @@ export function FruppyScanForm({
                 <p className="truncate font-bold text-navy">{displayName(preview.name)}</p>
                 <Link
                   href={`${base}/customers`}
-                  className="text-xs font-medium text-brand hover:underline"
+                  className="text-xs font-medium text-brand-dark hover:underline"
                 >
                   Ver en clientes
                 </Link>
@@ -353,7 +353,7 @@ export function FruppyScanForm({
 
         {/* Hint (web) */}
         <p className="hidden items-start gap-2 rounded-2xl bg-pastel-lav/60 px-4 py-3 text-xs text-ink-soft lg:flex">
-          <IconBulb className="mt-0.5 size-4 shrink-0 text-[#7c5cd6]" />
+          <IconBulb className="mt-0.5 size-4 shrink-0 text-[#6545c4]" />
           Usa la cámara, un lector USB que escriba el token, o pégalo manualmente.
         </p>
       </div>

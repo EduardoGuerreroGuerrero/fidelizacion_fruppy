@@ -72,7 +72,7 @@ export default async function ScanPage({
 
   return (
     <div className="mx-auto max-w-xl">
-      <p className="text-sm text-neutral-500">
+      <p className="text-sm text-ink-soft">
         <Link href={`/dashboard/${slug}`} className="hover:underline">
           {org.name}
         </Link>{" "}

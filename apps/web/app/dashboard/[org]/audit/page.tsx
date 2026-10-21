@@ -30,7 +30,7 @@ export default async function AuditPage({ params }: { params: Promise<{ org: str
   return (
     <div className="mx-auto max-w-3xl">
       <h1 className="mb-1 text-2xl font-semibold">Auditoría</h1>
-      <p className="mb-4 text-sm text-neutral-500">
+      <p className="mb-4 text-sm text-ink-soft">
         Acciones sensibles registradas. Visible solo para owner/admin.
       </p>
       <ul className="space-y-2">
@@ -41,18 +41,18 @@ export default async function AuditPage({ params }: { params: Promise<{ org: str
           >
             <p className="min-w-0 break-words">
               <span className="font-medium">{l.action}</span>
-              <span className="ml-2 break-all text-neutral-500">
+              <span className="ml-2 break-all text-ink-soft">
                 {l.entity_type}
                 {l.entity_id ? ` · ${String(l.entity_id).slice(0, 8)}…` : ""}
               </span>
             </p>
-            <span className="shrink-0 text-xs text-neutral-400">
+            <span className="shrink-0 text-xs text-ink-soft">
               {new Date(l.created_at).toLocaleString("es-CO")}
             </span>
           </li>
         ))}
         {(logs ?? []).length === 0 && (
-          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-neutral-500 dark:border-neutral-700">
+          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-ink-soft dark:border-neutral-700">
             Sin eventos registrados (o sin permiso de lectura).
           </li>
         )}
