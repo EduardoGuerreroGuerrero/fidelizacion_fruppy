@@ -250,7 +250,7 @@ begin
 
   -- --- T16 permisos de ejecución ---
   perform pg_temp.t_ok(
-    not has_function_privilege('anon', 'public.scan_card(text,int,uuid,text)', 'execute')
+    not has_function_privilege('anon', 'public.scan_card(text,int,uuid,text,numeric)', 'execute')
     and not has_function_privilege('anon', 'public.earn(uuid,bigint,int,bigint,uuid,text,text)', 'execute')
     and not has_function_privilege('anon', 'public.redeem_reward(uuid,uuid,uuid,text)', 'execute'),
     'T16a anon no ejecuta RPCs del motor');
