@@ -3,28 +3,29 @@ import { createClient } from "@/lib/supabase/server";
 import { pushConfigured } from "@/lib/push/send";
 import {
   cancelPushCampaign,
+  duplicatePushCampaign,
   queuePushCampaign,
   savePushCampaign,
 } from "@/lib/admin/actions";
-import { RememberForm } from "@/app/_components/remember-form";
 import { SubmitButton } from "@/app/_components/submit-button";
+import { CampaignComposer } from "./composer";
 
 export const instant = false;
 
-const input =
-  "w-full rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-transparent";
-
-const STATUS_LABEL: Record<string, string> = {
-  draft: "Borrador",
-  scheduled: "Programada",
-  sending: "Enviando",
-  sent: "Enviada",
-  cancelled: "Cancelada",
+const STATUS: Record<string, { label: string; cls: string }> = {
+  draft: { label: "Borrador", cls: "bg-neutral-100 text-ink-soft" },
+  scheduled: { label: "Programada", cls: "bg-amber-100 text-amber-800" },
+  sending: { label: "Enviando", cls: "bg-sky-100 text-sky-800" },
+  sent: { label: "Enviada", cls: "bg-brand-soft text-brand" },
+  cancelled: { label: "Cancelada", cls: "bg-red-50 text-red-700" },
 };
 
-// Campañas push del comercio. La audiencia la resuelve el servidor (misma
-// regla que el envío): suscripción activa + consentimiento vigente +
-// cliente activo — y solo de ESTE comercio.
+const when = (iso: string) =>
+  new Date(iso).toLocaleString("es-CO", { dateStyle: "medium", timeStyle: "short" });
+
+// Campañas del comercio (push en navegador + mensaje en Google Wallet). La
+// audiencia la resuelve el servidor (misma regla que el envío): suscripción
+// activa + consentimiento vigente + cliente activo — y solo de ESTE comercio.
 export default async function CampaignsPage({
   params,
   searchParams,
@@ -73,144 +74,158 @@ export default async function CampaignsPage({
     ? limits.push_campaigns_per_month
     : 30;
 
+  const lastSent = (campaigns ?? []).find((c) => c.status === "sent");
+  const scheduledCount = (campaigns ?? []).filter((c) => c.status === "scheduled").length;
+  const disabled = !pushEnabled || !configured;
+  const aud = audience ?? 0;
+
+  const summary: [string, string, string][] = [
+    ["Audiencia elegible", String(aud), "suscripciones push"],
+    ["Este mes", `${monthly}/${monthlyLimit}`, "campañas enviadas"],
+    ["Programadas", String(scheduledCount), "pendientes"],
+    ["Última enviada", lastSent?.sent_at ? when(lastSent.sent_at) : "—", lastSent?.title ?? "aún ninguna"],
+  ];
+
   return (
-    <div className="mx-auto max-w-2xl">
-      <h1 className="mb-4 text-2xl font-semibold">Campañas push</h1>
+    <div className="mx-auto max-w-5xl space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold">Campañas</h1>
+        <p className="mt-1 text-sm text-ink-soft">
+          Avisos a tus clientes en su navegador y en Google Wallet.
+        </p>
+      </div>
 
       {error && (
-        <p className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-900/30 dark:text-red-300">
+        <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-900/30 dark:text-red-300">
           {error}
         </p>
       )}
       {ok && (
-        <p className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-800 dark:bg-green-900/30 dark:text-green-300">
+        <p role="status" className="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-800 dark:bg-green-900/30 dark:text-green-300">
           {ok}
         </p>
       )}
-
       {!pushEnabled ? (
-        <p className="mb-4 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
-          Las notificaciones push están desactivadas para este comercio
-          (Configuración → Privacidad y funciones).
+        <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+          Las notificaciones push están desactivadas para este comercio (Configuración → Privacidad y funciones).
         </p>
       ) : !configured ? (
-        <p className="mb-4 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+        <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
           Push no está configurado en el servidor (faltan claves VAPID).
         </p>
       ) : null}
 
-      <section className="mb-6 rounded-lg border border-neutral-200 p-5 dark:border-neutral-800">
-        <div className="flex items-center justify-between">
-          <h2 className="font-medium">Nueva campaña</h2>
-          <p className="text-xs text-ink-soft">
-            Audiencia elegible: <strong>{audience ?? 0}</strong> suscripciones ·{" "}
-            {monthly}/{monthlyLimit} este mes
-          </p>
-        </div>
-        {(audience ?? 0) > 500 ? (
-          <p className="mt-2 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
-            Audiencia grande: el envío se procesa por lotes; verifica el texto
-            antes de enviar.
-          </p>
-        ) : null}
-        <RememberForm storageKey="campaign-new" action={savePushCampaign.bind(null, slug)} className="mt-3 space-y-3">
-          <input
-            name="title"
-            required
-            maxLength={100}
-            placeholder="Título (ej. Hoy 2×1 en helados)"
-            className={input}
-          />
-          <textarea
-            name="body"
-            required
-            maxLength={300}
-            rows={3}
-            placeholder="Mensaje (máx. 300 caracteres)"
-            className={input}
-          />
-          <input
-            name="url"
-            placeholder="Enlace interno (ej. /promociones) u https://"
-            className={input}
-          />
-          <div>
-            <label htmlFor="schedule" className="mb-1 block text-xs text-ink-soft">
-              Programar para (opcional, hora local)
-            </label>
-            <input
-              id="schedule"
-              name="schedule"
-              type="datetime-local"
-              className={input}
-            />
+      <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {summary.map(([k, v, sub]) => (
+          <div key={k} className="rounded-2xl border border-ink/10 bg-white p-4 shadow-sm dark:bg-transparent">
+            <dt className="text-xs text-ink-soft">{k}</dt>
+            <dd className="mt-1 truncate text-lg font-semibold tabular-nums">{v}</dd>
+            <p className="truncate text-[11px] text-ink-soft">{sub}</p>
           </div>
-          <SubmitButton
-            disabled={!pushEnabled || !configured}
-            className="rounded-full bg-brand-dark px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper disabled:opacity-50">
-            Crear campaña
-          </SubmitButton>
-        </RememberForm>
-        <p className="mt-2 text-xs text-ink-soft">
-          Solo llega a clientes que activaron las notificaciones de {org.name}.
-          Quien las desactive antes del envío no la recibe.
+        ))}
+      </dl>
+
+      {aud === 0 && pushEnabled ? (
+        <p className="rounded-xl border border-dashed border-ink/15 px-4 py-3 text-sm text-ink-soft">
+          Aún nadie activó las notificaciones. Tus clientes lo hacen desde su tarjeta → Perfil → Notificaciones.
+          Los pases de Google Wallet también reciben el mensaje.
         </p>
+      ) : null}
+      {aud > 500 ? (
+        <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+          Audiencia grande: el envío se procesa por lotes; verifica el texto antes de enviar.
+        </p>
+      ) : null}
+
+      <section aria-labelledby="nueva">
+        <h2 id="nueva" className="mb-3 font-semibold">Nueva campaña</h2>
+        <CampaignComposer
+          action={savePushCampaign.bind(null, slug)}
+          orgName={org.name}
+          orgInitial={org.name.slice(0, 1).toUpperCase()}
+          disabled={disabled}
+          audience={aud}
+        />
       </section>
 
-      <ul className="space-y-2">
-        {(campaigns ?? []).map((c) => {
-          const stats = (c.stats ?? {}) as Record<string, number>;
-          return (
-            <li
-              key={c.id}
-              className="rounded-lg border border-neutral-200 px-4 py-3 dark:border-neutral-800"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="font-medium">{c.title}</p>
-                  <p className="mt-0.5 text-sm text-ink-soft">{c.body}</p>
-                  <p className="mt-1 text-xs text-ink-soft">
-                    {STATUS_LABEL[c.status] ?? c.status}
-                    {c.scheduled_at && c.status === "scheduled"
-                      ? ` · ${new Date(c.scheduled_at).toLocaleString("es-CO")}`
-                      : ""}
-                    {c.status === "sent" && stats.sent != null
-                      ? ` · ${stats.sent} enviadas${stats.skipped ? `, ${stats.skipped} omitidas` : ""}${stats.failed ? `, ${stats.failed} fallidas` : ""}${stats.expired ? `, ${stats.expired} expiradas` : ""}`
-                      : ""}
-                  </p>
-                </div>
-                <div className="flex shrink-0 gap-2">
-                  {(c.status === "draft" || c.status === "scheduled") && (
-                    <form action={queuePushCampaign.bind(null, slug, c.id)}>
-                      <SubmitButton
-                        className="rounded-md bg-brand-dark px-3 py-1 text-xs font-semibold text-white"
-                        confirm="¿Enviar la campaña ahora a todos los clientes suscritos? No se puede deshacer.">
-                        Enviar ahora
+      <section aria-labelledby="historial">
+        <h2 id="historial" className="mb-3 font-semibold">Historial</h2>
+        <ul className="space-y-2">
+          {(campaigns ?? []).map((c) => {
+            const stats = (c.stats ?? {}) as Record<string, number>;
+            const st = STATUS[c.status] ?? { label: c.status, cls: "bg-neutral-100 text-ink-soft" };
+            const total =
+              (stats.sent ?? 0) + (stats.failed ?? 0) + (stats.expired ?? 0) + (stats.skipped ?? 0);
+            const pct = total > 0 ? Math.round(((stats.sent ?? 0) / total) * 100) : 0;
+            return (
+              <li key={c.id} className="rounded-2xl border border-ink/10 bg-white p-4 shadow-sm dark:bg-transparent">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-medium">{c.title}</p>
+                      <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${st.cls}`}>
+                        {st.label}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 break-words text-sm text-ink-soft">{c.body}</p>
+                    <p className="mt-1 text-xs text-ink-soft">
+                      {c.status === "scheduled" && c.scheduled_at
+                        ? `Para ${when(c.scheduled_at)}`
+                        : c.sent_at
+                          ? `Enviada ${when(c.sent_at)}`
+                          : `Creada ${when(c.created_at)}`}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 flex-wrap gap-2">
+                    {(c.status === "draft" || c.status === "scheduled") && (
+                      <form action={queuePushCampaign.bind(null, slug, c.id)}>
+                        <SubmitButton
+                          disabled={disabled}
+                          className="rounded-full bg-brand-dark px-3.5 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+                          confirm="¿Enviar la campaña ahora a todos los clientes suscritos? No se puede deshacer.">
+                          Enviar ahora
+                        </SubmitButton>
+                      </form>
+                    )}
+                    <form action={duplicatePushCampaign.bind(null, slug, c.id)}>
+                      <SubmitButton className="rounded-full border border-ink/15 px-3.5 py-1.5 text-xs hover:bg-neutral-50">
+                        Duplicar
                       </SubmitButton>
                     </form>
-                  )}
-                  {(c.status === "draft" ||
-                    c.status === "scheduled" ||
-                    c.status === "sending") && (
-                    <form action={cancelPushCampaign.bind(null, slug, c.id)}>
-                      <SubmitButton
-                        className="rounded-md border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-                        confirm="¿Seguro que quieres cancelar?">
-                        Cancelar
-                      </SubmitButton>
-                    </form>
-                  )}
+                    {(c.status === "draft" || c.status === "scheduled" || c.status === "sending") && (
+                      <form action={cancelPushCampaign.bind(null, slug, c.id)}>
+                        <SubmitButton
+                          className="rounded-full border border-ink/15 px-3.5 py-1.5 text-xs hover:bg-neutral-50"
+                          confirm="¿Seguro que quieres cancelar?">
+                          Cancelar
+                        </SubmitButton>
+                      </form>
+                    )}
+                  </div>
                 </div>
-              </div>
+                {c.status === "sent" && total > 0 ? (
+                  <div className="mt-3">
+                    <div className="h-1.5 overflow-hidden rounded-full bg-neutral-100" aria-hidden>
+                      <div className="h-full rounded-full bg-pl-green-2" style={{ width: `${pct}%` }} />
+                    </div>
+                    <p className="mt-1.5 text-xs text-ink-soft">
+                      {stats.sent ?? 0} entregadas ({pct}%)
+                      {stats.skipped ? ` · ${stats.skipped} omitidas` : ""}
+                      {stats.failed ? ` · ${stats.failed} fallidas` : ""}
+                      {stats.expired ? ` · ${stats.expired} expiradas` : ""}
+                    </p>
+                  </div>
+                ) : null}
+              </li>
+            );
+          })}
+          {(campaigns ?? []).length === 0 && (
+            <li className="rounded-2xl border border-dashed border-ink/15 p-6 text-center text-sm text-ink-soft">
+              Aún no hay campañas.
             </li>
-          );
-        })}
-        {(campaigns ?? []).length === 0 && (
-          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-ink-soft dark:border-neutral-700">
-            Aún no hay campañas.
-          </li>
-        )}
-      </ul>
+          )}
+        </ul>
+      </section>
     </div>
   );
 }

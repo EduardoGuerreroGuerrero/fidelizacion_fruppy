@@ -2,6 +2,7 @@ import webpush from "web-push";
 import { optionalEnv } from "@/lib/env";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { pushCampaignToWallets } from "@/lib/wallet/push";
+import { resolveCampaignUrl } from "./destination";
 
 // Envío Web Push por comercio. Solo servidor: la clave privada VAPID nunca
 // sale del entorno. La elegibilidad se re-evalúa en el momento del envío:
@@ -34,6 +35,7 @@ type QueuedDelivery = {
   attempts: number;
   push_subscriptions: {
     id: string;
+    customer_id: string;
     endpoint: string;
     p256dh: string;
     auth: string;
@@ -133,13 +135,29 @@ export async function processPushQueue(limit = 50): Promise<{
     .from("push_deliveries")
     .select(
       "id, campaign_id, attempts, " +
-        "push_subscriptions!inner(id, endpoint, p256dh, auth, status, customers!inner(status, push_consent_state))",
+        "push_subscriptions!inner(id, customer_id, endpoint, p256dh, auth, status, customers!inner(status, push_consent_state))",
     )
     .eq("status", "queued")
     .order("created_at")
     .limit(limit);
 
-  for (const d of (deliveries ?? []) as unknown as QueuedDelivery[]) {
+  const batch = (deliveries ?? []) as unknown as QueuedDelivery[];
+  // Token de tarjeta por cliente: el enlace interno de la campaña se abre en
+  // SU tarjeta (/t/[token]/…), no en la raíz del sitio.
+  const customerIds = [
+    ...new Set(batch.map((d) => d.push_subscriptions?.customer_id).filter(Boolean)),
+  ] as string[];
+  const tokenByCustomer = new Map<string, string>();
+  if (customerIds.length) {
+    const { data: cards } = await admin
+      .from("customer_cards")
+      .select("customer_id, token")
+      .in("customer_id", customerIds)
+      .eq("status", "active");
+    for (const c of cards ?? []) tokenByCustomer.set(c.customer_id, c.token);
+  }
+
+  for (const d of batch) {
     const sub = d.push_subscriptions;
     const cust = Array.isArray(sub?.customers) ? sub?.customers[0] : sub?.customers;
     // Re-chequeo en el envío: baja de consentimiento, cliente inactivo o
@@ -183,7 +201,7 @@ export async function processPushQueue(limit = 50): Promise<{
         JSON.stringify({
           title: campaign.title,
           body: campaign.body,
-          url: campaign.url ?? undefined,
+          url: resolveCampaignUrl(campaign.url, tokenByCustomer.get(sub.customer_id) ?? null),
         }),
         // urgency:high → FCM prioridad alta: despierta el dispositivo al
         // instante aunque Chrome esté dormido (Doze/MIUI). Con prioridad
