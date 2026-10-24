@@ -2,11 +2,11 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, supabaseAdmin } from "@/lib/supabase/server";
 import { enqueueEmail, trySendOutbox } from "@/lib/email/outbox";
 import { logoToDataUri } from "@/lib/organizations/logo";
-import { processPushQueue, pushConfigured } from "@/lib/push/send";
-import { pushCampaignToWallets } from "@/lib/wallet/push";
+import { processPushQueue, pushConfigured, saveWalletStats } from "@/lib/push/send";
+import { pushCampaignToWallets, syncWalletLocations, type LocationSyncResult } from "@/lib/wallet/push";
 import { CARD_DESTINATIONS, scheduleToDate } from "@/lib/push/destination";
 import { STAMP_ICON_KEYS } from "@/app/t/[token]/_components/stamp-icons";
 
@@ -243,6 +243,28 @@ export async function deleteReward(orgSlug: string, rewardId: string) {
 
 // ---------- Sedes ------------------------------------------------------------
 
+// Texto para el comercio tras republicar la clase de Wallet con sus sedes.
+function locationSyncNote(r: LocationSyncResult): string {
+  if (!r.ok)
+    return r.error === "wallet_not_configured"
+      ? ""
+      : " No se pudo actualizar Google Wallet; usa «Sincronizar con Wallet» para reintentar.";
+  return r.published
+    ? " Google Wallet actualizado."
+    : " Se aplicará en Google Wallet cuando se emita el primer pase.";
+}
+
+// Solo sincroniza si el comercio activó la proximidad en Wallet.
+async function syncIfProximity(orgId: string): Promise<string> {
+  const { data } = await supabaseAdmin()
+    .from("organizations")
+    .select("features")
+    .eq("id", orgId)
+    .maybeSingle();
+  if ((data?.features as Record<string, unknown> | null)?.wallet_proximity !== true) return "";
+  return locationSyncNote(await syncWalletLocations(orgId));
+}
+
 export async function saveLocation(orgSlug: string, formData: FormData) {
   const { supabase, user, orgId } = await requireMembership(orgSlug);
   const back = `/dashboard/${orgSlug}/locations`;
@@ -274,7 +296,8 @@ export async function saveLocation(orgSlug: string, formData: FormData) {
     name,
   });
   revalidatePath(back);
-  redirect(back + "?ok=" + encodeURIComponent("Sede guardada."));
+  const note = await syncIfProximity(orgId);
+  redirect(back + "?ok=" + encodeURIComponent("Sede guardada." + note));
 }
 
 export async function setLocationStatus(
@@ -294,7 +317,38 @@ export async function setLocationStatus(
         encodeURIComponent("No se pudo cambiar el estado."),
     );
   await audit(orgId, user.id, `location.${status}`, "location", locationId);
+  await syncIfProximity(orgId);
   revalidatePath(`/dashboard/${orgSlug}/locations`);
+}
+
+// Reintento manual: republica la clase de Wallet con las sedes actuales.
+export async function syncLocationsToWallet(orgSlug: string) {
+  const { user, orgId, role } = await requireMembership(orgSlug);
+  const back = `/dashboard/${orgSlug}/locations`;
+  if (!["owner", "admin", "manager"].includes(role))
+    fail(back, "Solo manager+ puede sincronizar con Wallet.");
+  const res = await syncWalletLocations(orgId);
+  await audit(orgId, user.id, "location.wallet_sync", "organization", orgId, {
+    ok: res.ok,
+    ...(res.ok ? { published: res.published } : { error: res.error }),
+  });
+  revalidatePath(back);
+  if (!res.ok)
+    fail(
+      back,
+      res.error === "wallet_not_configured"
+        ? "Google Wallet no está configurado en el servidor."
+        : "Google rechazó la actualización de la clase. Revisa las coordenadas e inténtalo de nuevo.",
+    );
+  redirect(
+    back +
+      "?ok=" +
+      encodeURIComponent(
+        res.published
+          ? "Sedes publicadas en Google Wallet."
+          : "Sin pases emitidos todavía: las sedes se aplicarán al emitir el primero.",
+      ),
+  );
 }
 
 // ---------- Personal ----------------------------------------------------------
@@ -512,7 +566,16 @@ export async function updateOrgPrivacy(orgSlug: string, formData: FormData) {
     self_registration: flag("feat_self_registration"),
     push: flag("feat_push"),
     location: flag("feat_location"),
+    wallet_proximity: flag("feat_wallet_proximity"),
   };
+
+  const { data: prevOrg } = await supabase
+    .from("organizations")
+    .select("features")
+    .eq("id", orgId)
+    .maybeSingle();
+  const proximityWasOn =
+    (prevOrg?.features as Record<string, unknown> | null)?.wallet_proximity === true;
 
   const { error } = await supabase
     .from("organizations")
@@ -524,8 +587,13 @@ export async function updateOrgPrivacy(orgSlug: string, formData: FormData) {
     consent_version: consentVersion,
     features,
   });
+  // Cambiar la proximidad publica o retira las sedes de la clase de Wallet.
+  const note =
+    features.wallet_proximity || proximityWasOn
+      ? locationSyncNote(await syncWalletLocations(orgId))
+      : "";
   revalidatePath(`/dashboard/${orgSlug}/settings`);
-  redirect(back + "?ok=" + encodeURIComponent("Privacidad y funciones guardadas."));
+  redirect(back + "?ok=" + encodeURIComponent("Privacidad y funciones guardadas." + note));
 }
 
 // Rotar el QR de autorregistro (join_token) ante abuso o fuga. Admin+,
@@ -590,6 +658,7 @@ async function dispatchCampaign(
   const wallet = await pushCampaignToWallets(orgId, campaign.title, campaign.body).catch(
     () => null,
   );
+  if (wallet) await saveWalletStats(supabaseAdmin(), campaign.id, wallet);
 
   const parts: string[] = [
     drain

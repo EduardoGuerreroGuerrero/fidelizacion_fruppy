@@ -18,6 +18,9 @@ export interface WalletPassData {
    *  el update reescribe el array solo con este para no mostrar historial. */
   lastMessage: { header: string; body: string } | null;
   firstName: string;
+  /** Sedes publicadas en la clase (proximidad). Vacío si el comercio no activó
+   *  la función o no tiene sedes con coordenadas. */
+  locations: { latitude: number; longitude: number; relevantText: string }[];
   programName: string;
   /** null si el programa es de puntos. */
   stamps: { current: number; goal: number | null } | null;
@@ -54,6 +57,9 @@ export interface WalletProvider {
   ): Promise<void>;
   /** Revocación lógica: marca el pase como vacío/inactivo en la wallet. */
   revokePass(serialNumber: string): Promise<void>;
+  /** Republica la clase del comercio (p. ej. al cambiar sus sedes). Lanza si
+   *  Google la rechaza — a diferencia del publish best-effort de emisión. */
+  republishClass(serialNumber: string): Promise<void>;
   healthCheck(): Promise<{ ok: boolean; detail?: string }>;
 }
 

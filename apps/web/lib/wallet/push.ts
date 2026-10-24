@@ -1,6 +1,7 @@
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { walletProvider } from "./passlet";
 import type { WalletPassData } from "./provider";
+import { renderCampaignText } from "@/lib/push/template";
 
 // Fontanería interna Wallet (no es server action): espejo de entregas en
 // wallet_passes y pushes best-effort tras movimientos de fidelización.
@@ -128,14 +129,24 @@ export async function pushCampaignToWallets(
   if (!walletProvider.configured()) return out;
 
   const admin = supabaseAdmin();
-  const { data: passes } = await admin
-    .from("wallet_passes")
-    .select("id, serial_number, notify_count, notify_window_start")
-    .eq("organization_id", orgId)
-    .eq("provider", "google")
-    .in("status", ["active", "pending"]);
+  const [{ data: passes }, { data: orgRow }] = await Promise.all([
+    admin
+      .from("wallet_passes")
+      .select("id, serial_number, notify_count, notify_window_start, customers(first_name)")
+      .eq("organization_id", orgId)
+      .eq("provider", "google")
+      .in("status", ["active", "pending"]),
+    admin.from("organizations").select("name").eq("id", orgId).maybeSingle(),
+  ]);
+  const rawTitle = title;
+  const rawBody = body;
 
   for (const p of passes ?? []) {
+    // {nombre}/{negocio} se resuelven por pase; nunca sale un marcador crudo.
+    const cust = Array.isArray(p.customers) ? p.customers[0] : p.customers;
+    const vars = { negocio: orgRow?.name ?? null, nombre: cust?.first_name ?? null };
+    title = renderCampaignText(rawTitle, vars);
+    body = renderCampaignText(rawBody, vars);
     const windowStart = p.notify_window_start
       ? new Date(p.notify_window_start).getTime()
       : 0;
@@ -212,4 +223,31 @@ export async function pushCampaignToWallets(
     }
   }
   return out;
+}
+
+export type LocationSyncResult =
+  | { ok: true; passes: number; published: boolean }
+  | { ok: false; error: string };
+
+// Republica la clase de Wallet del comercio con sus sedes actuales. La clase
+// vive en Google desde que se emite el primer pase: sin pases no hay nada que
+// sincronizar todavía (se aplica sola al emitir el primero). Lanza nunca:
+// devuelve el resultado para mostrarlo al comercio.
+export async function syncWalletLocations(orgId: string): Promise<LocationSyncResult> {
+  if (!walletProvider.googleEnabled()) return { ok: false, error: "wallet_not_configured" };
+  try {
+    const { data: passes } = await supabaseAdmin()
+      .from("wallet_passes")
+      .select("serial_number")
+      .eq("organization_id", orgId)
+      .eq("provider", "google")
+      .limit(1);
+    if (!passes?.length) return { ok: true, passes: 0, published: false };
+    await walletProvider.republishClass(passes[0].serial_number);
+    return { ok: true, passes: passes.length, published: true };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message.slice(0, 160) : "sync_failed";
+    console.error("[wallet] location sync failed:", msg);
+    return { ok: false, error: msg };
+  }
 }

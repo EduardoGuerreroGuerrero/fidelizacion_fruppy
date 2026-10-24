@@ -146,6 +146,9 @@ export class PassletWalletProvider implements WalletProvider {
       id: `loyalty-${data.orgId}`,
       name: data.programName,
       color: data.brandColor ?? "#0f5132",
+      // Proximidad: Google la muestra según permisos del usuario; aquí solo
+      // se publican las coordenadas de las sedes (máx. 10, ya recortadas).
+      locations: data.locations.length ? data.locations : undefined,
       apple: baseUrl
         ? {
             icon: {
@@ -180,14 +183,19 @@ export class PassletWalletProvider implements WalletProvider {
   // Sobrescribe la clase de Google cuando la marca del comercio cambió
   // (create() no toca clases existentes). Cacheada por firma por proceso:
   // solo vuelve a publicar si el config efectivo es distinto del anterior.
-  private async ensurePublished(data: WalletPassData): Promise<void> {
-    const t = this.templateOf(data);
-    const sig = JSON.stringify([
+  private sigOf(data: WalletPassData): string {
+    return JSON.stringify([
       data.brandColor,
       data.logoUrl,
       data.orgName,
       data.programName,
+      data.locations,
     ]);
+  }
+
+  private async ensurePublished(data: WalletPassData): Promise<void> {
+    const t = this.templateOf(data);
+    const sig = this.sigOf(data);
     const key = `loyalty-${data.orgId}`;
     if (this.published.get(key) === sig) return;
     try {
@@ -198,6 +206,13 @@ export class PassletWalletProvider implements WalletProvider {
       // marcar como publicada, la próxima llamada lo reintenta.
       console.error("[wallet] class publish failed:", e instanceof Error ? e.message : e);
     }
+  }
+
+  async republishClass(serialNumber: string): Promise<void> {
+    const data = await passDataBySerial(serialNumber);
+    if (!data) throw new Error("pass_not_found");
+    await this.templateOf(data).publish();
+    this.published.set(`loyalty-${data.orgId}`, this.sigOf(data));
   }
 
   private contentOf(data: WalletPassData): PassContent {
