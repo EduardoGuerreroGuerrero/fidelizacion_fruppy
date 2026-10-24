@@ -7,6 +7,7 @@ import { enqueueEmail, trySendOutbox } from "@/lib/email/outbox";
 import { logoToDataUri } from "@/lib/organizations/logo";
 import { processPushQueue, pushConfigured } from "@/lib/push/send";
 import { pushCampaignToWallets } from "@/lib/wallet/push";
+import { CARD_DESTINATIONS, scheduleToDate } from "@/lib/push/destination";
 import { STAMP_ICON_KEYS } from "@/app/t/[token]/_components/stamp-icons";
 
 // Acciones de administración del comercio (Fase 7). Todas verifican sesión
@@ -545,69 +546,21 @@ export async function rotateJoinToken(orgSlug: string) {
 
 // ---------- Campañas push ------------------------------------------------------
 
-export async function savePushCampaign(orgSlug: string, formData: FormData) {
-  const { supabase, user, orgId, role } = await requireMembership(orgSlug);
+type OrgCtx = Awaited<ReturnType<typeof requireMembership>>;
+
+// Encola la campaña (audiencia resuelta en servidor), drena la cola al
+// instante y empuja el mismo mensaje a los pases Google. Devuelve el resumen
+// para el aviso; los errores redirigen con ?error=.
+async function dispatchCampaign(
+  ctx: OrgCtx,
+  orgSlug: string,
+  campaign: { id: string; title: string; body: string },
+): Promise<string> {
+  const { supabase, user, orgId } = ctx;
   const back = `/dashboard/${orgSlug}/campaigns`;
-  if (!["owner", "admin", "manager"].includes(role))
-    fail(back, "Solo manager+ puede crear campañas.");
-
-  const title = String(formData.get("title") ?? "").trim();
-  const body = String(formData.get("body") ?? "").trim();
-  const url = String(formData.get("url") ?? "").trim() || null;
-  const schedule = String(formData.get("schedule") ?? "").trim();
-
-  if (title.length < 1 || title.length > 100) fail(back, "Título inválido (máx. 100).");
-  if (body.length < 1 || body.length > 300) fail(back, "Mensaje inválido (máx. 300).");
-  if (url && !/^https:\/\/|^\/[^/]/.test(url) && url !== "/")
-    fail(back, "URL inválida: interna (/ruta) o https://.");
-
-  const { data: campaign, error } = await supabase
-    .from("push_campaigns")
-    .insert({
-      organization_id: orgId,
-      created_by: user.id,
-      title,
-      body,
-      url,
-      status: "draft",
-    })
-    .select("id")
-    .single();
-  if (error || !campaign) fail(back, "No se pudo crear la campaña.");
-
-  // Programar para después → la cola la dispara al vencer la hora.
-  if (schedule) {
-    const at = new Date(schedule);
-    if (!Number.isFinite(at.getTime()) || at.getTime() < Date.now() + 60_000)
-      fail(back, "La fecha de envío debe ser futura (mínimo 1 minuto).");
-    const { error: e2 } = await supabase.rpc("schedule_push_campaign", {
-      p_campaign_id: campaign.id,
-      p_at: at.toISOString(),
-    });
-    if (e2) fail(back, "No se pudo programar la campaña.");
-  }
-
-  await audit(orgId, user.id, "campaign.created", "push_campaign", campaign.id, { title });
-  revalidatePath(back);
-  redirect(back + "?ok=" + encodeURIComponent("Campaña creada."));
-}
-
-export async function queuePushCampaign(orgSlug: string, campaignId: string) {
-  const { supabase, user, orgId, role } = await requireMembership(orgSlug);
-  const back = `/dashboard/${orgSlug}/campaigns`;
-  if (!["owner", "admin", "manager"].includes(role))
-    fail(back, "Solo manager+ puede enviar campañas.");
-
-  const { data: campaign } = await supabase
-    .from("push_campaigns")
-    .select("id, title, body")
-    .eq("id", campaignId)
-    .eq("organization_id", orgId)
-    .maybeSingle();
-  if (!campaign) fail(back, "Campaña no encontrada.");
 
   const { data: count, error } = await supabase.rpc("queue_push_campaign", {
-    p_campaign_id: campaignId,
+    p_campaign_id: campaign.id,
   });
   if (error) {
     const m = error.message;
@@ -620,7 +573,7 @@ export async function queuePushCampaign(orgSlug: string, campaignId: string) {
           : "No se pudo encolar la campaña.",
     );
   }
-  await audit(orgId, user.id, "campaign.queued", "push_campaign", campaignId, {
+  await audit(orgId, user.id, "campaign.queued", "push_campaign", campaign.id, {
     recipients: count,
   });
 
@@ -652,9 +605,128 @@ export async function queuePushCampaign(orgSlug: string, campaignId: string) {
       `${wallet.limited} pase(s) sin aviso: Google permite máx. 3 notificaciones de este tipo por pase cada 24 h`,
     );
   if (wallet?.failed) parts.push(`${wallet.failed} pase(s) con error`);
+  return parts.join(" · ") + ".";
+}
+
+// Crea la campaña y, según `intent`: guarda borrador, programa o envía ya.
+export async function savePushCampaign(orgSlug: string, formData: FormData) {
+  const ctx = await requireMembership(orgSlug);
+  const { supabase, user, orgId, role } = ctx;
+  const back = `/dashboard/${orgSlug}/campaigns`;
+  if (!["owner", "admin", "manager"].includes(role))
+    fail(back, "Solo manager+ puede crear campañas.");
+
+  const intent = String(formData.get("intent") ?? "draft");
+  const title = String(formData.get("title") ?? "").trim();
+  const body = String(formData.get("body") ?? "").trim();
+  const dest = String(formData.get("dest") ?? "card");
+  const custom = String(formData.get("url") ?? "").trim();
+  const schedule = String(formData.get("schedule") ?? "").trim();
+  const tz = Number(formData.get("tz") ?? 0);
+
+  if (title.length < 1 || title.length > 100) fail(back, "Título inválido (máx. 100).");
+  if (body.length < 1 || body.length > 300) fail(back, "Mensaje inválido (máx. 300).");
+
+  let url: string | null = null;
+  if (dest === "custom") {
+    if (!/^https:\/\//.test(custom)) fail(back, "El enlace externo debe empezar por https://");
+    url = custom;
+  } else {
+    url = CARD_DESTINATIONS.find((d) => d.value === dest)?.url ?? null;
+  }
+
+  let at: Date | null = null;
+  if (intent === "schedule") {
+    at = scheduleToDate(schedule, tz);
+    if (!Number.isFinite(at.getTime()) || at.getTime() < Date.now() + 60_000)
+      fail(back, "La fecha de envío debe ser futura (mínimo 1 minuto).");
+  }
+
+  const { data: campaign, error } = await supabase
+    .from("push_campaigns")
+    .insert({
+      organization_id: orgId,
+      created_by: user.id,
+      title,
+      body,
+      url,
+      status: "draft",
+    })
+    .select("id")
+    .single();
+  if (error || !campaign) fail(back, "No se pudo crear la campaña.");
+
+  await audit(orgId, user.id, "campaign.created", "push_campaign", campaign.id, { title });
+
+  if (at) {
+    const { error: e2 } = await supabase.rpc("schedule_push_campaign", {
+      p_campaign_id: campaign.id,
+      p_at: at.toISOString(),
+    });
+    if (e2) fail(back, "No se pudo programar la campaña.");
+  }
+
+  let msg = "Borrador guardado.";
+  if (at) msg = "Campaña programada.";
+  if (intent === "send") msg = await dispatchCampaign(ctx, orgSlug, { id: campaign.id, title, body });
 
   revalidatePath(back);
-  redirect(back + "?ok=" + encodeURIComponent(parts.join(" · ") + "."));
+  redirect(back + "?ok=" + encodeURIComponent(msg));
+}
+
+export async function queuePushCampaign(orgSlug: string, campaignId: string) {
+  const ctx = await requireMembership(orgSlug);
+  const back = `/dashboard/${orgSlug}/campaigns`;
+  if (!["owner", "admin", "manager"].includes(ctx.role))
+    fail(back, "Solo manager+ puede enviar campañas.");
+
+  const { data: campaign } = await ctx.supabase
+    .from("push_campaigns")
+    .select("id, title, body")
+    .eq("id", campaignId)
+    .eq("organization_id", ctx.orgId)
+    .maybeSingle();
+  if (!campaign) fail(back, "Campaña no encontrada.");
+
+  const msg = await dispatchCampaign(ctx, orgSlug, campaign);
+  revalidatePath(back);
+  redirect(back + "?ok=" + encodeURIComponent(msg));
+}
+
+// Copia una campaña como borrador nuevo (reutilizar textos que funcionaron).
+export async function duplicatePushCampaign(orgSlug: string, campaignId: string) {
+  const { supabase, user, orgId, role } = await requireMembership(orgSlug);
+  const back = `/dashboard/${orgSlug}/campaigns`;
+  if (!["owner", "admin", "manager"].includes(role))
+    fail(back, "Solo manager+ puede crear campañas.");
+
+  const { data: src } = await supabase
+    .from("push_campaigns")
+    .select("title, body, url")
+    .eq("id", campaignId)
+    .eq("organization_id", orgId)
+    .maybeSingle();
+  if (!src) fail(back, "Campaña no encontrada.");
+
+  const { data: copy, error } = await supabase
+    .from("push_campaigns")
+    .insert({
+      organization_id: orgId,
+      created_by: user.id,
+      title: src.title,
+      body: src.body,
+      url: src.url,
+      status: "draft",
+    })
+    .select("id")
+    .single();
+  if (error || !copy) fail(back, "No se pudo duplicar la campaña.");
+
+  await audit(orgId, user.id, "campaign.duplicated", "push_campaign", copy.id, {
+    from: campaignId,
+  });
+  revalidatePath(back);
+  redirect(back + "?ok=" + encodeURIComponent("Copia creada como borrador."));
 }
 
 export async function cancelPushCampaign(orgSlug: string, campaignId: string) {
