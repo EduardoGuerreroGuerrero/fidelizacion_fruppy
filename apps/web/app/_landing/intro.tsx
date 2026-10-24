@@ -82,20 +82,25 @@ export default function IntroVideo() {
         leaving ? "pointer-events-none opacity-0" : "opacity-100"
       }`}
     >
-      {/* Nivel SaaS: intro PineappleLoyalty, sin marca de ningún comercio. */}
-      <video
-        ref={videoRef}
-        className="h-full w-full object-contain"
-        src="/pineapple/intro.mp4"
-        poster="/pineapple/logo-vertical.png"
-        autoPlay
-        muted
-        playsInline
-        preload="auto"
-        onEnded={finish}
-        onError={finish}
-        onCanPlay={tryPlay}
-      />
+      {/* Nivel SaaS: intro PineappleLoyalty, sin marca de ningún comercio.
+          El wrapper con overflow-hidden + el leve scale() en el video evitan
+          un bug de compositing de Chrome/Edge que pinta una línea de 1px en
+          el borde donde termina el rectángulo del video con object-contain. */}
+      <div className="h-full w-full overflow-hidden">
+        <video
+          ref={videoRef}
+          className="h-full w-full scale-[1.004] object-contain"
+          src="/pineapple/intro.mp4"
+          poster="/pineapple/logo-vertical.png"
+          autoPlay
+          muted
+          playsInline
+          preload="auto"
+          onEnded={finish}
+          onError={finish}
+          onCanPlay={tryPlay}
+        />
+      </div>
       <button
         type="button"
         onClick={finish}
