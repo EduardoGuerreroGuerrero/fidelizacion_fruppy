@@ -134,7 +134,7 @@ begin
   r := public.register_customer_via_join(v_join_c, 'Ana Otra', 'ana@test.co',
                                          null, true, 'hash-j03', 'j03-1');
   perform pg_temp.t_ok((r->>'ok')::boolean and (r->>'existing')::boolean = true
-                       and r->'cards' is null,
+                       and r->>'cards' is null,
                        'J03a correo duplicado → existing sin revelar tokens (anon-safe)');
   perform pg_temp.t_ok(
     (select count(*) from public.customers where organization_id = ORG_C) = 1,
@@ -347,7 +347,7 @@ begin
   r := public.register_customer_via_join(
          v_join_c, 'Caro Multi', 'CARO@test.co', null, false, 'hash-j15', 'j15-2',
          array[PROG_STAMPS_C, v_prog_pts_c]);
-  perform pg_temp.t_ok((r->>'existing')::boolean = true and r->'cards' is null,
+  perform pg_temp.t_ok((r->>'existing')::boolean = true and r->>'cards' is null,
                        'J15d cliente existente: sigue sin revelar tokens en la respuesta');
   perform pg_temp.t_ok(
     (select count(*) from public.loyalty_accounts
