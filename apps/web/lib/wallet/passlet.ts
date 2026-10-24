@@ -319,7 +319,14 @@ export class PassletWalletProvider implements WalletProvider {
       await this.ensurePublished(data);
       return this.templateOf(data).create(this.contentOf(data));
     });
-    await this.syncHero(data);
+    // create() no toca un objeto que Google ya tiene (p. ej. el cliente vuelve
+    // a pulsar "Google Wallet"): se actualiza con el formato actual — campos,
+    // imagen de detalle, texto del QR e imagen principal — sin aviso al
+    // teléfono (el saldo no cambia). Best-effort: el enlace de guardado ya
+    // está listo y no debe depender de esto.
+    await this.updatePass(data.serialNumber).catch((e) => {
+      console.error("[wallet] refresh on issue failed:", e instanceof Error ? e.message : e);
+    });
     return {
       applePkpass: issued.apple ?? null,
       googleSaveUrl: issued.google ? googleSaveUrl(issued.google) : null,
