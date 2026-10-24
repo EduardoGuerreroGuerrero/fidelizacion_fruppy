@@ -422,6 +422,21 @@ export default async function SettingsPage({
               </span>
             </span>
           </label>
+          <label className="flex items-start gap-2.5 text-sm">
+            <input
+              type="checkbox"
+              name="feat_wallet_proximity"
+              defaultChecked={features.wallet_proximity === true}
+              className="mt-0.5 size-4 accent-brand"
+            />
+            <span>
+              Proximidad en Google Wallet{" "}
+              <span className="text-xs text-ink-soft">
+                (publica tus sedes con coordenadas en el pase; Google decide cuándo avisar
+                según los permisos del cliente — no conocemos su ubicación)
+              </span>
+            </span>
+          </label>
         </fieldset>
 
         <SubmitButton

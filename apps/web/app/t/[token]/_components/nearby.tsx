@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { CardLocation } from "./data";
 import { IconPin } from "./icons";
+import { LocationRow } from "./location-row";
 
 // "Sedes cercanas": la geolocalización se pide SOLO tras el clic del
 // usuario y tras explicar la finalidad. La posición nunca sale del
@@ -22,13 +23,9 @@ function km(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
 
 type State = "idle" | "asking" | "denied" | "unavailable" | "sorted";
 
-export function NearbySort({
-  locations,
-  renderRow,
-}: {
-  locations: CardLocation[];
-  renderRow: (l: Loc, index: number) => React.ReactNode;
-}) {
+// Renderiza las filas aquí mismo: un Server Component no puede pasar
+// funciones (renderRow) a un Client Component — antes la página daba 500.
+export function NearbySort({ locations }: { locations: CardLocation[] }) {
   const [state, setState] = useState<State>("idle");
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 
@@ -99,7 +96,9 @@ export function NearbySort({
       ) : null}
 
       <ul className="mt-4">
-        {withDistance.map((l, i) => renderRow(l, i))}
+        {withDistance.map((l) => (
+          <LocationRow key={l.id} location={l} distanceKm={l._km} />
+        ))}
         {withDistance.length === 0 ? (
           <li className="mx-5 rounded-2xl border border-dashed border-neutral-200 p-6 text-center text-sm text-ink-soft">
             Este comercio aún no ha publicado sus sedes.

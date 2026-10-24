@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getCardAppData } from "../_components/data";
 import { TitleBar } from "../_components/chrome";
-import { LocationRow } from "../_components/cards";
+import { LocationRow } from "../_components/location-row";
 import { NearbySort } from "../_components/nearby";
 
 export const instant = false;
@@ -52,12 +52,7 @@ export default async function NuestrasSedes({
       {/* Lista de sedes — orden por cercanía opcional (geolocalización
           en el dispositivo, sin persistir ni enviar la posición) */}
       {card.location_enabled ? (
-        <NearbySort
-          locations={locations}
-          renderRow={(l) => (
-            <LocationRow key={l.id} location={l} distanceKm={l._km} />
-          )}
-        />
+        <NearbySort locations={locations} />
       ) : (
         <ul className="mt-4">
           {locations.map((l) => (

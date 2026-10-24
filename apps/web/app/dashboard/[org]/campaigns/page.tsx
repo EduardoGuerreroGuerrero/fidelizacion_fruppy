@@ -20,6 +20,15 @@ const STATUS: Record<string, { label: string; cls: string }> = {
   cancelled: { label: "Cancelada", cls: "bg-red-50 text-red-700" },
 };
 
+const walletStats = (w: Record<string, number>) =>
+  [
+    `${w.notified ?? 0} con aviso`,
+    w.textOnly ? `${w.textOnly} solo texto (cuota de Google)` : null,
+    w.failed ? `${w.failed} con error` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
 const when = (iso: string) =>
   new Date(iso).toLocaleString("es-CO", { dateStyle: "medium", timeStyle: "short" });
 
@@ -153,6 +162,7 @@ export default async function CampaignsPage({
         <ul className="space-y-2">
           {(campaigns ?? []).map((c) => {
             const stats = (c.stats ?? {}) as Record<string, number>;
+            const wallet = (c.stats as { wallet?: Record<string, number> } | null)?.wallet;
             const st = STATUS[c.status] ?? { label: c.status, cls: "bg-neutral-100 text-ink-soft" };
             const total =
               (stats.sent ?? 0) + (stats.failed ?? 0) + (stats.expired ?? 0) + (stats.skipped ?? 0);
@@ -203,6 +213,11 @@ export default async function CampaignsPage({
                     )}
                   </div>
                 </div>
+                {c.status === "sent" && wallet ? (
+                  <p className="mt-2 text-xs text-ink-soft">
+                    Wallet: {walletStats(wallet)}
+                  </p>
+                ) : null}
                 {c.status === "sent" && total > 0 ? (
                   <div className="mt-3">
                     <div className="h-1.5 overflow-hidden rounded-full bg-neutral-100" aria-hidden>

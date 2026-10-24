@@ -8,6 +8,7 @@ import {
   type WalletConfig,
 } from "passlet";
 import { passDataBySerial } from "./pass-data";
+import { safeBrand, walletCardImageUrl, walletHeroUrl } from "./images";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import {
   WalletNotConfiguredError,
@@ -44,6 +45,31 @@ export class PassletWalletProvider implements WalletProvider {
   // publish() sobreescribe la clase en Google (create() solo crea las que
   // faltan), así evitamos republicar la misma config una y otra vez.
   private published = new Map<string, string>();
+  // Banner e imagen de saldo son mejoras visuales: Google las descarga al
+  // publicar y rechaza TODO si no puede (URL inalcanzable, ruta caída). Ante
+  // un rechazo se emite/actualiza sin imágenes durante unos minutos en vez de
+  // dejar al cliente sin pase o con el saldo congelado.
+  private plainUntil = 0;
+  private get plain(): boolean {
+    return Date.now() < this.plainUntil;
+  }
+  private degradeImages(reason: unknown): void {
+    this.plainUntil = Date.now() + 5 * 60_000;
+    this.published.clear();
+    console.error(
+      "[wallet] imágenes del pase desactivadas 5 min:",
+      reason instanceof Error ? reason.message : reason,
+    );
+  }
+  private async guarded<T>(fn: () => Promise<T>): Promise<T> {
+    try {
+      return await fn();
+    } catch (e) {
+      if (this.plain) throw e;
+      this.degradeImages(e);
+      return await fn();
+    }
+  }
 
   configured(): boolean {
     return this.appleConfigured() || this.googleConfigured();
@@ -146,6 +172,9 @@ export class PassletWalletProvider implements WalletProvider {
       id: `loyalty-${data.orgId}`,
       name: data.programName,
       color: data.brandColor ?? "#0f5132",
+      // Proximidad: Google la muestra según permisos del usuario; aquí solo
+      // se publican las coordenadas de las sedes (máx. 10, ya recortadas).
+      locations: data.locations.length ? data.locations : undefined,
       apple: baseUrl
         ? {
             icon: {
@@ -163,16 +192,22 @@ export class PassletWalletProvider implements WalletProvider {
         ? {
             issuerName: data.orgName,
             // Logo del comercio si lo subió; si no, el genérico de la marca
-            // SaaS. Sin "hero": sin esa imagen la tarjeta queda unicolor
-            // (antes mostraba una promo fija de ejemplo, ajena al comercio).
+            // SaaS. El banner se genera con el color y nombre del comercio
+            // (misma identidad que la tarjeta de la app): nada ajeno al
+            // comercio y sin tarjeta unicolor.
             logo: data.logoUrl ?? `${baseUrl}/pineapple/wallet-logo.png?v=3`,
+            hero: this.plain
+              ? undefined
+              : walletHeroUrl(baseUrl, data.orgId, data.brandColor, data.orgName, data.programName),
           }
         : undefined,
+      // Claves nativas de Google (loyalty): member → nombre del titular,
+      // points → saldo grande (solo programas de puntos). El saldo de sellos
+      // va como texto + la imagen de la tarjeta.
       fields: [
-        field.secondary("holder", "Cliente"),
-        field.secondary("org", "Comercio"),
-        field.primary("balance", "Sellos", { changeMessage: "Sellos: %@" }),
         field.primary("points", "Puntos", { changeMessage: "Puntos: %@" }),
+        field.secondary("member", "Cliente"),
+        field.secondary("balance", "Sellos", { changeMessage: "Sellos: %@" }),
       ],
     });
   }
@@ -180,14 +215,20 @@ export class PassletWalletProvider implements WalletProvider {
   // Sobrescribe la clase de Google cuando la marca del comercio cambió
   // (create() no toca clases existentes). Cacheada por firma por proceso:
   // solo vuelve a publicar si el config efectivo es distinto del anterior.
-  private async ensurePublished(data: WalletPassData): Promise<void> {
-    const t = this.templateOf(data);
-    const sig = JSON.stringify([
+  private sigOf(data: WalletPassData): string {
+    return JSON.stringify([
       data.brandColor,
       data.logoUrl,
       data.orgName,
       data.programName,
+      data.locations,
+      this.plain,
     ]);
+  }
+
+  private async ensurePublished(data: WalletPassData): Promise<void> {
+    const t = this.templateOf(data);
+    const sig = this.sigOf(data);
     const key = `loyalty-${data.orgId}`;
     if (this.published.get(key) === sig) return;
     try {
@@ -195,17 +236,35 @@ export class PassletWalletProvider implements WalletProvider {
       this.published.set(key, sig);
     } catch (e) {
       // Publicar es mejora de marca, no debe romper emisión ni updates; sin
-      // marcar como publicada, la próxima llamada lo reintenta.
+      // marcar como publicada, la próxima llamada lo reintenta. Si fue por
+      // las imágenes, se reintenta de inmediato sin ellas.
       console.error("[wallet] class publish failed:", e instanceof Error ? e.message : e);
+      if (!this.plain) {
+        this.degradeImages(e);
+        try {
+          await this.templateOf(data).publish();
+          this.published.set(key, this.sigOf(data));
+        } catch (e2) {
+          console.error("[wallet] class publish (sin imágenes) failed:", e2 instanceof Error ? e2.message : e2);
+        }
+      }
     }
+  }
+
+  async republishClass(serialNumber: string): Promise<void> {
+    const data = await passDataBySerial(serialNumber);
+    if (!data) throw new Error("pass_not_found");
+    await this.guarded(async () => {
+      await this.templateOf(data).publish();
+      this.published.set(`loyalty-${data.orgId}`, this.sigOf(data));
+    });
   }
 
   private contentOf(data: WalletPassData): PassContent {
     return {
       serialNumber: data.serialNumber,
       values: {
-        holder: data.firstName,
-        org: data.orgName,
+        member: data.firstName,
         balance: data.stamps ? `${data.stamps.current}/${data.stamps.goal ?? "?"}` : null,
         points: data.points != null ? String(data.points) : null,
       },
@@ -215,6 +274,23 @@ export class PassletWalletProvider implements WalletProvider {
       // array desde aquí → solo sobrevive el último mensaje enviado, el
       // historial queda limpio como en el diseño del mockup.
       google: {
+        // Tarjeta con nombre, insignia y contador (como la de la app); se
+        // regenera con cada movimiento porque la URL cambia con el saldo.
+        images: env("NEXT_PUBLIC_BASE_URL") && !this.plain
+          ? [
+              {
+                id: "tarjeta",
+                url: walletCardImageUrl(env("NEXT_PUBLIC_BASE_URL")!, data.serialNumber, {
+                  firstName: data.firstName,
+                  current: data.stamps ? data.stamps.current : (data.points ?? 0),
+                  goal: data.stamps?.goal ?? null,
+                  kind: data.stamps ? "stamps" : "points",
+                  revoked: data.revoked,
+                  brandColor: safeBrand(data.brandColor),
+                }),
+              },
+            ]
+          : undefined,
         messages: data.lastMessage
           ? [{ header: data.lastMessage.header, body: data.lastMessage.body, messageType: "TEXT" as const }]
           : [],
@@ -223,8 +299,10 @@ export class PassletWalletProvider implements WalletProvider {
   }
 
   async issuePass(data: WalletPassData): Promise<WalletIssueResult> {
-    await this.ensurePublished(data);
-    const issued = await this.templateOf(data).create(this.contentOf(data));
+    const issued = await this.guarded(async () => {
+      await this.ensurePublished(data);
+      return this.templateOf(data).create(this.contentOf(data));
+    });
     return {
       applePkpass: issued.apple ?? null,
       googleSaveUrl: issued.google ? googleSaveUrl(issued.google) : null,
@@ -237,8 +315,10 @@ export class PassletWalletProvider implements WalletProvider {
     // esto el pase se actualiza en silencio). En Apple no aplica: APNs
     // siempre avisa cuando hay changeMessage.
     const data = await passDataBySerial(serialNumber);
-    if (data) await this.ensurePublished(data);
-    await this.getWallet().update(serialNumber, { notify: true });
+    await this.guarded(async () => {
+      if (data) await this.ensurePublished(data);
+      await this.getWallet().update(serialNumber, { notify: true });
+    });
   }
 
   async sendPassMessage(

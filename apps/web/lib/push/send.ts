@@ -3,6 +3,7 @@ import { optionalEnv } from "@/lib/env";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { pushCampaignToWallets } from "@/lib/wallet/push";
 import { resolveCampaignUrl } from "./destination";
+import { renderCampaignText } from "./template";
 
 // Envío Web Push por comercio. Solo servidor: la clave privada VAPID nunca
 // sale del entorno. La elegibilidad se re-evalúa en el momento del envío:
@@ -40,9 +41,12 @@ type QueuedDelivery = {
     p256dh: string;
     auth: string;
     status: string;
-    customers: { status: string; push_consent_state: string | null } | { status: string; push_consent_state: string | null }[] | null;
+    customers: CustRow | CustRow[] | null;
   } | null;
+  organization_id: string;
 };
+
+type CustRow = { status: string; push_consent_state: string | null; first_name: string | null };
 
 type CampaignRow = { id: string; status: string; title: string; body: string; url: string | null };
 
@@ -85,11 +89,25 @@ async function queueDueCampaigns(admin: ReturnType<typeof supabaseAdmin>): Promi
 
     // Mismo mensaje hacia los pases Google entregados (con cuota 3/24h;
     // degradado a TEXT al agotarse). Best-effort: no bloquea el drenaje.
-    await pushCampaignToWallets(c.organization_id, c.title, c.body).catch((e) => {
+    const wallet = await pushCampaignToWallets(c.organization_id, c.title, c.body).catch((e) => {
       console.error("[push] wallet campaign failed:", e instanceof Error ? e.message : e);
+      return null;
     });
+    if (wallet) await saveWalletStats(admin, c.id, wallet);
   }
   return due?.length ?? 0;
+}
+
+// Guarda el resultado de wallet dentro de push_campaigns.stats.wallet (jsonb,
+// sin migración) para mostrarlo en el historial.
+export async function saveWalletStats(
+  admin: ReturnType<typeof supabaseAdmin>,
+  campaignId: string,
+  wallet: Record<string, number>,
+): Promise<void> {
+  const { data: cur } = await admin.from("push_campaigns").select("stats").eq("id", campaignId).maybeSingle();
+  const prev = (cur?.stats ?? {}) as Record<string, unknown>;
+  await admin.from("push_campaigns").update({ stats: { ...prev, wallet } }).eq("id", campaignId);
 }
 
 async function finishCampaignIfDone(
@@ -107,10 +125,14 @@ async function finishCampaignIfDone(
     .from("push_deliveries")
     .select("status")
     .eq("campaign_id", campaignId);
-  const stats: Record<string, number> = { sent: 0, failed: 0, expired: 0, skipped: 0 };
+  const counts: Record<string, number> = { sent: 0, failed: 0, expired: 0, skipped: 0 };
   for (const r of rows ?? []) {
-    if (r.status in stats) stats[r.status as keyof typeof stats] += 1;
+    if (r.status in counts) counts[r.status as keyof typeof counts] += 1;
   }
+  // Conserva el resultado de wallet que ya hubiera guardado el envío.
+  const { data: cur } = await admin.from("push_campaigns").select("stats").eq("id", campaignId).maybeSingle();
+  const prev = (cur?.stats ?? {}) as Record<string, unknown>;
+  const stats = prev.wallet ? { ...counts, wallet: prev.wallet } : counts;
   await admin
     .from("push_campaigns")
     .update({ status: "sent", sent_at: new Date().toISOString(), stats })
@@ -134,8 +156,8 @@ export async function processPushQueue(limit = 50): Promise<{
   const { data: deliveries } = await admin
     .from("push_deliveries")
     .select(
-      "id, campaign_id, attempts, " +
-        "push_subscriptions!inner(id, customer_id, endpoint, p256dh, auth, status, customers!inner(status, push_consent_state))",
+      "id, campaign_id, organization_id, attempts, " +
+        "push_subscriptions!inner(id, customer_id, endpoint, p256dh, auth, status, customers!inner(status, push_consent_state, first_name))",
     )
     .eq("status", "queued")
     .order("created_at")
@@ -155,6 +177,13 @@ export async function processPushQueue(limit = 50): Promise<{
       .in("customer_id", customerIds)
       .eq("status", "active");
     for (const c of cards ?? []) tokenByCustomer.set(c.customer_id, c.token);
+  }
+
+  const orgIds = [...new Set(batch.map((d) => d.organization_id))];
+  const orgName = new Map<string, string>();
+  if (orgIds.length) {
+    const { data: orgs } = await admin.from("organizations").select("id, name").in("id", orgIds);
+    for (const o of orgs ?? []) orgName.set(o.id, o.name);
   }
 
   for (const d of batch) {
@@ -192,6 +221,8 @@ export async function processPushQueue(limit = 50): Promise<{
       continue;
     }
 
+    const vars = { negocio: orgName.get(d.organization_id) ?? null, nombre: cust.first_name };
+
     try {
       await webpush.sendNotification(
         {
@@ -199,8 +230,8 @@ export async function processPushQueue(limit = 50): Promise<{
           keys: { p256dh: sub.p256dh, auth: sub.auth },
         },
         JSON.stringify({
-          title: campaign.title,
-          body: campaign.body,
+          title: renderCampaignText(campaign.title, vars),
+          body: renderCampaignText(campaign.body, vars),
           url: resolveCampaignUrl(campaign.url, tokenByCustomer.get(sub.customer_id) ?? null),
         }),
         // urgency:high → FCM prioridad alta: despierta el dispositivo al
