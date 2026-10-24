@@ -69,6 +69,14 @@ declare
   b          boolean;
   v_camp     uuid;
   v_tok2     text;
+
+  -- J15 · multi-programa en el autorregistro
+  PROG_STAMPS_C constant uuid := 'eeeeeeee-1111-0000-0000-000000000003';
+  v_prog_pts_c  uuid;
+  v_prog_foreign uuid;
+  v_cust3       uuid;
+  v_tok_stamps  text;
+  v_tok_pts     text;
 begin
   select join_token into v_join_c from public.organizations where id = ORG_C;
   select join_token into v_join_d from public.organizations where id = ORG_D;
@@ -76,8 +84,9 @@ begin
   -- --- J01 resolve_join ---
   r := public.resolve_join(v_join_c);
   perform pg_temp.t_ok((r->>'ok')::boolean and r->>'org_name' = 'Org C Join'
-                       and r->>'program_name' = 'Sellos C',
-                       'J01a resolve_join devuelve marca y programa');
+                       and json_array_length(r->'programs') = 1
+                       and r->'programs'->0->>'name' = 'Sellos C',
+                       'J01a resolve_join devuelve marca y programas activos');
   perform pg_temp.t_ok(public.resolve_join(repeat('f', 32)) is null,
                        'J01b token inexistente → null');
   r := public.resolve_join(v_join_d);
@@ -89,9 +98,10 @@ begin
          v_join_c, '  ana prueba ', 'Ana@Test.co', '+57 300 1112233',
          false, 'hash-j02', 'j02-1');
   perform pg_temp.t_ok((r->>'ok')::boolean and (r->>'existing')::boolean = false
-                       and r->>'card_token' is not null,
-                       'J02a alta devuelve token de tarjeta');
-  v_card_tok := r->>'card_token';
+                       and json_array_length(r->'cards') = 1
+                       and r->'cards'->0->>'token' is not null,
+                       'J02a alta devuelve tarjeta del programa (único, por defecto)');
+  v_card_tok := r->'cards'->0->>'token';
   v_cust := (r->>'customer_id')::uuid;
 
   select count(*) into n from public.customers
@@ -124,8 +134,8 @@ begin
   r := public.register_customer_via_join(v_join_c, 'Ana Otra', 'ana@test.co',
                                          null, true, 'hash-j03', 'j03-1');
   perform pg_temp.t_ok((r->>'ok')::boolean and (r->>'existing')::boolean = true
-                       and r->>'card_token' is null,
-                       'J03a correo duplicado → existing sin filtrar tarjeta');
+                       and r->'cards' is null,
+                       'J03a correo duplicado → existing sin revelar tokens (anon-safe)');
   perform pg_temp.t_ok(
     (select count(*) from public.customers where organization_id = ORG_C) = 1,
     'J03b no se creó duplicado');
@@ -298,6 +308,70 @@ begin
   r := public.submit_rights_request(v_card_tok, 'access', null);
   perform pg_temp.t_ok(r->>'error' = 'rate_limited',
                        'J13c antiabuso: máx. 5 abiertas');
+
+  -- --- J15 multi-programa: el cliente elige uno, varios, o ninguno ----------
+
+  -- Org C pasa a tener 2 programas activos a la vez (sellos + puntos).
+  insert into public.loyalty_programs
+    (id, organization_id, name, program_type, status, points_per_currency_unit)
+  values
+    ('eeeeeeee-1111-0000-0000-000000000004', ORG_C, 'Puntos C', 'points', 'active', 1.0)
+  returning id into v_prog_pts_c;
+  -- Programa de OTRO comercio: debe ignorarse si alguien lo cuela en p_program_ids.
+  insert into public.loyalty_programs
+    (id, organization_id, name, program_type, status, stamp_goal)
+  values
+    ('eeeeeeee-1111-0000-0000-000000000009', ORG_D, 'Sellos D', 'stamps', 'active', 5)
+  returning id into v_prog_foreign;
+
+  r := public.resolve_join(v_join_c);
+  perform pg_temp.t_ok(json_array_length(r->'programs') = 2,
+                       'J15a resolve_join lista los 2 programas activos de Org C');
+
+  -- Alta nueva seleccionando solo "Puntos C" (ignora el id ajeno de Org D).
+  r := public.register_customer_via_join(
+         v_join_c, 'Caro Multi', 'caro@test.co', null, false, 'hash-j15', 'j15-1',
+         array[v_prog_pts_c, v_prog_foreign]);
+  perform pg_temp.t_ok((r->>'ok')::boolean and (r->>'existing')::boolean = false
+                       and json_array_length(r->'cards') = 1
+                       and r->'cards'->0->>'program_id' = v_prog_pts_c::text,
+                       'J15b selecciona solo Puntos C — id ajeno descartado en silencio');
+  v_cust3 := (r->>'customer_id')::uuid;
+  perform pg_temp.t_ok(
+    (select count(*) from public.loyalty_accounts
+      where customer_id = v_cust3 and organization_id = ORG_C) = 1,
+    'J15c solo se creó la cuenta del programa elegido, no la de sellos');
+
+  -- El mismo correo vuelve a escanear, ahora marcando TAMBIÉN sellos: se
+  -- suma la cuenta/tarjeta que le faltaba sin tocar la que ya tenía.
+  r := public.register_customer_via_join(
+         v_join_c, 'Caro Multi', 'CARO@test.co', null, false, 'hash-j15', 'j15-2',
+         array[PROG_STAMPS_C, v_prog_pts_c]);
+  perform pg_temp.t_ok((r->>'existing')::boolean = true and r->'cards' is null,
+                       'J15d cliente existente: sigue sin revelar tokens en la respuesta');
+  perform pg_temp.t_ok(
+    (select count(*) from public.loyalty_accounts
+      where customer_id = v_cust3 and organization_id = ORG_C) = 2,
+    'J15e ahora tiene cuenta en los 2 programas, sin duplicar la anterior');
+
+  select cc.token into v_tok_pts
+    from public.customer_cards cc join public.loyalty_accounts a on a.id = cc.account_id
+   where cc.customer_id = v_cust3 and a.program_id = v_prog_pts_c;
+  select cc.token into v_tok_stamps
+    from public.customer_cards cc join public.loyalty_accounts a on a.id = cc.account_id
+   where cc.customer_id = v_cust3 and a.program_id = PROG_STAMPS_C;
+  perform pg_temp.t_ok(v_tok_pts is not null and v_tok_stamps is not null
+                       and v_tok_pts <> v_tok_stamps,
+                       'J15f cada programa tiene su propio token de tarjeta');
+
+  -- Sin selección válida (ninguno de los ids pertenece a Org C): respaldo
+  -- histórico, el programa activo más antiguo (sellos, creado primero).
+  r := public.register_customer_via_join(
+         v_join_c, 'Dana Fallback', 'dana@test.co', null, false, 'hash-j15', 'j15-3',
+         array[v_prog_foreign]);
+  perform pg_temp.t_ok((r->>'ok')::boolean
+                       and r->'cards'->0->>'program_id' = PROG_STAMPS_C::text,
+                       'J15g sin selección válida cae al programa activo más antiguo');
 end $e2e$;
 
 -- ---------- J14 · RLS a nivel tabla (rol no-superuser) ------------------------
