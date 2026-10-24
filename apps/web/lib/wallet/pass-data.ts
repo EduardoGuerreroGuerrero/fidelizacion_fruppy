@@ -85,6 +85,31 @@ export async function walletLocationsOf(
   return toWalletLocations(data ?? [], orgName).locations;
 }
 
+// Premio al que apunta el saldo: el más barato aún no alcanzado; si ya se
+// alcanzan todos, el más barato marcado como listo.
+async function nextRewardOf(
+  programId: string | null,
+  kind: "stamps" | "points" | null,
+  current: number,
+): Promise<WalletPassData["nextReward"]> {
+  if (!programId || !kind) return null;
+  const col = kind === "stamps" ? "cost_stamps" : "cost_points";
+  const { data } = await supabaseAdmin()
+    .from("rewards")
+    .select(`name, ${col}`)
+    .eq("program_id", programId)
+    .eq("status", "active")
+    .not(col, "is", null)
+    .order(col);
+  const rows = ((data ?? []) as unknown as Record<string, unknown>[]).map((r) => ({
+    name: String(r.name),
+    cost: Number(r[col]),
+  }));
+  const next = rows.find((r) => r.cost > current);
+  if (next) return { ...next, ready: false };
+  return rows[0] ? { ...rows[0], ready: true } : null;
+}
+
 async function toPassData(card: CardRow): Promise<WalletPassData> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
   const cust = first(card.customers);
@@ -124,6 +149,11 @@ async function toPassData(card: CardRow): Promise<WalletPassData> {
         ? { current: acc?.current_stamps ?? 0, goal: prog.stamp_goal ?? null }
         : null,
     points: prog?.program_type === "points" ? (acc?.current_points ?? 0) : null,
+    nextReward: await nextRewardOf(
+      acc?.program_id ?? null,
+      prog?.program_type === "stamps" || prog?.program_type === "points" ? prog.program_type : null,
+      prog?.program_type === "stamps" ? (acc?.current_stamps ?? 0) : (acc?.current_points ?? 0),
+    ),
     cardUrl: `${baseUrl}/t/${card.token}`,
     revoked: card.status !== "active",
   };

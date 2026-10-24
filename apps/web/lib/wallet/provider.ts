@@ -25,6 +25,9 @@ export interface WalletPassData {
   /** null si el programa es de puntos. */
   stamps: { current: number; goal: number | null } | null;
   points: number | null;
+  /** Próximo premio del programa (para la barra de progreso del pase).
+   *  ready=true cuando el saldo ya alcanza el premio más barato. */
+  nextReward: { name: string; cost: number; ready: boolean } | null;
   /** URL pública /t/{token} — también es el payload del barcode. */
   cardUrl: string;
   revoked: boolean;

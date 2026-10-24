@@ -21,9 +21,12 @@ export function walletHeroUrl(
   return `${baseUrl}/wallet-img/hero/${orgId}?v=${v}`;
 }
 
+// variant "hero": frente de la tarjeta (3:1, saldo enorme); "full": detalle
+// del pase (más alto, con barra de progreso o sellos grandes).
 export function walletCardImageUrl(
   baseUrl: string,
   serial: string,
+  variant: "hero" | "full",
   parts: {
     firstName: string;
     current: number;
@@ -31,12 +34,23 @@ export function walletCardImageUrl(
     kind: "stamps" | "points";
     revoked: boolean;
     brandColor: string | null;
+    next: { name: string; cost: number; ready: boolean } | null;
   },
 ): string {
   const v = hash(
-    [parts.firstName, parts.current, parts.goal, parts.kind, parts.revoked, parts.brandColor, 2].join("|"),
+    [
+      variant,
+      parts.firstName,
+      parts.current,
+      parts.goal,
+      parts.kind,
+      parts.revoked,
+      parts.brandColor,
+      parts.next ? `${parts.next.name}:${parts.next.cost}:${parts.next.ready}` : "",
+      3,
+    ].join("|"),
   );
-  return `${baseUrl}/wallet-img/card/${serial}?v=${v}`;
+  return `${baseUrl}/wallet-img/card/${serial}?k=${variant}&v=${v}`;
 }
 
 export const DEFAULT_BRAND = "#0f5132";
