@@ -9,6 +9,7 @@ import {
 } from "passlet";
 import { passDataBySerial } from "./pass-data";
 import { safeBrand, walletCardImageUrl, walletHeroUrl } from "./images";
+import { patchLoyaltyObjectHero } from "./google-api";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import {
   WalletNotConfiguredError,
@@ -260,6 +261,32 @@ export class PassletWalletProvider implements WalletProvider {
     });
   }
 
+  private cardImageUrl(data: WalletPassData, variant: "hero" | "full"): string {
+    return walletCardImageUrl(env("NEXT_PUBLIC_BASE_URL")!, data.serialNumber, variant, {
+      firstName: data.firstName,
+      current: data.stamps ? data.stamps.current : (data.points ?? 0),
+      goal: data.stamps?.goal ?? null,
+      kind: data.stamps ? "stamps" : "points",
+      revoked: data.revoked,
+      brandColor: safeBrand(data.brandColor),
+      next: data.nextReward,
+    });
+  }
+
+  // Imagen principal del frente de la tarjeta, POR pase: passlet no la expone
+  // para fidelización, así que se parchea el objeto. Best-effort: un fallo
+  // deja el banner de la clase y no afecta al saldo.
+  private async syncHero(data: WalletPassData): Promise<void> {
+    const gc = this.googleCreds();
+    const issuer = env("GOOGLE_WALLET_ISSUER_ID");
+    if (this.plain || !gc || !issuer || !env("NEXT_PUBLIC_BASE_URL")) return;
+    try {
+      await patchLoyaltyObjectHero(gc, issuer, data.serialNumber, this.cardImageUrl(data, "hero"));
+    } catch (e) {
+      console.error("[wallet] hero patch failed:", e instanceof Error ? e.message : e);
+    }
+  }
+
   private contentOf(data: WalletPassData): PassContent {
     return {
       serialNumber: data.serialNumber,
@@ -268,7 +295,8 @@ export class PassletWalletProvider implements WalletProvider {
         balance: data.stamps ? `${data.stamps.current}/${data.stamps.goal ?? "?"}` : null,
         points: data.points != null ? String(data.points) : null,
       },
-      barcode: { format: "QR", value: data.cardUrl },
+      // altText " ": sin él Google imprime la URL completa bajo el QR.
+      barcode: { format: "QR", value: data.cardUrl, altText: " " },
       apple: data.revoked ? { voided: true } : undefined,
       // Google acumula messages[] en el objeto; wallet.update() reescribe el
       // array desde aquí → solo sobrevive el último mensaje enviado, el
@@ -277,19 +305,7 @@ export class PassletWalletProvider implements WalletProvider {
         // Tarjeta con nombre, insignia y contador (como la de la app); se
         // regenera con cada movimiento porque la URL cambia con el saldo.
         images: env("NEXT_PUBLIC_BASE_URL") && !this.plain
-          ? [
-              {
-                id: "tarjeta",
-                url: walletCardImageUrl(env("NEXT_PUBLIC_BASE_URL")!, data.serialNumber, {
-                  firstName: data.firstName,
-                  current: data.stamps ? data.stamps.current : (data.points ?? 0),
-                  goal: data.stamps?.goal ?? null,
-                  kind: data.stamps ? "stamps" : "points",
-                  revoked: data.revoked,
-                  brandColor: safeBrand(data.brandColor),
-                }),
-              },
-            ]
+          ? [{ id: "tarjeta", url: this.cardImageUrl(data, "full") }]
           : undefined,
         messages: data.lastMessage
           ? [{ header: data.lastMessage.header, body: data.lastMessage.body, messageType: "TEXT" as const }]
@@ -303,6 +319,7 @@ export class PassletWalletProvider implements WalletProvider {
       await this.ensurePublished(data);
       return this.templateOf(data).create(this.contentOf(data));
     });
+    await this.syncHero(data);
     return {
       applePkpass: issued.apple ?? null,
       googleSaveUrl: issued.google ? googleSaveUrl(issued.google) : null,
@@ -319,6 +336,7 @@ export class PassletWalletProvider implements WalletProvider {
       if (data) await this.ensurePublished(data);
       await this.getWallet().update(serialNumber, { notify: true });
     });
+    if (data) await this.syncHero(data);
   }
 
   async sendPassMessage(
