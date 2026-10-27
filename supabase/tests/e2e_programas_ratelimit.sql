@@ -1,6 +1,6 @@
 -- ============================================================================
 -- E2E: rate limit genérico (check_rate_limit) y eliminación segura de programas
--- (program_delete_summary / delete_program). Autónomo: trae sus fixtures.
+-- (program_delete_summary). Autónomo: trae sus fixtures.
 -- ============================================================================
 
 create or replace function pg_temp.t_ok(p_cond boolean, p_label text)
@@ -97,44 +97,43 @@ begin
   perform pg_temp.t_ok((r->>'can_delete')::boolean = false and r->>'reason' = 'not_archived',
                        'D3 programa activo: hay que archivarlo antes');
 
-  r := public.delete_program(P_ACTIVE);
-  perform pg_temp.t_ok((r->>'ok')::boolean = false and r->>'error' = 'not_archived'
-                       and exists (select 1 from public.loyalty_programs where id = P_ACTIVE),
-                       'D4 delete_program rechaza un activo y no lo borra');
-  r := public.delete_program(P_HIST);
-  perform pg_temp.t_ok((r->>'ok')::boolean = false and r->>'error' = 'has_history'
-                       and exists (select 1 from public.loyalty_programs where id = P_HIST)
-                       and exists (select 1 from public.loyalty_transactions
-                                    where account_id = 'bbbbbbbb-2222-0000-0000-000000000003'),
-                       'D5 delete_program rechaza con historial y el ledger queda intacto');
+  -- El borrado lo hace el servidor con service_role (aquí, el superusuario):
+  -- se comprueba lo que la base garantiza por sí sola.
+  begin
+    delete from public.loyalty_programs where id = P_HIST;
+    raise exception 'E2E_FAIL: D4 borrar un programa con historial debía fallar';
+  exception when foreign_key_violation then
+    perform pg_temp.t_ok(exists (select 1 from public.loyalty_programs where id = P_HIST)
+                         and exists (select 1 from public.loyalty_transactions
+                                      where account_id = 'bbbbbbbb-2222-0000-0000-000000000003'),
+                         'D4 la FK restrict impide borrar un programa con historial y el ledger queda intacto');
+  end;
 
   perform set_config('app.user_id', U_STAFF_P::text, false);
-  r := public.delete_program(P_EMPTY);
-  perform pg_temp.t_ok((r->>'ok')::boolean = false and r->>'error' = 'forbidden'
-                       and exists (select 1 from public.loyalty_programs where id = P_EMPTY),
-                       'D6 staff no puede eliminar');
+  r := public.program_delete_summary(P_EMPTY);
+  perform pg_temp.t_ok((r->>'ok')::boolean = false and r->>'error' = 'forbidden',
+                       'D5 staff no obtiene resumen de eliminación');
 
   perform set_config('app.user_id', U_OWNER_Q::text, false);
-  r := public.delete_program(P_EMPTY);
+  r := public.program_delete_summary(P_EMPTY);
   perform pg_temp.t_ok((r->>'ok')::boolean = false and r->>'error' = 'forbidden',
-                       'D7 owner de OTRO comercio no puede eliminar');
-  r := public.delete_program(P_OTHER);
-  perform pg_temp.t_ok((r->>'ok')::boolean, 'D8 owner elimina su propio archivado vacío');
+                       'D6 owner de OTRO comercio no obtiene resumen');
+  r := public.program_delete_summary(P_OTHER);
+  perform pg_temp.t_ok((r->>'ok')::boolean and (r->>'can_delete')::boolean,
+                       'D7 owner ve que su archivado vacío se puede eliminar');
 
-  perform set_config('app.user_id', U_OWNER_P::text, false);
-  r := public.delete_program(P_EMPTY);
-  perform pg_temp.t_ok((r->>'ok')::boolean and (r->>'accounts')::int = 1,
-                       'D9 owner elimina el archivado sin historial');
+  delete from public.loyalty_programs where id = P_EMPTY and status = 'archived';
   select count(*) into n from public.loyalty_accounts where program_id = P_EMPTY;
-  perform pg_temp.t_ok(n = 0, 'D10 cuentas del programa eliminadas');
+  perform pg_temp.t_ok(n = 0, 'D8 cuentas del programa eliminadas en cascada');
   select count(*) into n from public.rewards where program_id = P_EMPTY;
-  perform pg_temp.t_ok(n = 0, 'D11 premios del programa eliminados');
+  perform pg_temp.t_ok(n = 0, 'D9 premios del programa eliminados en cascada');
   select count(*) into n from public.customer_cards c
     where c.account_id = 'bbbbbbbb-2222-0000-0000-000000000002';
-  perform pg_temp.t_ok(n = 0, 'D12 tarjetas del programa eliminadas');
+  perform pg_temp.t_ok(n = 0, 'D10 tarjetas del programa eliminadas en cascada');
   perform pg_temp.t_ok(exists (select 1 from public.customers where id = 'cccccccc-2222-0000-0000-000000000001'),
-                       'D13 el cliente sigue en el CRM');
+                       'D11 el cliente sigue en el CRM');
+  perform set_config('app.user_id', U_OWNER_P::text, false);
   r := public.program_delete_summary(P_EMPTY);
-  perform pg_temp.t_ok(r->>'error' = 'program_not_found', 'D14 un programa ya eliminado no existe');
+  perform pg_temp.t_ok(r->>'error' = 'program_not_found', 'D12 un programa ya eliminado no existe');
 end
 $e2e$;

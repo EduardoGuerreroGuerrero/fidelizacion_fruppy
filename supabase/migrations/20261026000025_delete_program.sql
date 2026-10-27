@@ -8,8 +8,13 @@
 --    historial y permanece archivado. Las FK `on delete restrict` ya lo
 --    impedirían; aquí se comprueba antes para dar un motivo claro.
 --  * Sin historial, eliminar arrastra por `on delete cascade` las cuentas,
---    tarjetas, premios y pases de wallet del programa. El servidor revoca los
---    pases en Google/Apple ANTES de llamar a esta función.
+--    tarjetas, premios y pases de wallet del programa.
+--
+-- La base solo expone la COMPROBACIÓN (program_delete_summary, solo lectura).
+-- El borrado lo ejecuta el servidor (service_role) tras revocar los pases en
+-- Google/Apple y siempre condicionado a status = 'archived'; las FK
+-- `on delete restrict` de loyalty_transactions y redemptions impiden perder
+-- historial aunque hubiera una carrera entre la comprobación y el borrado.
 -- ============================================================================
 
 create or replace function public.program_delete_summary(p_program_id uuid)
@@ -83,37 +88,3 @@ $$;
 
 revoke all on function public.program_delete_summary(uuid) from public, anon;
 grant execute on function public.program_delete_summary(uuid) to authenticated;
-
-create or replace function public.delete_program(p_program_id uuid)
-returns json
-language plpgsql
-security definer
-set search_path = ''
-as $$
-declare
-  v_summary json;
-begin
-  -- Misma comprobación que el resumen, dentro de la misma transacción: no se
-  -- confía en lo que el cliente haya visto antes.
-  v_summary := public.program_delete_summary(p_program_id);
-  if not (v_summary ->> 'ok')::boolean then
-    return v_summary;
-  end if;
-  if not (v_summary ->> 'can_delete')::boolean then
-    return json_build_object('ok', false, 'error', v_summary ->> 'reason');
-  end if;
-
-  delete from public.loyalty_programs where id = p_program_id;
-
-  return json_build_object(
-    'ok', true,
-    'accounts', (v_summary ->> 'accounts')::int,
-    'cards', (v_summary ->> 'cards')::int,
-    'rewards', (v_summary ->> 'rewards')::int,
-    'passes', (v_summary ->> 'passes')::int
-  );
-end;
-$$;
-
-revoke all on function public.delete_program(uuid) from public, anon;
-grant execute on function public.delete_program(uuid) to authenticated;

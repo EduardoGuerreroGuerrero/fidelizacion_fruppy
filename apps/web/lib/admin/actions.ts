@@ -209,14 +209,21 @@ export async function deleteProgram(orgSlug: string, programId: string, formData
     }
   }
 
-  const { data: res, error } = await supabase.rpc("delete_program", { p_program_id: programId });
-  const r = res as { ok?: boolean; error?: string } | null;
-  if (error || !r?.ok) {
+  // Borrado condicionado a «archivado» y a ESTE comercio. Las FK `restrict` de
+  // loyalty_transactions/redemptions impiden perder historial aunque aparezca
+  // un movimiento entre la comprobación y este borrado (23503).
+  const { error, count } = await admin
+    .from("loyalty_programs")
+    .delete({ count: "exact" })
+    .eq("id", programId)
+    .eq("organization_id", orgId)
+    .eq("status", "archived");
+  if (error || !count) {
     if (revokedCards.length)
       await admin.from("customer_cards").update({ status: "active" }).in("id", revokedCards);
     fail(
       back,
-      r?.error === "has_history"
+      error?.code === "23503"
         ? "Este programa tiene historial de movimientos: permanece archivado."
         : "No se pudo eliminar el programa.",
     );
@@ -224,7 +231,7 @@ export async function deleteProgram(orgSlug: string, programId: string, formData
 
   await audit(orgId, user.id, "program.deleted", "loyalty_program", programId, {
     name: prog.name,
-    accounts: (res as { accounts?: number }).accounts,
+    accounts: accountIds.length,
   });
   revalidatePath(back);
   redirect(back + "?ok=" + encodeURIComponent(`Programa «${prog.name}» eliminado.`));
