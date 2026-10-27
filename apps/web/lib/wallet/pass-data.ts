@@ -1,6 +1,7 @@
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { publicLogoUrl } from "@/lib/organizations/logo";
 import type { WalletPassData } from "./provider";
+import { toWalletLocations } from "./locations";
 
 // Carga del pase desde la DB (fuente de verdad) para emisión y updates.
 // Usa service_role: el token de la tarjeta ES la credencial pública, y los
@@ -9,7 +10,7 @@ import type { WalletPassData } from "./provider";
 const SELECT =
   "id, token, status, organization_id, customer_id, customers(first_name), " +
   "loyalty_accounts(program_id, current_stamps, current_points, loyalty_programs(name, program_type, stamp_goal)), " +
-  "organizations(name, brand)";
+  "organizations(name, brand, features)";
 
 type CardRow = {
   id: string;
@@ -39,9 +40,15 @@ type CardRow = {
       }[]
     | null;
   organizations:
-    | { name: string; brand: { logo_url?: string; color?: string } | null }
-    | { name: string; brand: { logo_url?: string; color?: string } | null }[]
+    | OrgRow
+    | OrgRow[]
     | null;
+};
+
+type OrgRow = {
+  name: string;
+  brand: { logo_url?: string; color?: string } | null;
+  features: Record<string, unknown> | null;
 };
 
 const first = <T>(v: T | T[] | null | undefined): T | null =>
@@ -59,6 +66,48 @@ async function lastMessageBySerial(
     .maybeSingle();
   const m = data?.last_message as { header?: string; body?: string } | null;
   return m && m.header && m.body ? { header: m.header, body: m.body } : null;
+}
+
+// Sedes de la organización para la clase de Wallet. Solo si el comercio activó
+// la proximidad (features.wallet_proximity) — desactivada por defecto.
+export async function walletLocationsOf(
+  orgId: string,
+  orgName: string,
+  features: Record<string, unknown> | null,
+): Promise<WalletPassData["locations"]> {
+  if (features?.wallet_proximity !== true) return [];
+  const { data } = await supabaseAdmin()
+    .from("locations")
+    .select("name, lat, lng, status")
+    .eq("organization_id", orgId)
+    .eq("status", "active")
+    .order("created_at");
+  return toWalletLocations(data ?? [], orgName).locations;
+}
+
+// Premio al que apunta el saldo: el más barato aún no alcanzado; si ya se
+// alcanzan todos, el más barato marcado como listo.
+async function nextRewardOf(
+  programId: string | null,
+  kind: "stamps" | "points" | null,
+  current: number,
+): Promise<WalletPassData["nextReward"]> {
+  if (!programId || !kind) return null;
+  const col = kind === "stamps" ? "cost_stamps" : "cost_points";
+  const { data } = await supabaseAdmin()
+    .from("rewards")
+    .select(`name, ${col}`)
+    .eq("program_id", programId)
+    .eq("status", "active")
+    .not(col, "is", null)
+    .order(col);
+  const rows = ((data ?? []) as unknown as Record<string, unknown>[]).map((r) => ({
+    name: String(r.name),
+    cost: Number(r[col]),
+  }));
+  const next = rows.find((r) => r.cost > current);
+  if (next) return { ...next, ready: false };
+  return rows[0] ? { ...rows[0], ready: true } : null;
 }
 
 async function toPassData(card: CardRow): Promise<WalletPassData> {
@@ -93,12 +142,18 @@ async function toPassData(card: CardRow): Promise<WalletPassData> {
         : null,
     lastMessage: await lastMessageBySerial(card.id),
     firstName: cust?.first_name ?? "Cliente",
+    locations: await walletLocationsOf(card.organization_id, org?.name ?? "Comercio", org?.features ?? null),
     programName: prog?.name ?? "Fidelización",
     stamps:
       prog?.program_type === "stamps"
         ? { current: acc?.current_stamps ?? 0, goal: prog.stamp_goal ?? null }
         : null,
     points: prog?.program_type === "points" ? (acc?.current_points ?? 0) : null,
+    nextReward: await nextRewardOf(
+      acc?.program_id ?? null,
+      prog?.program_type === "stamps" || prog?.program_type === "points" ? prog.program_type : null,
+      prog?.program_type === "stamps" ? (acc?.current_stamps ?? 0) : (acc?.current_points ?? 0),
+    ),
     cardUrl: `${baseUrl}/t/${card.token}`,
     revoked: card.status !== "active",
   };

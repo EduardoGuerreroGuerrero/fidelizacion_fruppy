@@ -5,12 +5,13 @@ import { SubmitButton } from "@/app/_components/submit-button";
 
 export const instant = false;
 
+type JoinProgram = { id: string; name: string; program_type: string };
+
 type JoinInfo = {
   ok: boolean;
   reason?: string;
   org_name?: string;
-  program_name?: string;
-  program_type?: string;
+  programs?: JoinProgram[];
   brand_color?: string | null;
   logo_url?: string | null;
   privacy_email?: string | null;
@@ -66,6 +67,8 @@ export default async function JoinPage({
     ? info.brand_color
     : "#17b8a6";
   const controller = info.data_controller ?? info.org_name ?? "el comercio";
+  const programs = info.programs ?? [];
+  const multiProgram = programs.length > 1;
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white px-5 pb-10 pt-8">
@@ -84,8 +87,11 @@ export default async function JoinPage({
         )}
         <h1 className="mt-1 text-xl font-semibold text-ink">{info.org_name}</h1>
         <p className="text-sm text-ink-soft">
-          Únete a {info.program_name} y acumula{" "}
-          {info.program_type === "points" ? "puntos" : "sellos"} en cada visita.
+          {multiProgram
+            ? `Elige a qué programa${programs.length > 1 ? "s" : ""} de ${info.org_name} quieres unirte.`
+            : `Únete a ${programs[0]?.name ?? "su programa"} y acumula ${
+                programs[0]?.program_type === "points" ? "puntos" : "sellos"
+              } en cada visita.`}
         </p>
       </header>
 
@@ -142,6 +148,39 @@ export default async function JoinPage({
             className={input}
           />
         </div>
+
+        {multiProgram ? (
+          <fieldset className="rounded-2xl border border-neutral-200 bg-neutral-50/60 p-4">
+            <legend className="px-1 text-sm font-semibold text-ink">Programas</legend>
+            <p className="mt-1 text-[12px] leading-snug text-ink-soft">
+              Puedes unirte a uno o a varios — cada uno tiene su propia tarjeta y QR.
+            </p>
+            <div className="mt-2.5 space-y-2">
+              {programs.map((p) => (
+                <label
+                  key={p.id}
+                  className="flex items-start gap-2.5 text-[13px] leading-snug text-ink"
+                >
+                  <input
+                    type="checkbox"
+                    name="program_ids"
+                    value={p.id}
+                    defaultChecked
+                    className="mt-0.5 size-4 shrink-0 accent-brand"
+                  />
+                  <span>
+                    {p.name}{" "}
+                    <span className="text-ink-soft">
+                      ({p.program_type === "points" ? "puntos" : "sellos"})
+                    </span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        ) : (
+          <input type="hidden" name="program_ids" value={programs[0]?.id ?? ""} />
+        )}
 
         {/* Honeypot anti-spam: invisible para humanos, los bots lo rellenan */}
         <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">

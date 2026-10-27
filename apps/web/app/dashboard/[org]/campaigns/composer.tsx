@@ -4,6 +4,7 @@ import { useState } from "react";
 import { RememberForm } from "@/app/_components/remember-form";
 import { SubmitButton } from "@/app/_components/submit-button";
 import { CARD_DESTINATIONS } from "@/lib/push/destination";
+import { renderCampaignText } from "@/lib/push/template";
 
 // Compositor de campañas: plantillas, contadores, destino, programación con
 // atajos y vista previa en vivo de cómo se verá en el navegador y en Wallet.
@@ -68,6 +69,10 @@ export function CampaignComposer({
   const [tab, setTab] = useState<"browser" | "wallet">("browser");
 
   const scheduled = schedule !== "";
+  // Vista previa con las variables resueltas como las verá un cliente real.
+  const vars = { negocio: orgName, nombre: "Ana" };
+  const pTitle = renderCampaignText(title, vars);
+  const pBody = renderCampaignText(body, vars);
   const invalid = title.trim() === "" || body.trim() === "" || (dest === "custom" && !/^https:\/\//.test(custom));
 
   return (
@@ -131,6 +136,20 @@ export function CampaignComposer({
             placeholder="Cuéntales qué pasa y por qué vale la pena entrar hoy."
             className={field}
           />
+          <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[11px] text-ink-soft">
+            Insertar:
+            {(["{nombre}", "{negocio}"] as const).map((v) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setBody((b) => `${b}${b && !b.endsWith(" ") ? " " : ""}${v}`)}
+                className="rounded-full border border-ink/10 px-2 py-0.5 font-mono hover:bg-neutral-50"
+              >
+                {v}
+              </button>
+            ))}
+            <span>se reemplazan por cliente al enviar</span>
+          </div>
         </div>
 
         <fieldset>
@@ -266,9 +285,9 @@ export function CampaignComposer({
                 </span>
                 <span>{orgName} · ahora</span>
               </div>
-              <p className="mt-1.5 break-words text-sm font-semibold">{title || "Título de tu notificación"}</p>
+              <p className="mt-1.5 break-words text-sm font-semibold">{pTitle || "Título de tu notificación"}</p>
               <p className="mt-0.5 break-words text-[13px] text-ink-soft">
-                {body || "Aquí se verá el mensaje que reciben tus clientes."}
+                {pBody || "Aquí se verá el mensaje que reciben tus clientes."}
               </p>
             </div>
           ) : (
@@ -276,8 +295,8 @@ export function CampaignComposer({
               <p className="text-xs opacity-80">{orgName}</p>
               <div className="mt-3 rounded-xl bg-white/12 p-3 backdrop-blur-sm" style={{ background: "rgb(255 255 255 / 0.14)" }}>
                 <p className="text-[11px] uppercase tracking-wide opacity-70">Mensaje</p>
-                <p className="mt-1 break-words text-sm font-semibold">{title || "Título"}</p>
-                <p className="mt-0.5 break-words text-[13px] opacity-90">{body || "Mensaje…"}</p>
+                <p className="mt-1 break-words text-sm font-semibold">{pTitle || "Título"}</p>
+                <p className="mt-0.5 break-words text-[13px] opacity-90">{pBody || "Mensaje…"}</p>
               </div>
             </div>
           )}
