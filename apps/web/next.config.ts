@@ -24,6 +24,18 @@ const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  // HSTS: fuerza HTTPS en el navegador tras la primera visita (evita
+  // SSL-strip). 2 años + subdominios + preload. Seguro: la app solo se sirve
+  // por HTTPS en Vercel.
+  {
+    key: "Strict-Transport-Security",
+    value: "max-age=63072000; includeSubDomains; preload",
+  },
+  // Aislamiento de ventana y endurecimiento adicional. No se añade COEP/CORP
+  // para no romper la carga de imágenes https:/data: del pase y los logos.
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
+  { key: "X-DNS-Prefetch-Control", value: "off" },
   // Cámara solo del propio sitio (escáner de QR); geolocalización para
   // "sedes cercanas"; nada de micrófono ni pagos.
   {
