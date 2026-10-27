@@ -58,3 +58,7 @@ Muckup/Recursos/*.mp4
 
 .vercel
 .env*
+
+# ---- Artefactos de redirección de Windows (cmd/PowerShell) ----
+nul
+NUL
