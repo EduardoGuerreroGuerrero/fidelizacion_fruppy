@@ -11,18 +11,18 @@ begin
 end $$;
 
 insert into auth.users (id) values
-  ('00000000-0000-0000-0000-0000000000e1'),  -- owner  org P
-  ('00000000-0000-0000-0000-0000000000e2'),  -- staff  org P
-  ('00000000-0000-0000-0000-0000000000e9');  -- owner  org Q (otro comercio)
+  ('00000000-0000-0000-0000-00000000a0e1'),  -- owner  org P
+  ('00000000-0000-0000-0000-00000000a0e2'),  -- staff  org P
+  ('00000000-0000-0000-0000-00000000a0e9');  -- owner  org Q (otro comercio)
 
 insert into public.organizations (id, name, slug, status, features, legal) values
   ('ffffffff-1111-0000-0000-00000000000a', 'Org P Prog', 'e2e-org-p', 'active', '{}', '{}'),
   ('ffffffff-1111-0000-0000-00000000000b', 'Org Q Prog', 'e2e-org-q', 'active', '{}', '{}');
 
 insert into public.organization_members (organization_id, user_id, role, status) values
-  ('ffffffff-1111-0000-0000-00000000000a', '00000000-0000-0000-0000-0000000000e1', 'owner', 'active'),
-  ('ffffffff-1111-0000-0000-00000000000a', '00000000-0000-0000-0000-0000000000e2', 'staff', 'active'),
-  ('ffffffff-1111-0000-0000-00000000000b', '00000000-0000-0000-0000-0000000000e9', 'owner', 'active');
+  ('ffffffff-1111-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000a0e1', 'owner', 'active'),
+  ('ffffffff-1111-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000a0e2', 'staff', 'active'),
+  ('ffffffff-1111-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000a0e9', 'owner', 'active');
 
 insert into public.loyalty_programs (id, organization_id, name, program_type, status, stamp_goal) values
   ('aaaaaaaa-2222-0000-0000-000000000001', 'ffffffff-1111-0000-0000-00000000000a', 'Activo P', 'stamps', 'active', 8),
@@ -49,9 +49,9 @@ insert into public.loyalty_transactions (organization_id, account_id, transactio
 
 do $e2e$
 declare
-  U_OWNER_P constant uuid := '00000000-0000-0000-0000-0000000000e1';
-  U_STAFF_P constant uuid := '00000000-0000-0000-0000-0000000000e2';
-  U_OWNER_Q constant uuid := '00000000-0000-0000-0000-0000000000e9';
+  U_OWNER_P constant uuid := '00000000-0000-0000-0000-00000000a0e1';
+  U_STAFF_P constant uuid := '00000000-0000-0000-0000-00000000a0e2';
+  U_OWNER_Q constant uuid := '00000000-0000-0000-0000-00000000a0e9';
   P_ACTIVE  constant uuid := 'aaaaaaaa-2222-0000-0000-000000000001';
   P_EMPTY   constant uuid := 'aaaaaaaa-2222-0000-0000-000000000002';
   P_HIST    constant uuid := 'aaaaaaaa-2222-0000-0000-000000000003';
