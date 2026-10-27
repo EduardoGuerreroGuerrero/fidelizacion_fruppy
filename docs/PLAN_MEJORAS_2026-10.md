@@ -3,6 +3,23 @@
 Estado a 2026-10-26, sobre `main` (`4a05bde`). Revisado contra el código, la base de
 producción (Supabase `itqnpobhrojviftqtwgv`) y la documentación oficial citada al final.
 
+## Estado de ejecución (2026-10-27)
+
+| # | Resultado | Verificado en producción |
+|---|-----------|--------------------------|
+| 1 | **Hecho.** Migración 0023 aplicada (aditiva: la firma de 7 parámetros pasó a envoltorio de la nueva, sin `drop`) | El selector muestra los 2 programas; un correo existente recibió la tarjeta del programa nuevo sin tocar la anterior |
+| 4 | **Hecho.** Variante `dark:` neutralizada, `color-scheme: light`, componente `Badge`, 220 clases `dark:` retiradas y prueba que impide reintroducirlas | Con el sistema en modo oscuro las fichas de Clientes se leen bien |
+| 3 | **Parcial.** Guardas en la app hechas (proxy, `maxDuration`, limpieza en cron). **Pendiente manual**: Spend Cap de Supabase y Spend Management de Vercel (ver `docs/COSTOS_Y_LIMITES.md`) | — |
+| 2 | **Hecho.** Migración 0024 + `lib/ratelimit.ts` en contacto, push, consentimiento, preferencias, derechos y Wallet; imágenes con redirección canónica | 10 peticiones pasan y la 11.ª recibe 429 con `Retry-After`; contador en `rate_limits` |
+| 5 | **Hecho.** Migración 0025 (comprobación de solo lectura) y borrado desde el servidor, solo de archivados sin historial | Un programa de prueba: sin botón mientras está activo, con nombre mal escrito se rechaza, con el correcto se elimina y queda auditado |
+
+Cambios respecto al diseño original:
+- **5:** `apply_migration` rechazó una función con `delete from`, así que la base solo
+  expone `program_delete_summary` y el borrado lo ejecuta el servidor (service_role),
+  condicionado a `status = 'archived'`. Las FK `restrict` siguen impidiendo perder historial.
+- **1:** la 0023 original incluía `drop function`; se reemplazó por una versión aditiva.
+- **2:** pendientes las reglas de Firewall de Vercel y el anti-bot (Turnstile).
+
 ## 0. Resumen y orden de ejecución
 
 | # | Punto | Estado real hoy | Prioridad | Esfuerzo |
