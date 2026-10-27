@@ -27,8 +27,12 @@ insert into public.organization_members (organization_id, user_id, role, status)
 insert into public.loyalty_programs (id, organization_id, name, program_type, status, stamp_goal) values
   ('aaaaaaaa-2222-0000-0000-000000000001', 'ffffffff-1111-0000-0000-00000000000a', 'Activo P', 'stamps', 'active', 8),
   ('aaaaaaaa-2222-0000-0000-000000000002', 'ffffffff-1111-0000-0000-00000000000a', 'Archivado vacío', 'stamps', 'archived', 8),
-  ('aaaaaaaa-2222-0000-0000-000000000003', 'ffffffff-1111-0000-0000-00000000000a', 'Archivado con historial', 'points', 'archived', null),
   ('aaaaaaaa-2222-0000-0000-000000000004', 'ffffffff-1111-0000-0000-00000000000b', 'Archivado de Q', 'stamps', 'archived', 8);
+
+insert into public.loyalty_programs
+  (id, organization_id, name, program_type, status, points_per_currency_unit) values
+  ('aaaaaaaa-2222-0000-0000-000000000003', 'ffffffff-1111-0000-0000-00000000000a',
+   'Archivado con historial', 'points', 'archived', 1);
 
 insert into public.customers (id, organization_id, first_name, email) values
   ('cccccccc-2222-0000-0000-000000000001', 'ffffffff-1111-0000-0000-00000000000a', 'Cli P', 'p@e2e.test');
