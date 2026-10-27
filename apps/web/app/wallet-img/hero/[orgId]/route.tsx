@@ -1,13 +1,17 @@
 import { ImageResponse } from "next/og";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { safeBrand } from "@/lib/wallet/images";
+import { limitRequest } from "@/lib/ratelimit";
 
 // Banner del pase de Google Wallet (1032×336, proporción que pide Google):
 // color del comercio, onda decorativa y su nombre — misma identidad que la
 // tarjeta de la app. Solo muestra el nombre del comercio y del programa.
-export async function GET(_req: Request, ctx: { params: Promise<{ orgId: string }> }) {
+export async function GET(req: Request, ctx: { params: Promise<{ orgId: string }> }) {
   const { orgId } = await ctx.params;
   if (!/^[0-9a-f-]{36}$/i.test(orgId)) return new Response("not found", { status: 404 });
+
+  const limited = await limitRequest(req, "wallet-img", "hero", 120, 60, false);
+  if (limited) return limited;
 
   const { data: org } = await supabaseAdmin()
     .from("organizations")

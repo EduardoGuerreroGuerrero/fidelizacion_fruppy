@@ -6,6 +6,7 @@ import { createClient, supabaseAdmin } from "@/lib/supabase/server";
 import { enqueueEmail, trySendOutbox } from "@/lib/email/outbox";
 import { logoToDataUri } from "@/lib/organizations/logo";
 import { processPushQueue, pushConfigured, saveWalletStats } from "@/lib/push/send";
+import { walletProvider } from "@/lib/wallet/passlet";
 import { pushCampaignToWallets, syncWalletLocations, type LocationSyncResult } from "@/lib/wallet/push";
 import { CARD_DESTINATIONS, scheduleToDate } from "@/lib/push/destination";
 import { STAMP_ICON_KEYS } from "@/app/t/[token]/_components/stamp-icons";
@@ -145,6 +146,88 @@ export async function setProgramStatus(
     );
   await audit(orgId, user.id, `program.${status}`, "loyalty_program", programId);
   revalidatePath(`/dashboard/${orgSlug}/programs`);
+}
+
+// Eliminar un programa ARCHIVADO y sin historial (el ledger es append-only: con
+// movimientos o canjes solo puede permanecer archivado). Owner/admin; exige
+// escribir el nombre del programa. Antes de borrar se revocan sus pases en
+// Google/Apple para no dejar pases huérfanos; la RPC vuelve a validar todo.
+export async function deleteProgram(orgSlug: string, programId: string, formData: FormData) {
+  const { supabase, user, orgId, role } = await requireMembership(orgSlug);
+  const back = `/dashboard/${orgSlug}/programs`;
+  if (!["owner", "admin"].includes(role)) fail(back, "Solo owner/admin puede eliminar programas.");
+
+  const { data: prog } = await supabase
+    .from("loyalty_programs")
+    .select("id, name")
+    .eq("id", programId)
+    .eq("organization_id", orgId)
+    .maybeSingle();
+  if (!prog) fail(back, "Programa no encontrado.");
+  if (String(formData.get("confirm_name") ?? "").trim() !== prog.name)
+    fail(back, "Escribe el nombre exacto del programa para confirmar.");
+
+  const { data: summary } = await supabase.rpc("program_delete_summary", {
+    p_program_id: programId,
+  });
+  const s = summary as { ok?: boolean; can_delete?: boolean; reason?: string } | null;
+  if (!s?.ok) fail(back, "No se pudo comprobar el programa. Inténtalo de nuevo.");
+  if (!s.can_delete)
+    fail(
+      back,
+      s.reason === "has_history"
+        ? "Este programa tiene historial de movimientos: permanece archivado."
+        : "Archiva el programa antes de eliminarlo.",
+    );
+
+  // Revocar tarjetas y pases del programa (solo las que estaban activas, para
+  // poder restaurarlas si la eliminación fallara).
+  const admin = supabaseAdmin();
+  const { data: accounts } = await admin
+    .from("loyalty_accounts")
+    .select("id")
+    .eq("program_id", programId)
+    .eq("organization_id", orgId);
+  const accountIds = (accounts ?? []).map((a) => a.id);
+  let revokedCards: string[] = [];
+  if (accountIds.length) {
+    const { data: cards } = await admin
+      .from("customer_cards")
+      .select("id")
+      .in("account_id", accountIds)
+      .eq("status", "active");
+    revokedCards = (cards ?? []).map((c) => c.id);
+    if (revokedCards.length)
+      await admin.from("customer_cards").update({ status: "revoked" }).in("id", revokedCards);
+    const { data: passes } = await admin
+      .from("wallet_passes")
+      .select("serial_number")
+      .eq("program_id", programId)
+      .eq("organization_id", orgId);
+    for (const p of passes ?? []) {
+      if (p.serial_number) await walletProvider.revokePass(p.serial_number).catch(() => {});
+    }
+  }
+
+  const { data: res, error } = await supabase.rpc("delete_program", { p_program_id: programId });
+  const r = res as { ok?: boolean; error?: string } | null;
+  if (error || !r?.ok) {
+    if (revokedCards.length)
+      await admin.from("customer_cards").update({ status: "active" }).in("id", revokedCards);
+    fail(
+      back,
+      r?.error === "has_history"
+        ? "Este programa tiene historial de movimientos: permanece archivado."
+        : "No se pudo eliminar el programa.",
+    );
+  }
+
+  await audit(orgId, user.id, "program.deleted", "loyalty_program", programId, {
+    name: prog.name,
+    accounts: (res as { accounts?: number }).accounts,
+  });
+  revalidatePath(back);
+  redirect(back + "?ok=" + encodeURIComponent(`Programa «${prog.name}» eliminado.`));
 }
 
 // ---------- Recompensas ------------------------------------------------------

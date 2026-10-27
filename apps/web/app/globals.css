@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+/* El panel y la tarjeta son SIEMPRE claros. Tailwind activa `dark:` con el modo
+   oscuro del teléfono (prefers-color-scheme), lo que dejaba fichas casi negras
+   con texto oscuro sobre la página clara. La variante `dark` solo se activa
+   con data-theme="dark" (hoy ningún elemento lo usa) y se declara el esquema
+   claro para que el navegador no invierta colores por su cuenta. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  color-scheme: light;
+}
+
 :root {
   --background: #f7f8fa;
   --foreground: #2b2f33;

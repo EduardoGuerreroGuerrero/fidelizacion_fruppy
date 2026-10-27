@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { limitRequest } from "@/lib/ratelimit";
 
 // Suscripción/baja de push del cliente para SU comercio. El token de la
 // tarjeta es la credencial; la RPC valida el flag de la org y registra la
@@ -10,6 +11,9 @@ export async function POST(req: Request, ctx: { params: Promise<{ token: string 
   if (!/^[a-f0-9]{32}$/i.test(token)) {
     return NextResponse.json({ ok: false, error: "invalid_token" }, { status: 400 });
   }
+
+  const limited = await limitRequest(req, "push", token, 10, 3600);
+  if (limited) return limited;
 
   let body: {
     action?: string;

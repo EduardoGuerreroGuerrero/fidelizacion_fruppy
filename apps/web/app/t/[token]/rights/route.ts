@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { limitRequest } from "@/lib/ratelimit";
 
 // Envío de solicitud de derechos del titular. El token de la tarjeta es la
 // credencial; la RPC impone antiabuso (máx. 5 abiertas) y valida el tipo.
@@ -14,6 +15,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ token: string 
   if (!/^[a-f0-9]{32}$/i.test(token)) {
     return NextResponse.redirect(back, 303);
   }
+  const limited = await limitRequest(req, "rights", token, 10, 3600);
+  if (limited) return limited;
 
   const form = await req.formData().catch(() => null);
   const type = String(form?.get("type") ?? "");

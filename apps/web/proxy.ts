@@ -55,8 +55,11 @@ export async function proxy(request: NextRequest) {
   return response;
 }
 
+// Rutas públicas de alto volumen (tarjeta del cliente, alta por QR, logos e
+// imágenes del pase) no usan la sesión del panel: excluirlas evita una
+// llamada a Supabase Auth y una invocación del proxy por cada petición.
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|mp4|webm|mov)$).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|wallet-img|logo/|t/|join/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|mp4|webm|mov)$).*)",
   ],
 };

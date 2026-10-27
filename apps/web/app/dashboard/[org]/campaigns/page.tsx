@@ -105,28 +105,28 @@ export default async function CampaignsPage({
       </div>
 
       {error && (
-        <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-900/30 dark:text-red-300">
+        <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">
           {error}
         </p>
       )}
       {ok && (
-        <p role="status" className="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-800 dark:bg-green-900/30 dark:text-green-300">
+        <p role="status" className="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-800">
           {ok}
         </p>
       )}
       {!pushEnabled ? (
-        <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+        <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
           Las notificaciones push están desactivadas para este comercio (Configuración → Privacidad y funciones).
         </p>
       ) : !configured ? (
-        <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+        <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
           Push no está configurado en el servidor (faltan claves VAPID).
         </p>
       ) : null}
 
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {summary.map(([k, v, sub]) => (
-          <div key={k} className="rounded-2xl border border-ink/10 bg-white p-4 shadow-sm dark:bg-transparent">
+          <div key={k} className="rounded-2xl border border-ink/10 bg-white p-4 shadow-sm">
             <dt className="text-xs text-ink-soft">{k}</dt>
             <dd className="mt-1 truncate text-lg font-semibold tabular-nums">{v}</dd>
             <p className="truncate text-[11px] text-ink-soft">{sub}</p>
@@ -141,7 +141,7 @@ export default async function CampaignsPage({
         </p>
       ) : null}
       {aud > 500 ? (
-        <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+        <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
           Audiencia grande: el envío se procesa por lotes; verifica el texto antes de enviar.
         </p>
       ) : null}
@@ -168,7 +168,7 @@ export default async function CampaignsPage({
               (stats.sent ?? 0) + (stats.failed ?? 0) + (stats.expired ?? 0) + (stats.skipped ?? 0);
             const pct = total > 0 ? Math.round(((stats.sent ?? 0) / total) * 100) : 0;
             return (
-              <li key={c.id} className="rounded-2xl border border-ink/10 bg-white p-4 shadow-sm dark:bg-transparent">
+              <li key={c.id} className="rounded-2xl border border-ink/10 bg-white p-4 shadow-sm">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">

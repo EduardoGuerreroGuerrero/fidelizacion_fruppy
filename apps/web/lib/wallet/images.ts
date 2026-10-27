@@ -53,6 +53,32 @@ export function walletCardImageUrl(
   return `${baseUrl}/wallet-img/card/${serial}?k=${variant}&v=${v}`;
 }
 
+// URL canónica de la imagen de saldo de un pase: la usa el pase al publicarse
+// y la ruta para comprobar que ?v= es el esperado (si no, redirige a esta).
+export function cardImageUrlFor(
+  baseUrl: string,
+  data: {
+    serialNumber: string;
+    firstName: string;
+    stamps: { current: number; goal: number | null } | null;
+    points: number | null;
+    revoked: boolean;
+    brandColor: string | null;
+    nextReward: { name: string; cost: number; ready: boolean } | null;
+  },
+  variant: "hero" | "full",
+): string {
+  return walletCardImageUrl(baseUrl, data.serialNumber, variant, {
+    firstName: data.firstName,
+    current: data.stamps ? data.stamps.current : (data.points ?? 0),
+    goal: data.stamps?.goal ?? null,
+    kind: data.stamps ? "stamps" : "points",
+    revoked: data.revoked,
+    brandColor: safeBrand(data.brandColor),
+    next: data.nextReward,
+  });
+}
+
 export const DEFAULT_BRAND = "#0f5132";
 
 export function safeBrand(color: string | null | undefined): string {

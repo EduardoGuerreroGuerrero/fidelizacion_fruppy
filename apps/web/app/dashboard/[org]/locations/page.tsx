@@ -10,7 +10,7 @@ import { statusLabel } from "@/lib/labels";
 export const instant = false;
 
 const input =
-  "rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-transparent";
+  "rounded-md border border-neutral-300 px-3 py-2 text-sm";
 
 export default async function LocationsPage({
   params,
@@ -56,12 +56,12 @@ export default async function LocationsPage({
     <div className="mx-auto max-w-2xl">
       <h1 className="mb-4 text-2xl font-semibold">Sedes</h1>
 
-      <section className="mb-6 rounded-lg border border-neutral-200 p-5 dark:border-neutral-800">
+      <section className="mb-6 rounded-lg border border-neutral-200 p-5">
         <div className="flex items-center justify-between gap-3">
           <h2 className="font-medium">Proximidad en Google Wallet</h2>
           <span
             className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-              proximityOn ? "bg-brand-soft text-brand" : "bg-neutral-100 text-ink-soft"
+              proximityOn ?"bg-brand-soft text-brand" : "bg-neutral-100 text-ink-soft"
             }`}
           >
             {proximityOn ? "Activada" : "Desactivada"}
@@ -112,17 +112,17 @@ export default async function LocationsPage({
       </section>
 
       {error && (
-        <p className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-900/30 dark:text-red-300">
+        <p className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800">
           {error}
         </p>
       )}
       {ok && (
-        <p className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-800 dark:bg-green-900/30 dark:text-green-300">
+        <p className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-800">
           {ok}
         </p>
       )}
 
-      <section className="mb-6 rounded-lg border border-neutral-200 p-5 dark:border-neutral-800">
+      <section className="mb-6 rounded-lg border border-neutral-200 p-5">
         <h2 className="mb-3 font-medium">Nueva sede</h2>
         <RememberForm storageKey="location-new" action={saveLocation.bind(null, slug)} className="flex flex-wrap gap-2">
           <input
@@ -159,7 +159,7 @@ export default async function LocationsPage({
         {(locations ?? []).map((l) => (
           <li
             key={l.id}
-            className="rounded-lg border border-neutral-200 px-4 py-3 dark:border-neutral-800"
+            className="rounded-lg border border-neutral-200 px-4 py-3"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -182,7 +182,7 @@ export default async function LocationsPage({
                 )}
               >
                 <SubmitButton
-                  className="rounded-md border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
+                  className="rounded-md border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-100">
                   {l.status === "active" ? "Desactivar" : "Activar"}
                 </SubmitButton>
               </form>
@@ -206,14 +206,14 @@ export default async function LocationsPage({
                 className={input + " w-24"}
               />
               <SubmitButton
-                className="shrink-0 rounded-md border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
+                className="shrink-0 rounded-md border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-100">
                 Guardar
               </SubmitButton>
             </form>
           </li>
         ))}
         {(locations ?? []).length === 0 && (
-          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-ink-soft dark:border-neutral-700">
+          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-ink-soft">
             Sin sedes. Crea la primera.
           </li>
         )}

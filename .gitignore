@@ -58,3 +58,6 @@ Muckup/Recursos/*.mp4
 
 .vercel
 .env*
+
+# Capturas de WhatsApp con datos personales de clientes reales: nunca al repo
+Muckup/WhatsApp Image*

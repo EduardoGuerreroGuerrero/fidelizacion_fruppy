@@ -9,7 +9,7 @@ export const instant = false;
 
 const ROLES = ["owner", "admin", "manager", "staff"] as const;
 const input =
-  "rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-transparent";
+  "rounded-md border border-neutral-300 px-3 py-2 text-sm";
 
 export default async function TeamPage({
   params,
@@ -84,17 +84,17 @@ export default async function TeamPage({
       <h1 className="mb-4 text-2xl font-semibold">Equipo</h1>
 
       {error && (
-        <p className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-900/30 dark:text-red-300">
+        <p className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800">
           {error}
         </p>
       )}
       {ok && (
-        <p className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-800 dark:bg-green-900/30 dark:text-green-300">
+        <p className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-800">
           {ok}
         </p>
       )}
 
-      <section className="mb-8 rounded-lg border border-neutral-200 p-5 dark:border-neutral-800">
+      <section className="mb-8 rounded-lg border border-neutral-200 p-5">
         <h2 className="mb-1 font-medium">Invitar por email</h2>
         <p className="mb-3 text-xs text-ink-soft">
           La invitación se activa automáticamente cuando esa persona inicia sesión con el email
@@ -125,7 +125,7 @@ export default async function TeamPage({
         {members.map((m) => (
           <li
             key={m.id}
-            className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-neutral-200 px-4 py-3 text-sm dark:border-neutral-800"
+            className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-neutral-200 px-4 py-3 text-sm"
           >
             <div>
               <p className="font-medium text-ink">
@@ -148,7 +148,7 @@ export default async function TeamPage({
                   name="role"
                   defaultValue={m.role}
                   disabled={m.role === "owner" && !iAmOwner}
-                  className="rounded border border-neutral-300 px-2 py-1 text-xs dark:border-neutral-700 dark:bg-transparent"
+                  className="rounded border border-neutral-300 px-2 py-1 text-xs"
                 >
                   {ROLES.filter((r) => r !== "owner" || iAmOwner || m.role === "owner").map(
                     (r) => (
@@ -160,15 +160,15 @@ export default async function TeamPage({
                 </select>
                 <SubmitButton
                   disabled={m.role === "owner" && !iAmOwner}
-                  className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 disabled:opacity-50 dark:border-neutral-700 dark:hover:bg-neutral-800">
+                  className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 disabled:opacity-50">
                   OK
                 </SubmitButton>
               </form>
               <span
                 className={`rounded px-2 py-1 text-xs ${
-                  m.status === "active"
-                    ? "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300"
-                    : "bg-neutral-100 text-ink-soft dark:bg-neutral-800"
+                  m.status ==="active"
+                    ? "bg-green-100 text-green-800"
+                    : "bg-neutral-100 text-ink-soft"
                 }`}
               >
                 {statusLabel(m.status)}
@@ -183,7 +183,7 @@ export default async function TeamPage({
                   )}
                 >
                   <SubmitButton
-                    className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
+                    className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100">
                     {m.status === "active" ? "Suspender" : "Reactivar"}
                   </SubmitButton>
                 </form>
@@ -198,7 +198,7 @@ export default async function TeamPage({
         {(invites ?? []).map((i) => (
           <li
             key={i.id}
-            className="flex items-center justify-between rounded-lg border border-neutral-200 px-4 py-3 text-sm dark:border-neutral-800"
+            className="flex items-center justify-between rounded-lg border border-neutral-200 px-4 py-3 text-sm"
           >
             <div>
               <p className="font-medium">{i.email}</p>
@@ -209,7 +209,7 @@ export default async function TeamPage({
             {i.status === "pending" && (
               <form action={cancelInvite.bind(null, slug, i.id)}>
                 <SubmitButton
-                  className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                  className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100"
                   confirm="¿Seguro que quieres cancelar?">
                   Cancelar
                 </SubmitButton>

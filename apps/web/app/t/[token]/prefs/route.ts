@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { limitRequest } from "@/lib/ratelimit";
 
 // Centro de preferencias del cliente (formulario clásico, sin JS):
 // alterna consentimientos por canal. El token de la tarjeta es la
@@ -15,6 +16,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ token: string 
   if (!/^[a-f0-9]{32}$/i.test(token)) {
     return NextResponse.redirect(back, 303);
   }
+  const limited = await limitRequest(req, "prefs", token, 30, 3600);
+  if (limited) return limited;
 
   const form = await req.formData().catch(() => null);
   const purpose = String(form?.get("purpose") ?? "");

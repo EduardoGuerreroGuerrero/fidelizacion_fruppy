@@ -81,8 +81,8 @@ begin
   -- 2. Rate limit: 20 altas/hora por (org, hash de cliente). El hash lo
   --    calcula el servidor (IP+UA); no guarda la IP en claro.
   if p_client_hash is not null then
-    delete from public.join_attempts
-     where created_at < now() - interval '1 day';
+    -- La limpieza de intentos viejos (> 1 día) la hace el cron diario
+    -- (/api/cron/drain), no cada alta.
     select count(*) into v_attempts
       from public.join_attempts
      where organization_id = v_org.id

@@ -43,7 +43,7 @@ const GRANULARITIES = [
 
 function Card({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
-    <div className="rounded-lg border border-neutral-200 p-5 dark:border-neutral-800">
+    <div className="rounded-lg border border-neutral-200 p-5">
       <p className="text-2xl font-semibold tabular-nums">{value}</p>
       <p className="mt-1 text-sm text-ink-soft">{label}</p>
       {hint && <p className="mt-1 text-xs text-ink-soft">{hint}</p>}
@@ -142,30 +142,30 @@ export default async function AnalyticsPage({
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-medium">Visitas por período</h2>
         <div className="flex flex-wrap items-center gap-3 text-xs">
-          <div className="flex overflow-hidden rounded-md border border-neutral-200 dark:border-neutral-800">
+          <div className="flex overflow-hidden rounded-md border border-neutral-200">
             {PERIODS.map((p) => (
               <a
                 key={p.days}
                 href={filterLink(p.days, granularity)}
                 className={`px-3 py-1.5 font-medium transition ${
                   p.days === days
-                    ? "bg-brand-dark text-white"
-                    : "hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                    ?"bg-brand-dark text-white"
+                    : "hover:bg-neutral-100"
                 }`}
               >
                 {p.label}
               </a>
             ))}
           </div>
-          <div className="flex overflow-hidden rounded-md border border-neutral-200 dark:border-neutral-800">
+          <div className="flex overflow-hidden rounded-md border border-neutral-200">
             {GRANULARITIES.map((g) => (
               <a
                 key={g.value}
                 href={filterLink(days, g.value)}
                 className={`px-3 py-1.5 font-medium transition ${
                   g.value === granularity
-                    ? "bg-brand-dark text-white"
-                    : "hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                    ?"bg-brand-dark text-white"
+                    : "hover:bg-neutral-100"
                 }`}
               >
                 {g.label}
@@ -175,14 +175,14 @@ export default async function AnalyticsPage({
         </div>
       </div>
 
-      <div className="rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
+      <div className="rounded-lg border border-neutral-200 p-4">
         <div className="mb-3 flex items-center justify-between text-xs text-ink-soft">
           <span>
-            Total del período: <strong className="text-neutral-700 dark:text-neutral-300">{totalVisits}</strong>
+            Total del período: <strong className="text-neutral-700">{totalVisits}</strong>
           </span>
           <span>
             Promedio por {granularity === "month" ? "mes" : granularity === "week" ? "semana" : "día"}:{" "}
-            <strong className="text-neutral-700 dark:text-neutral-300">{avgVisits}</strong>
+            <strong className="text-neutral-700">{avgVisits}</strong>
           </span>
         </div>
         {m.visits_daily.length > 0 && totalVisits > 0 ? (
@@ -196,7 +196,7 @@ export default async function AnalyticsPage({
                   style={{ height: `${Math.max(2, (d.count / maxVisits) * 100)}%` }}
                 >
                   {d.count > 0 && (
-                    <span className="pointer-events-none absolute -top-5 left-1/2 hidden -translate-x-1/2 text-[11px] font-semibold text-neutral-600 group-hover:block dark:text-neutral-300">
+                    <span className="pointer-events-none absolute -top-5 left-1/2 hidden -translate-x-1/2 text-[11px] font-semibold text-neutral-600 group-hover:block">
                       {d.count}
                     </span>
                   )}
@@ -218,7 +218,7 @@ export default async function AnalyticsPage({
                     {show && (
                       <span
                         className={`absolute top-0 whitespace-nowrap ${visibility}${
-                          i === 0 ? "left-0" : last ? "right-0" : "left-1/2 -translate-x-1/2"
+                          i === 0 ?"left-0" : last ? "right-0" : "left-1/2 -translate-x-1/2"
                         }`}
                       >
                         {bucketLabel(d.day, granularity)}
