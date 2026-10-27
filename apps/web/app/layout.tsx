@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Caveat, Geist_Mono, Poppins } from "next/font/google";
 import "./globals.css";
 
@@ -21,6 +21,9 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+// Esquema claro fijo: sin inversión automática de colores en el teléfono.
+export const viewport: Viewport = { colorScheme: "light" };
 
 export const metadata: Metadata = {
   metadataBase: new URL(

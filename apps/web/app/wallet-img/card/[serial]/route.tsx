@@ -1,7 +1,8 @@
 import { ImageResponse } from "next/og";
 import type { ReactElement } from "react";
 import { passDataBySerial } from "@/lib/wallet/pass-data";
-import { safeBrand } from "@/lib/wallet/images";
+import { cardImageUrlFor, safeBrand } from "@/lib/wallet/images";
+import { limitRequest } from "@/lib/ratelimit";
 
 // Imágenes de saldo del pase de Google Wallet, con la estética de la tarjeta
 // de la app (color del comercio, ondas, panel translúcido, insignia):
@@ -81,10 +82,26 @@ function Badge({ text, color, small }: { text: string; color: string; small?: bo
 export async function GET(req: Request, ctx: { params: Promise<{ serial: string }> }) {
   const { serial } = await ctx.params;
   if (!/^[0-9a-f-]{36}$/i.test(serial)) return new Response("not found", { status: 404 });
-  const variant = new URL(req.url).searchParams.get("k") === "hero" ? "hero" : "full";
+  const url = new URL(req.url);
+  const variant = url.searchParams.get("k") === "hero" ? "hero" : "full";
+
+  // 120 imágenes por minuto y por IP (solo memoria: es una ruta de volumen).
+  const limited = await limitRequest(req, "wallet-img", "card", 120, 60, false);
+  if (limited) return limited;
 
   const d = await passDataBySerial(serial);
   if (!d) return new Response("not found", { status: 404 });
+
+  // ?v= debe ser el del saldo actual. Si no coincide (valor inventado para
+  // saltarse la caché, o saldo que cambió después de publicar el pase) se
+  // redirige a la URL canónica: cacheable y sin render duplicado.
+  const canonical = new URL(cardImageUrlFor(url.origin, d, variant));
+  if (url.searchParams.get("v") !== canonical.searchParams.get("v")) {
+    return new Response(null, {
+      status: 307,
+      headers: { Location: canonical.toString(), "Cache-Control": "public, max-age=60" },
+    });
+  }
 
   const color = safeBrand(d.brandColor);
   const isStamps = !!d.stamps;

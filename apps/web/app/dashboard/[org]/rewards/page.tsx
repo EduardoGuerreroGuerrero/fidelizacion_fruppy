@@ -9,7 +9,7 @@ import { programTypeLabel, statusLabel } from "@/lib/labels";
 export const instant = false;
 
 const input =
-  "w-full rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-transparent";
+  "w-full rounded-md border border-neutral-300 px-3 py-2 text-sm";
 
 export default async function RewardsPage({
   params,
@@ -60,17 +60,17 @@ export default async function RewardsPage({
       <h1 className="mb-4 text-2xl font-semibold">Recompensas</h1>
 
       {error && (
-        <p className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-900/30 dark:text-red-300">
+        <p className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800">
           {error}
         </p>
       )}
       {ok && (
-        <p className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-800 dark:bg-green-900/30 dark:text-green-300">
+        <p className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-800">
           {ok}
         </p>
       )}
 
-      <section className="mb-8 rounded-lg border border-neutral-200 p-5 dark:border-neutral-800">
+      <section className="mb-8 rounded-lg border border-neutral-200 p-5">
         <h2 className="mb-3 font-medium">Nueva recompensa</h2>
         <RememberForm storageKey="reward-new" action={saveReward.bind(null, slug)} className="grid gap-3 sm:grid-cols-2">
           <input name="name" required placeholder="Nombre" className={input} />
@@ -112,7 +112,7 @@ export default async function RewardsPage({
         {(rewards ?? []).map((r) => (
           <li
             key={r.id}
-            className="flex items-center justify-between rounded-lg border border-neutral-200 px-4 py-3 dark:border-neutral-800"
+            className="flex items-center justify-between rounded-lg border border-neutral-200 px-4 py-3"
           >
             <div>
               <p className="font-medium">
@@ -138,13 +138,13 @@ export default async function RewardsPage({
                 )}
               >
                 <SubmitButton
-                  className="rounded-md border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
+                  className="rounded-md border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-100">
                   {r.status === "active" ? "Desactivar" : "Activar"}
                 </SubmitButton>
               </form>
               <form action={deleteReward.bind(null, slug, r.id)}>
                 <SubmitButton
-                  className="rounded-md border border-red-300 px-3 py-1 text-xs text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-950"
+                  className="rounded-md border border-red-300 px-3 py-1 text-xs text-red-700 hover:bg-red-50"
                   confirm="¿Eliminar definitivamente? No se puede deshacer.">
                   Eliminar
                 </SubmitButton>
@@ -153,7 +153,7 @@ export default async function RewardsPage({
           </li>
         ))}
         {(rewards ?? []).length === 0 && (
-          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-ink-soft dark:border-neutral-700">
+          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-ink-soft">
             Sin recompensas todavía.
           </li>
         )}
@@ -167,7 +167,7 @@ export default async function RewardsPage({
           return (
             <li
               key={r.id}
-              className="flex items-center justify-between rounded-lg border border-neutral-200 px-4 py-2 text-sm dark:border-neutral-800"
+              className="flex items-center justify-between rounded-lg border border-neutral-200 px-4 py-2 text-sm"
             >
               <span>
                 {rw?.name ?? "?"} — {displayName(`${cu?.first_name ?? ""} ${cu?.last_name ?? ""}`)}

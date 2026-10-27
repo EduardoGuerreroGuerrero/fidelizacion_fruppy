@@ -30,17 +30,20 @@
 --    programas seleccionados reenviar por correo.
 -- ============================================================================
 
-drop function if exists public.register_customer_via_join(text, text, text, text, boolean, text, text);
-
+-- Migración ADITIVA (sin drop): la función nueva (8 parámetros, sin valores por
+-- defecto) convive con la firma anterior de 7, que pasa a ser un envoltorio.
+-- Así no hay ninguna ventana sin función y las llamadas antiguas (sin
+-- p_program_ids) siguen funcionando; con 7 argumentos solo aplica la antigua y
+-- con 8 solo la nueva (sin ambigüedad por defaults).
 create or replace function public.register_customer_via_join(
   p_token           text,
   p_first_name      text,
   p_email           text,
-  p_phone           text default null,
-  p_marketing       boolean default false,
-  p_client_hash     text default null,
-  p_idempotency_key text default null,
-  p_program_ids     uuid[] default null
+  p_phone           text,
+  p_marketing       boolean,
+  p_client_hash     text,
+  p_idempotency_key text,
+  p_program_ids     uuid[]
 )
 returns json
 language plpgsql
@@ -81,8 +84,8 @@ begin
   -- 2. Rate limit: 20 altas/hora por (org, hash de cliente). El hash lo
   --    calcula el servidor (IP+UA); no guarda la IP en claro.
   if p_client_hash is not null then
-    delete from public.join_attempts
-     where created_at < now() - interval '1 day';
+    -- La limpieza de intentos viejos (> 1 día) la hace el cron diario
+    -- (/api/cron/drain), no cada alta.
     select count(*) into v_attempts
       from public.join_attempts
      where organization_id = v_org.id
@@ -223,6 +226,31 @@ $$;
 
 revoke all on function public.register_customer_via_join(text, text, text, text, boolean, text, text, uuid[]) from public, anon;
 grant execute on function public.register_customer_via_join(text, text, text, text, boolean, text, text, uuid[]) to anon, authenticated;
+
+-- Firma anterior (7 parámetros): mismo comportamiento histórico, delega en la
+-- nueva sin selección de programas (cae al programa activo más antiguo).
+create or replace function public.register_customer_via_join(
+  p_token           text,
+  p_first_name      text,
+  p_email           text,
+  p_phone           text default null,
+  p_marketing       boolean default false,
+  p_client_hash     text default null,
+  p_idempotency_key text default null
+)
+returns json
+language sql
+security definer
+set search_path = ''
+as $$
+  select public.register_customer_via_join(
+    p_token, p_first_name, p_email, p_phone, p_marketing,
+    p_client_hash, p_idempotency_key, null::uuid[]
+  );
+$$;
+
+revoke all on function public.register_customer_via_join(text, text, text, text, boolean, text, text) from public, anon;
+grant execute on function public.register_customer_via_join(text, text, text, text, boolean, text, text) to anon, authenticated;
 
 create or replace function public.resolve_join(p_token text)
 returns json

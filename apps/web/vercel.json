@@ -1,4 +1,7 @@
 {
+  "functions": {
+    "app/wallet-img/**/route.tsx": { "maxDuration": 10 }
+  },
   "crons": [
     {
       "path": "/api/cron/drain",

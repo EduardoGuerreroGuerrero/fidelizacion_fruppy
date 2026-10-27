@@ -23,7 +23,7 @@ export function ColorPicker({
         aria-label="Elegir color de la tarjeta"
         value={/^#[0-9a-fA-F]{6}$/.test(value) ? value : DEFAULT_BRAND_COLOR}
         onChange={(e) => setValue(e.target.value)}
-        className="size-10 shrink-0 cursor-pointer rounded-md border border-neutral-300 bg-transparent p-0.5 dark:border-neutral-700"
+        className="size-10 shrink-0 cursor-pointer rounded-md border border-neutral-300 bg-transparent p-0.5"
       />
       <input
         id={id}
@@ -32,7 +32,7 @@ export function ColorPicker({
         onChange={(e) => setValue(e.target.value)}
         placeholder={DEFAULT_BRAND_COLOR}
         maxLength={7}
-        className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-transparent"
+        className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
       />
     </div>
   );

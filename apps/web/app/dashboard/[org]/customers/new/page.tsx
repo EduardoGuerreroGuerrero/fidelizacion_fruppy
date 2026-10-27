@@ -32,7 +32,7 @@ export default async function NewCustomerPage({
   const action = createCustomer.bind(null, slug);
 
   const input =
-    "w-full rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-transparent";
+    "w-full rounded-md border border-neutral-300 px-3 py-2 text-sm";
   const label = "mb-1 block text-sm font-medium";
 
   return (
@@ -46,12 +46,12 @@ export default async function NewCustomerPage({
       <h1 className="mb-6 mt-1 text-2xl font-semibold">Nuevo cliente</h1>
 
       {error && (
-        <p className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-900/30 dark:text-red-300">
+        <p className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800">
           {error}
         </p>
       )}
       {warn && (
-        <p className="mb-4 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:bg-amber-900/30 dark:text-amber-300">
+        <p className="mb-4 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-900">
           {warn}
         </p>
       )}
@@ -120,7 +120,7 @@ export default async function NewCustomerPage({
         </label>
 
         {warn && (
-          <label className="flex items-start gap-2 text-sm font-medium text-amber-900 dark:text-amber-300">
+          <label className="flex items-start gap-2 text-sm font-medium text-amber-900">
             <input type="checkbox" name="confirm_duplicate" className="mt-0.5" />
             <span>Crear de todas formas (revisé los duplicados)</span>
           </label>
@@ -133,7 +133,7 @@ export default async function NewCustomerPage({
           </SubmitButton>
           <Link
             href={`/dashboard/${slug}/customers`}
-            className="rounded-md border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+            className="rounded-md border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-100"
           >
             Cancelar
           </Link>

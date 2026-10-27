@@ -37,7 +37,7 @@ export default async function AuditPage({ params }: { params: Promise<{ org: str
         {(logs ?? []).map((l) => (
           <li
             key={l.id}
-            className="flex flex-col gap-1 rounded-lg border border-neutral-200 px-4 py-3 text-sm dark:border-neutral-800 sm:flex-row sm:items-start sm:justify-between sm:gap-3"
+            className="flex flex-col gap-1 rounded-lg border border-neutral-200 px-4 py-3 text-sm sm:flex-row sm:items-start sm:justify-between sm:gap-3"
           >
             <p className="min-w-0 break-words">
               <span className="font-medium">{l.action}</span>
@@ -52,7 +52,7 @@ export default async function AuditPage({ params }: { params: Promise<{ org: str
           </li>
         ))}
         {(logs ?? []).length === 0 && (
-          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-ink-soft dark:border-neutral-700">
+          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-ink-soft">
             Sin eventos registrados (o sin permiso de lectura).
           </li>
         )}

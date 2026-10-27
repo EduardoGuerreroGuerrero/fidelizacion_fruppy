@@ -16,7 +16,7 @@ import { DEFAULT_BRAND_COLOR } from "@/lib/brand";
 export const instant = false;
 
 const input =
-  "w-full rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-transparent";
+  "w-full rounded-md border border-neutral-300 px-3 py-2 text-sm";
 const label = "mb-1 block text-sm font-medium";
 
 const TIMEZONES = [
@@ -123,12 +123,12 @@ export default async function SettingsPage({
       <h1 className="mb-4 text-2xl font-semibold">Configuración</h1>
 
       {error && (
-        <p className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-900/30 dark:text-red-300">
+        <p className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800">
           {error}
         </p>
       )}
       {ok && (
-        <p className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-800 dark:bg-green-900/30 dark:text-green-300">
+        <p className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-800">
           {ok}
         </p>
       )}
@@ -184,7 +184,7 @@ export default async function SettingsPage({
                 <img
                   src={brand.logo_url}
                   alt="Logo actual"
-                  className="h-10 w-auto rounded border border-neutral-200 bg-white object-contain p-1 dark:border-neutral-700"
+                  className="h-10 w-auto rounded border border-neutral-200 bg-white object-contain p-1"
                 />
                 <label className="flex items-center gap-1.5 text-xs text-ink-soft">
                   <input type="checkbox" name="remove_logo" className="accent-brand" />
@@ -197,7 +197,7 @@ export default async function SettingsPage({
               name="logo"
               type="file"
               accept="image/png,image/jpeg,image/webp,image/avif,image/gif,image/svg+xml"
-              className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm text-neutral-600 file:mr-3 file:rounded-full file:border-0 file:bg-neutral-100 file:px-3 file:py-1 file:text-xs file:font-semibold dark:border-neutral-700 dark:bg-transparent dark:text-neutral-400"
+              className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm text-neutral-600 file:mr-3 file:rounded-full file:border-0 file:bg-neutral-100 file:px-3 file:py-1 file:text-xs file:font-semibold"
             />
             <p className="mt-1 text-xs text-ink-soft">
               PNG, JPG, WebP o SVG — máx. 10 MB. Si el fondo es de un solo
@@ -213,7 +213,7 @@ export default async function SettingsPage({
               {STAMP_ICON_OPTIONS.map(({ key, label: l, Icon }) => (
                 <label
                   key={key}
-                  className="flex cursor-pointer flex-col items-center gap-1 rounded-lg border border-neutral-200 p-2 text-center has-[:checked]:border-brand has-[:checked]:bg-brand/5 dark:border-neutral-700"
+                  className="flex cursor-pointer flex-col items-center gap-1 rounded-lg border border-neutral-200 p-2 text-center has-[:checked]:border-brand has-[:checked]:bg-brand/5"
                 >
                   <input
                     type="radio"
@@ -223,7 +223,7 @@ export default async function SettingsPage({
                     className="sr-only"
                   />
                   <Icon filled className="size-6" />
-                  <span className="text-xs leading-tight text-neutral-600 dark:text-neutral-400">
+                  <span className="text-xs leading-tight text-neutral-600">
                     {l}
                   </span>
                 </label>
@@ -270,7 +270,7 @@ export default async function SettingsPage({
                           key={i}
                           className={`flex size-6 items-center justify-center rounded-full ${
                             i < previewFilled
-                              ? "bg-pastel-pink"
+                              ?"bg-pastel-pink"
                               : "border border-[#f0d4dc] bg-white"
                           }`}
                         >
@@ -315,7 +315,7 @@ export default async function SettingsPage({
           ubicación opcional. */}
       <form
         action={updateOrgPrivacy.bind(null, slug)}
-        className="mt-8 space-y-4 rounded-lg border border-neutral-200 p-5 dark:border-neutral-800"
+        className="mt-8 space-y-4 rounded-lg border border-neutral-200 p-5"
       >
         <h2 className="font-medium">Privacidad y funciones</h2>
         <div>
@@ -445,11 +445,11 @@ export default async function SettingsPage({
         </SubmitButton>
       </form>
       {isOwner ? (
-        <section className="mt-10 rounded-xl border border-red-200 p-5 dark:border-red-900">
-          <h2 className="text-lg font-semibold text-red-700 dark:text-red-300">Zona de peligro</h2>
+        <section className="mt-10 rounded-xl border border-red-200 p-5">
+          <h2 className="text-lg font-semibold text-red-700">Zona de peligro</h2>
           <p className="mt-1 text-xs text-ink-soft">
             Solo el propietario ve esto. Para confirmar escribe el identificador de la
-            organización: <code className="rounded bg-neutral-100 px-1 dark:bg-neutral-800">{slug}</code>
+            organización: <code className="rounded bg-neutral-100 px-1">{slug}</code>
           </p>
 
           <form action={closeOrganization.bind(null, slug)} className="mt-4 space-y-2">
@@ -466,12 +466,12 @@ export default async function SettingsPage({
                 autoComplete="off"
                 placeholder={slug}
                 aria-label="Escribe el identificador para confirmar el cierre"
-                className="rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-transparent"
+                className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
               />
               <SubmitButton
                 pendingText="Cerrando…"
                 confirm="¿Cerrar esta organización? Se revocan todas las tarjetas y el QR deja de funcionar. Esta acción no se puede deshacer desde el panel."
-                className="rounded-md border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-950"
+                className="rounded-md border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50"
               >
                 Cerrar organización
               </SubmitButton>
@@ -491,7 +491,7 @@ export default async function SettingsPage({
                 autoComplete="off"
                 placeholder={slug}
                 aria-label="Escribe el identificador para confirmar la eliminación"
-                className="rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-transparent"
+                className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
               />
               <SubmitButton
                 pendingText="Eliminando…"

@@ -173,7 +173,7 @@ export default async function CustomerPage({
   const consentOff = setMarketingConsent.bind(null, slug, customer.id, false);
 
   const input =
-    "w-full rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-transparent";
+    "w-full rounded-md border border-neutral-300 px-3 py-2 text-sm";
   const label = "mb-1 block text-sm font-medium";
 
   return (
@@ -193,30 +193,30 @@ export default async function CustomerPage({
             <SubmitButton
               confirm="¿Archivar este cliente? Se revocan sus tarjetas y deja de aparecer entre los activos. Su historial de sellos se conserva."
               pendingText="Archivando…"
-              className="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-950"
+              className="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-700 hover:bg-red-50"
             >
               Archivar cliente
             </SubmitButton>
           </form>
         ) : (
-          <span className="rounded bg-neutral-100 px-2 py-1 text-xs text-ink-soft dark:bg-neutral-800">
+          <span className="rounded bg-neutral-100 px-2 py-1 text-xs text-ink-soft">
             archivado
           </span>
         )}
       </div>
 
       {error && (
-        <p className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-900/30 dark:text-red-300">
+        <p className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800">
           {error}
         </p>
       )}
       {ok && (
-        <p className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-800 dark:bg-green-900/30 dark:text-green-300">
+        <p className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-800">
           {ok}
         </p>
       )}
       {duplicates.length > 0 && (
-        <p className="mb-4 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:bg-amber-900/30 dark:text-amber-300">
+        <p className="mb-4 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-900">
           Posible duplicado con{" "}
           {duplicates.map((d, i) => (
             <span key={d.id}>
@@ -326,7 +326,7 @@ export default async function CustomerPage({
               return (
                 <li
                   key={p.id}
-                  className="rounded-md border border-neutral-200 px-4 py-3 text-sm dark:border-neutral-800"
+                  className="rounded-md border border-neutral-200 px-4 py-3 text-sm"
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-medium">{p.name}</span>
@@ -336,12 +336,12 @@ export default async function CustomerPage({
                           <Link
                             href={`/t/${card.token}`}
                             target="_blank"
-                            className="rounded bg-green-100 px-2 py-1 text-xs text-green-800 hover:bg-green-200 dark:bg-green-900/40 dark:text-green-300"
+                            className="rounded bg-green-100 px-2 py-1 text-xs text-green-800 hover:bg-green-200"
                           >
                             Ver tarjeta
                           </Link>
                         ) : (
-                          <span className="rounded bg-red-100 px-2 py-1 text-xs text-red-800 dark:bg-red-900/40 dark:text-red-300">
+                          <span className="rounded bg-red-100 px-2 py-1 text-xs text-red-800">
                             revocada
                           </span>
                         )}
@@ -358,20 +358,20 @@ export default async function CustomerPage({
                           <>
                             <form action={rotateCardToken.bind(null, slug, customer.id, card.id)}>
                               <SubmitButton
-                                className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                                className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100"
                                 confirm="¿Rotar el QR de esta tarjeta? El enlace y el QR actuales dejarán de funcionar.">
                                 Rotar QR
                               </SubmitButton>
                             </form>
                             <form action={syncWalletFormAction.bind(null, slug, customer.id)}>
                               <SubmitButton
-                                className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
+                                className="rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100">
                                 Wallet
                               </SubmitButton>
                             </form>
                             <form action={revokeCard.bind(null, slug, customer.id, card.id)}>
                               <SubmitButton
-                                className="rounded border border-red-300 px-2 py-1 text-xs text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-950"
+                                className="rounded border border-red-300 px-2 py-1 text-xs text-red-700 hover:bg-red-50"
                                 confirm="¿Revocar esta tarjeta? El cliente no podrá usarla hasta que la reemitas.">
                                 Revocar
                               </SubmitButton>
@@ -389,15 +389,15 @@ export default async function CustomerPage({
                     )}
                   </div>
                   {card?.status === "active" && (
-                    <div className="mt-3 flex items-start gap-4 border-t border-neutral-100 pt-3 dark:border-neutral-800">
+                    <div className="mt-3 flex items-start gap-4 border-t border-neutral-100 pt-3">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={cardQr.get(card.id)}
                         alt="QR para abrir la tarjeta en el celular del cliente"
-                        className="size-24 shrink-0 rounded-md border border-neutral-200 dark:border-neutral-700"
+                        className="size-24 shrink-0 rounded-md border border-neutral-200"
                       />
-                      <div className="text-xs text-neutral-600 dark:text-neutral-400">
-                        <p className="font-medium text-neutral-800 dark:text-neutral-200">
+                      <div className="text-xs text-neutral-600">
+                        <p className="font-medium text-neutral-800">
                           Entregar tarjeta
                         </p>
                         <p className="mt-1">
@@ -434,7 +434,7 @@ export default async function CustomerPage({
           </ul>
 
           <h2 className="mb-3 mt-8 text-lg font-medium">Consentimientos</h2>
-          <div className="mb-2 flex items-center justify-between rounded-md border border-neutral-200 px-4 py-3 text-sm dark:border-neutral-800">
+          <div className="mb-2 flex items-center justify-between rounded-md border border-neutral-200 px-4 py-3 text-sm">
             <div>
               <p className="font-medium">Tratamiento de datos (Ley 1581)</p>
               <p className="text-xs text-ink-soft">
@@ -446,8 +446,8 @@ export default async function CustomerPage({
             <span
               className={`rounded px-2 py-1 text-xs ${
                 customer.data_consent_at
-                  ? "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300"
-                  : "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"
+                  ?"bg-green-100 text-green-800"
+                  : "bg-amber-100 text-amber-800"
               }`}
             >
               {customer.data_consent_at ? "autorizado" : "pendiente"}
@@ -456,12 +456,12 @@ export default async function CustomerPage({
           <p className="mb-1 text-xs font-medium text-ink-soft">Marketing por correo</p>
           <form
             action={customer.marketing_consent_at ? consentOff : consentOn}
-            className="flex items-center justify-between rounded-md border border-neutral-200 px-4 py-3 dark:border-neutral-800"
+            className="flex items-center justify-between rounded-md border border-neutral-200 px-4 py-3"
           >
             <div className="text-sm">
               {customer.marketing_consent_at ? (
                 <>
-                  <span className="font-medium text-green-700 dark:text-green-400">Aceptado</span>{" "}
+                  <span className="font-medium text-green-700">Aceptado</span>{" "}
                   <span className="text-ink-soft">
                     el {new Date(customer.marketing_consent_at).toLocaleString("es-CO")}
                   </span>
@@ -476,7 +476,7 @@ export default async function CustomerPage({
                   ? "¿Retirar la autorización de marketing de este cliente?"
                   : "¿Registrar la autorización de marketing en nombre del cliente? Hazlo solo si el titular la dio expresamente (por ejemplo, en caja). Queda auditado como acción del equipo."
               }
-              className="rounded-md border border-neutral-300 px-3 py-1 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
+              className="rounded-md border border-neutral-300 px-3 py-1 text-sm hover:bg-neutral-100">
               {customer.marketing_consent_at ? "Retirar marketing" : "Registrar autorización"}
             </SubmitButton>
           </form>
@@ -499,7 +499,7 @@ export default async function CustomerPage({
                 return (
                   <li
                     key={a.id}
-                    className="rounded-md border border-neutral-200 px-4 py-3 text-sm dark:border-neutral-800"
+                    className="rounded-md border border-neutral-200 px-4 py-3 text-sm"
                   >
                     <span className="font-medium">{p?.name}</span>
                     <span className="float-right">
@@ -508,7 +508,7 @@ export default async function CustomerPage({
                         : `${a.current_points} pts`}
                     </span>
                     {programRewards.length > 0 && (
-                      <ul className="mt-2 space-y-1 border-t border-neutral-100 pt-2 dark:border-neutral-800">
+                      <ul className="mt-2 space-y-1 border-t border-neutral-100 pt-2">
                         {programRewards.map((r) => {
                           const cost =
                             r.cost_stamps !== null
@@ -523,7 +523,7 @@ export default async function CustomerPage({
                               key={r.id}
                               className="flex items-center justify-between gap-2 text-xs"
                             >
-                              <span className="text-neutral-600 dark:text-neutral-400">
+                              <span className="text-neutral-600">
                                 {r.name} — {cost}
                               </span>
                               <form
@@ -532,7 +532,7 @@ export default async function CustomerPage({
                                 <input type="hidden" name="idem" value={idem} />
                                 <SubmitButton
                                   disabled={!affordable}
-                                  className="rounded bg-green-700 px-2 py-1 text-white hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-neutral-300 dark:disabled:bg-neutral-700"
+                                  className="rounded bg-green-700 px-2 py-1 text-white hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-neutral-300"
                                   confirm="¿Canjear esta recompensa? Descuenta el saldo del cliente y no se puede deshacer.">
                                   Canjear
                                 </SubmitButton>
@@ -556,7 +556,7 @@ export default async function CustomerPage({
               {timeline.slice(0, 30).map((item, i) => (
                 <li
                   key={i}
-                  className="rounded-md border border-neutral-200 px-4 py-2 text-sm dark:border-neutral-800"
+                  className="rounded-md border border-neutral-200 px-4 py-2 text-sm"
                 >
                   <span className="text-ink-soft">
                     {new Date(item.at).toLocaleString("es-CO")}

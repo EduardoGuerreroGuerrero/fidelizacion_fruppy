@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { displayName } from "@/lib/format";
 import { ImportCsvButton } from "../_components/import-csv";
 import { statusLabel } from "@/lib/labels";
+import { Badge } from "@/app/_components/badge";
 
 export const instant = false;
 
@@ -77,7 +78,7 @@ export default async function CustomersPage({
           <ImportCsvButton slug={slug} />
           <a
             href={`/dashboard/${slug}/customers/export`}
-            className="rounded-md border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+            className="rounded-md border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-100"
           >
             Exportar CSV
           </a>
@@ -96,12 +97,12 @@ export default async function CustomersPage({
           name="q"
           defaultValue={q}
           placeholder="Buscar por nombre, email o teléfono…"
-          className="min-w-[12rem] flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-transparent"
+          className="min-w-[12rem] flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm"
         />
         <select
           name="status"
           defaultValue={status}
-          className="rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-transparent"
+          className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
         >
           <option value="active">Activos</option>
           <option value="inactive">Inactivos</option>
@@ -110,7 +111,7 @@ export default async function CustomersPage({
         <select
           name="consent"
           defaultValue={consent}
-          className="rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-transparent"
+          className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
         >
           <option value="">Todos los canales</option>
           <option value="marketing">Con marketing</option>
@@ -118,19 +119,19 @@ export default async function CustomersPage({
         </select>
         <button
           type="submit"
-          className="rounded-md border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+          className="rounded-md border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-100"
         >
           Buscar
         </button>
       </form>
 
       {customers && customers.length > 0 ? (
-        <ul className="divide-y divide-neutral-200 rounded-lg border border-neutral-200 dark:divide-neutral-800 dark:border-neutral-800">
+        <ul className="divide-y divide-neutral-200 rounded-lg border border-neutral-200">
           {customers.map((c) => (
             <li key={c.id}>
               <Link
                 href={`/dashboard/${slug}/customers/${c.id}`}
-                className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+                className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-neutral-50"
               >
                 <div className="min-w-0">
                   <p className="font-medium">
@@ -141,32 +142,18 @@ export default async function CustomersPage({
                   </p>
                 </div>
                 <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 text-xs">
-                  {c.marketing_consent_at && (
-                    <span className="rounded bg-green-100 px-2 py-1 text-green-800 dark:bg-green-900/40 dark:text-green-300">
-                      marketing
-                    </span>
-                  )}
-                  {c.push_consent_state === "granted" && (
-                    <span className="rounded bg-sky-100 px-2 py-1 text-sky-800 dark:bg-sky-900/40 dark:text-sky-300">
-                      push
-                    </span>
-                  )}
-                  <span
-                    className={`rounded px-2 py-1 ${
-                      c.status === "active"
-                        ? "bg-neutral-100 dark:bg-neutral-800"
-                        : "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300"
-                    }`}
-                  >
+                  {c.marketing_consent_at && <Badge tone="success">marketing</Badge>}
+                  {c.push_consent_state === "granted" && <Badge tone="info">push</Badge>}
+                  <Badge tone={c.status === "active" ? "neutral" : "danger"}>
                     {statusLabel(c.status)}
-                  </span>
+                  </Badge>
                 </div>
               </Link>
             </li>
           ))}
         </ul>
       ) : (
-        <p className="rounded-lg border border-dashed border-neutral-300 p-8 text-center text-ink-soft dark:border-neutral-700">
+        <p className="rounded-lg border border-dashed border-neutral-300 p-8 text-center text-ink-soft">
           {needle
             ? "Sin resultados para esa búsqueda."
             : "Aún no hay clientes. Registra el primero."}

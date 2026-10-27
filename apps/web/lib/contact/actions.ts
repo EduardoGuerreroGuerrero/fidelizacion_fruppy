@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { optionalEnv } from "@/lib/env";
 import { senderFor, sendEmail } from "@/lib/email/send";
 import { escapeHtml } from "@/lib/html";
+import { allowAction } from "@/lib/ratelimit";
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const TOPICS: Record<string, string> = {
@@ -23,6 +24,10 @@ function fail(msg: string): never {
 export async function sendContactMessage(formData: FormData) {
   // Honeypot: un humano no ve este campo; si viene lleno, fingimos éxito.
   if (String(formData.get("website") ?? "").trim() !== "") redirect("/contacto?sent=1");
+
+  // 3 mensajes por hora y por IP: cada envío consume cuota de correo.
+  if (!(await allowAction("contact", 3, 3600)))
+    fail("Has enviado varios mensajes seguidos. Inténtalo de nuevo en una hora o escribe a soporte@pineappleloyalty.com.");
 
   const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim().toLowerCase();

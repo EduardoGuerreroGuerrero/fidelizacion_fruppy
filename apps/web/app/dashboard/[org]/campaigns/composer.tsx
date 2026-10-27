@@ -10,7 +10,7 @@ import { renderCampaignText } from "@/lib/push/template";
 // atajos y vista previa en vivo de cómo se verá en el navegador y en Wallet.
 
 const field =
-  "w-full rounded-xl border border-ink/10 bg-white px-3.5 py-2.5 text-sm outline-none transition focus:border-pl-green-2 focus:ring-2 focus:ring-pl-green-2/30 dark:bg-transparent";
+  "w-full rounded-xl border border-ink/10 bg-white px-3.5 py-2.5 text-sm outline-none transition focus:border-pl-green-2 focus:ring-2 focus:ring-pl-green-2/30";
 
 const TEMPLATES = [
   { label: "Promo del día", title: "Hoy tenemos una promo para ti", body: "Pasa por {n} y muestra tu tarjeta para aprovecharla. Solo por hoy." },
@@ -42,7 +42,7 @@ function presetDate(kind: "1h" | "tomorrow" | "weekend"): string {
 
 function Counter({ value, max }: { value: number; max: number }) {
   return (
-    <span className={`text-[11px] tabular-nums ${value > max * 0.9 ? "text-amber-700" : "text-ink-soft"}`}>
+    <span className={`text-[11px] tabular-nums ${value > max * 0.9 ?"text-amber-700" : "text-ink-soft"}`}>
       {value}/{max}
     </span>
   );
@@ -80,7 +80,7 @@ export function CampaignComposer({
       <RememberForm
         storageKey="campaign-new"
         action={action}
-        className="space-y-5 rounded-2xl border border-ink/10 bg-white p-5 shadow-sm dark:bg-transparent"
+        className="space-y-5 rounded-2xl border border-ink/10 bg-white p-5 shadow-sm"
       >
         <input type="hidden" name="tz" value={new Date().getTimezoneOffset()} suppressHydrationWarning />
 
@@ -160,7 +160,7 @@ export function CampaignComposer({
                 key={d.value}
                 className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                   dest === d.value
-                    ? "border-brand bg-brand text-white"
+                    ?"border-brand bg-brand text-white"
                     : "border-ink/10 hover:bg-neutral-50"
                 }`}
               >
@@ -269,7 +269,7 @@ export function CampaignComposer({
               key={k}
               type="button"
               onClick={() => setTab(k)}
-              className={`flex-1 rounded-full px-3 py-1.5 transition ${tab === k ? "bg-white shadow-sm" : "text-ink-soft"}`}
+              className={`flex-1 rounded-full px-3 py-1.5 transition ${tab === k ?"bg-white shadow-sm" : "text-ink-soft"}`}
             >
               {label}
             </button>

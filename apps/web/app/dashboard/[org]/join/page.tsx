@@ -42,18 +42,18 @@ export default async function JoinQrPage({
       <h1 className="mb-4 text-2xl font-semibold">QR de registro de clientes</h1>
 
       {error && (
-        <p className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-900/30 dark:text-red-300">
+        <p className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800">
           {error}
         </p>
       )}
       {ok && (
-        <p className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-800 dark:bg-green-900/30 dark:text-green-300">
+        <p className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-800">
           {ok}
         </p>
       )}
 
       {!hasPrivacyChannel ? (
-        <p className="mb-4 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+        <p className="mb-4 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-800">
           El QR está <strong>deshabilitado</strong> hasta que configures un correo de
           privacidad en{" "}
           <a className="underline" href={`/dashboard/${slug}/settings`}>
@@ -64,14 +64,14 @@ export default async function JoinQrPage({
       ) : null}
 
       {!selfReg ? (
-        <p className="mb-4 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+        <p className="mb-4 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-800">
           El autorregistro está desactivado en Configuración → Privacidad y
           funciones. El QR no funcionará hasta activarlo.
         </p>
       ) : null}
 
-      <section className="rounded-lg border border-neutral-200 p-5 dark:border-neutral-800">
-        <p className="text-sm text-neutral-600 dark:text-neutral-400">
+      <section className="rounded-lg border border-neutral-200 p-5">
+        <p className="text-sm text-neutral-600">
           Imprime este QR en el punto de venta. El cliente lo escanea, se
           registra solo y recibe su tarjeta por correo — sin intervención del
           equipo.
@@ -83,9 +83,9 @@ export default async function JoinQrPage({
             alt="QR de registro"
             width={260}
             height={260}
-            className="rounded-xl border border-neutral-200 dark:border-neutral-800"
+            className="rounded-xl border border-neutral-200"
           />
-          <code className="break-all rounded-md bg-neutral-100 px-3 py-2 text-xs dark:bg-neutral-800">
+          <code className="break-all rounded-md bg-neutral-100 px-3 py-2 text-xs">
             {joinUrl}
           </code>
           <div className="flex flex-wrap justify-center gap-2 print:hidden">
@@ -101,7 +101,7 @@ export default async function JoinQrPage({
         </div>
         <form action={rotateJoinToken.bind(null, slug)} className="mt-4">
           <SubmitButton
-            className="rounded-full border border-neutral-300 px-4 py-2 text-sm font-semibold transition hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+            className="rounded-full border border-neutral-300 px-4 py-2 text-sm font-semibold transition hover:bg-neutral-100"
             confirm="¿Rotar el QR de registro? Los QR ya impresos dejarán de funcionar.">
             Rotar QR (invalida el anterior)
           </SubmitButton>

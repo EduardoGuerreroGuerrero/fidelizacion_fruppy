@@ -8,7 +8,7 @@ import {
   type WalletConfig,
 } from "passlet";
 import { passDataBySerial } from "./pass-data";
-import { safeBrand, walletCardImageUrl, walletHeroUrl } from "./images";
+import { cardImageUrlFor, walletHeroUrl } from "./images";
 import { patchLoyaltyObjectHero } from "./google-api";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import {
@@ -262,15 +262,7 @@ export class PassletWalletProvider implements WalletProvider {
   }
 
   private cardImageUrl(data: WalletPassData, variant: "hero" | "full"): string {
-    return walletCardImageUrl(env("NEXT_PUBLIC_BASE_URL")!, data.serialNumber, variant, {
-      firstName: data.firstName,
-      current: data.stamps ? data.stamps.current : (data.points ?? 0),
-      goal: data.stamps?.goal ?? null,
-      kind: data.stamps ? "stamps" : "points",
-      revoked: data.revoked,
-      brandColor: safeBrand(data.brandColor),
-      next: data.nextReward,
-    });
+    return cardImageUrlFor(env("NEXT_PUBLIC_BASE_URL")!, data, variant);
   }
 
   // Imagen principal del frente de la tarjeta, POR pase: passlet no la expone

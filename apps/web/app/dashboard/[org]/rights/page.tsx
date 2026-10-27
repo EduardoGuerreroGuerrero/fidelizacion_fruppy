@@ -67,17 +67,17 @@ export default async function RightsPage({
       <h1 className="mb-4 text-2xl font-semibold">Derechos de los titulares</h1>
 
       {error && (
-        <p className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-900/30 dark:text-red-300">
+        <p className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800">
           {error}
         </p>
       )}
       {ok && (
-        <p className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-800 dark:bg-green-900/30 dark:text-green-300">
+        <p className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-800">
           {ok}
         </p>
       )}
 
-      <p className="mb-4 rounded-md bg-neutral-50 px-4 py-3 text-xs text-neutral-600 dark:bg-neutral-900 dark:text-neutral-400">
+      <p className="mb-4 rounded-md bg-neutral-50 px-4 py-3 text-xs text-neutral-600">
         Plazo legal de respuesta (Ley 1581): 10 días hábiles para consultas
         (acceso a datos) y 15 días hábiles para reclamos (corrección, supresión,
         retiro de autorización, queja). Canal de privacidad configurado:{" "}
@@ -94,13 +94,13 @@ export default async function RightsPage({
           return (
             <li
               key={r.id}
-              className="rounded-lg border border-neutral-200 px-4 py-3 dark:border-neutral-800"
+              className="rounded-lg border border-neutral-200 px-4 py-3"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="font-medium">
                     {TYPE_LABEL[r.request_type] ?? r.request_type}
-                    <span className="ml-2 rounded bg-neutral-100 px-2 py-0.5 text-xs text-ink-soft dark:bg-neutral-800">
+                    <span className="ml-2 rounded bg-neutral-100 px-2 py-0.5 text-xs text-ink-soft">
                       {STATUS_LABEL[r.status] ?? r.status}
                     </span>
                   </p>
@@ -108,7 +108,7 @@ export default async function RightsPage({
                     {cust?.first_name ?? "—"} {cust?.email ? `· ${cust.email}` : ""}
                   </p>
                   {r.detail ? (
-                    <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
+                    <p className="mt-1 text-sm text-neutral-600">
                       {r.detail}
                     </p>
                   ) : null}
@@ -123,7 +123,7 @@ export default async function RightsPage({
                     ) : null}
                   </p>
                   {closed && r.response ? (
-                    <p className="mt-2 rounded-md bg-neutral-50 px-3 py-2 text-sm text-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+                    <p className="mt-2 rounded-md bg-neutral-50 px-3 py-2 text-sm text-neutral-700">
                       <span className="font-medium">Respuesta:</span> {r.response}
                     </p>
                   ) : null}
@@ -137,7 +137,7 @@ export default async function RightsPage({
                       name="response"
                       rows={3}
                       placeholder="Respuesta al titular (obligatoria al resolver o rechazar)"
-                      className="w-full rounded-md border border-neutral-300 px-2 py-1.5 text-xs dark:border-neutral-700 dark:bg-transparent"
+                      className="w-full rounded-md border border-neutral-300 px-2 py-1.5 text-xs"
                     />
                     <SubmitButton
                       name="status"
@@ -165,14 +165,14 @@ export default async function RightsPage({
                         name="status"
                         value="in_progress"
                         formNoValidate
-                        className="w-full rounded-md border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
+                        className="w-full rounded-md border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-100">
                         Marcar en trámite
                       </SubmitButton>
                     ) : null}
                     <SubmitButton
                       name="status"
                       value="rejected"
-                      className="w-full rounded-md border border-neutral-300 px-3 py-1 text-xs text-red-600 hover:bg-red-50 dark:border-neutral-700 dark:hover:bg-red-900/20"
+                      className="w-full rounded-md border border-neutral-300 px-3 py-1 text-xs text-red-600 hover:bg-red-50"
                       confirm="¿Rechazar esta solicitud? Se enviará tu respuesta al titular.">
                       Rechazar
                     </SubmitButton>
@@ -183,7 +183,7 @@ export default async function RightsPage({
           );
         })}
         {(requests ?? []).length === 0 && (
-          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-ink-soft dark:border-neutral-700">
+          <li className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-ink-soft">
             Sin solicitudes de derechos.
           </li>
         )}
