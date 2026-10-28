@@ -153,6 +153,56 @@ Verificación: `npm run lint && npm run typecheck && npm run build` en verde.
 
 ---
 
+## 3bis. Test dinámico autorizado · 2026-10-27
+
+Tras la revisión estática se ejecutó un **test dinámico autorizado** en dos
+capas. No se tocó ningún dato de producción.
+
+### Capa 1 — Black-box contra producción (`www.pineappleloyalty.com`)
+
+Peticiones controladas de solo lectura (sin fuzzing masivo / sin DoS):
+
+| Prueba | Esperado | Resultado |
+|--------|----------|-----------|
+| Token malformado / SQLi en `/t/<...>` | rechazo | 404 ✅ |
+| `/dashboard` sin sesión | redirect login | 307 → `/login` ✅ |
+| Export de clientes sin auth | bloqueo | 307 → login ✅ |
+| `/api/cron/drain` sin secreto | 401 | 401 ✅ |
+| `/api/health` | sin PII/secretos | solo status/env/ts ✅ |
+| Oráculo de enumeración (token válido inexistente) | indistinguible | sin diferencia ✅ |
+| Open-redirect en `/logo/<org>` | notFound | 404, sin `Location` ✅ |
+| CORS con `Origin` arbitrario | sin reflejo | sin `ACAO` ✅ |
+| GET en ruta solo-POST (`/t/<t>/push`) | 405 | 405 ✅ |
+
+### Capa 2 — RLS/RPC sobre Postgres vivo (rama temporal de Neon)
+
+Esquema idéntico a producción (23 migraciones aplicadas con `scripts/db_apply.py
+--stub-auth`), ejecutando como rol **`authenticated`** real (no superusuario),
+con `auth.uid()` simulado por GUC. Rama desechable, eliminada al finalizar.
+
+| Suite | Resultado | Propiedades clave verificadas en runtime |
+|-------|-----------|-------------------------------------------|
+| `scripts/test_e2e.py` | **14/14** | empleado suspendido/baja no lee ni escanea; rotación/revocación de token |
+| `scripts/test_engine.py` | **21/21** | **cross-tenant** (Org B no lee clientes de Org A); **ledger inmutable** (UPDATE directo prohibido); **atomicidad concurrente** (un solo canje gana; saldo = SUM(ledger)) |
+| `scripts/test_admin.py` | **18/18** | RBAC (staff no invita/renombra; externo no lee invitaciones ni analytics) |
+| `supabase/tests/*.sql` (5 archivos) | **173 aserciones, 0 fallos** | J14a-e, T09a-d, O04/O06/O14d-e, derechos/privacidad |
+
+**Total: 226 aserciones en runtime, todas verdes.** Sin fuga entre comercios,
+sin escritura no autorizada, sin mutación del ledger, sin condición de carrera.
+
+**Conclusión del test dinámico:** las 12 reglas del documento rector se cumplen
+**en ejecución**, no solo en el código. Sin hallazgos explotables
+críticos/altos/medios. El único trabajo pendiente es endurecimiento (CSP con
+nonce, §4).
+
+> Nota operativa observada: `scripts/test_engine.py` y `scripts/test_admin.py`
+> toman la URL de forma distinta — el primero de `DATABASE_URL` (+`load_dotenv`),
+> el segundo exige `--url`. Por defecto `.env` apunta a `localhost:54322`
+> (Supabase local), así que sin override cuelgan en el connect. Conviene unificar
+> el manejo de conexión entre los runners de prueba.
+
+---
+
 ## 4. Trabajo de seguimiento recomendado (fuera de alcance de esta entrega)
 
 1. **CSP con nonce (SEC-01):** introducir nonce por request en los scripts de
@@ -161,3 +211,5 @@ Verificación: `npm run lint && npm run typecheck && npm run build` en verde.
 2. **Monitorizar reportes CSP** antes del punto 1 (endpoint `report-to`).
 3. **Pruebas automatizadas de cabeceras:** añadir un test que verifique la
    presencia de HSTS/COOP/CSP en la respuesta, para evitar regresiones.
+4. **Unificar conexión en los runners de prueba** (`test_engine.py` /
+   `test_admin.py`): aceptar `--url` y `DATABASE_URL` por igual (ver nota §3bis).
