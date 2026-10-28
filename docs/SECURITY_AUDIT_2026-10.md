@@ -63,21 +63,31 @@ vulnerabilidad crítica ni alta. Los hallazgos son de **endurecimiento**
 
 ## 2. Hallazgos
 
-### SEC-01 — CSP en modo *Report-Only* (Media)
+### SEC-01 — CSP en modo *Report-Only* (Media) · **RESUELTO PARCIAL (2026-10-27)**
 
 - **OWASP:** A05 Security Misconfiguration · **CWE-693** Protection Mechanism
   Failure.
-- **Observado:** `apps/web/next.config.ts` emite
-  `Content-Security-Policy-Report-Only`, no la cabecera de cumplimiento. La
-  política además incluye `script-src 'unsafe-inline'`.
-- **Impacto:** ante un XSS, la CSP no bloquea nada en producción; solo reporta.
-  `'unsafe-inline'` debilita la política incluso si se forzara.
-- **Decisión (riesgo aceptado, documentada):** **no** se fuerza la CSP en esta
-  entrega. Forzarla con `'unsafe-inline'` presente aporta poca protección real
-  y arriesga romper producción (Next inyecta scripts/estilos en línea sin
-  nonce). El camino correcto es una migración a CSP con **nonce**, fuera del
-  alcance de un cambio seguro de cabeceras. Queda como trabajo de seguimiento
-  (ver §4).
+- **Observado:** `apps/web/next.config.ts` emitía
+  `Content-Security-Policy-Report-Only`, no la cabecera de cumplimiento.
+- **Resuelto:** la CSP pasó a **cumplimiento** (`Content-Security-Policy`) y se
+  añadieron `form-action 'self'` y `frame-src 'none'`. Ahora se **enforcean**
+  `default-src 'self'`, `object-src 'none'`, `base-uri 'self'`,
+  `frame-ancestors 'none'`, `form-action 'self'` y las allowlists de
+  `connect-src`/`img-src` (antes solo se reportaban). Cierra base-tag
+  injection, vectores de plugin/objeto, form-hijacking y limita canales de
+  exfiltración. Cambio verificado de riesgo cero: la app no carga
+  scripts/estilos/fuentes externos (solo `self` + Supabase + FCM); todos los
+  `<script>` son de `/_next/` (self); sin iframes; forms = Server Actions
+  same-origin. Prueba de humo local (`next start`) de `/`, `/login`, `/signup`,
+  `/contacto`, `/t/<token>`, `/join/<token>` → 200 con la CSP enforced.
+- **Pendiente (seguimiento, ver §4):** `script-src`/`style-src` conservan
+  `'unsafe-inline'`. Eliminarlo requiere migrar a CSP con **nonce**, que es
+  incompatible con el render estático/PPR de este proyecto (el shell
+  prerenderizado no recibe nonce por petición) y con el `proxy`, que excluye
+  las rutas públicas de cliente (`/t`, `/join`, `logo`, `wallet-img`) por
+  rendimiento. Es un cambio arquitectónico, no un ajuste de cabeceras. Riesgo
+  residual bajo: la app no tiene sinks de XSS (React escapa por defecto, sin
+  `dangerouslySetInnerHTML` ni scripts inline propios).
 
 ### SEC-02 — Falta cabecera HSTS (Media)
 
@@ -205,10 +215,16 @@ nonce, §4).
 
 ## 4. Trabajo de seguimiento recomendado (fuera de alcance de esta entrega)
 
-1. **CSP con nonce (SEC-01):** introducir nonce por request en los scripts de
-   Next y pasar de `Report-Only` a cumplimiento, eliminando `'unsafe-inline'`
-   de `script-src`. Requiere cambios de runtime y pruebas E2E.
-2. **Monitorizar reportes CSP** antes del punto 1 (endpoint `report-to`).
+1. **CSP con nonce (SEC-01, residual):** la CSP ya está en cumplimiento
+   (2026-10-27); falta eliminar `'unsafe-inline'` de `script-src` vía nonce.
+   Bloqueado por arquitectura: el render estático/PPR no recibe nonce por
+   petición y el `proxy` excluye las rutas públicas (`/t`, `/join`, `logo`,
+   `wallet-img`). Opciones: (a) render dinámico en las rutas que consuman el
+   nonce + proxy que cubra las públicas (coste de rendimiento), o (b) hashes
+   para los scripts de arranque de Next (frágil entre versiones). Requiere
+   pruebas E2E por ruta.
+2. **Monitorizar reportes CSP** (endpoint `report-to`/`/api/csp-report`) para
+   recolectar violaciones reales antes de endurecer `script-src`.
 3. **Pruebas automatizadas de cabeceras:** añadir un test que verifique la
    presencia de HSTS/COOP/CSP en la respuesta, para evitar regresiones.
 4. **Unificar conexión en los runners de prueba** (`test_engine.py` /
