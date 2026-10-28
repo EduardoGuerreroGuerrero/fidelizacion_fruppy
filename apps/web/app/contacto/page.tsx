@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { PageShell } from "../_landing/shell";
 import { RememberForm } from "@/app/_components/remember-form";
 import { SubmitButton } from "@/app/_components/submit-button";
+import { Turnstile } from "@/app/_components/turnstile";
 import { sendContactMessage } from "@/lib/contact/actions";
 
 // Lee ?sent / ?error del formulario: ruta dinámica (Next 16 cacheComponents).
@@ -114,6 +115,7 @@ export default async function ContactoPage({
                   <input name="website" tabIndex={-1} autoComplete="off" />
                 </label>
               </div>
+              <Turnstile />
               <SubmitButton
                 pendingText="Enviando…"
                 className="inline-flex items-center gap-1.5 rounded-full bg-pl-green-2 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-pl-green-2/90 disabled:opacity-60"

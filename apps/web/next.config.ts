@@ -8,12 +8,14 @@ const isDev = process.env.NODE_ENV !== "production";
 // (sin nonce); 'unsafe-eval' solo en desarrollo (HMR).
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com${isDev ? " 'unsafe-eval'" : ""}`,
+  // Turnstile (anti-bot de formularios públicos) se muestra en un iframe.
+  "frame-src https://challenges.cloudflare.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
   "media-src 'self' blob:",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://fcm.googleapis.com",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://fcm.googleapis.com https://challenges.cloudflare.com",
   "worker-src 'self' blob:",
   "frame-ancestors 'none'",
   "base-uri 'self'",

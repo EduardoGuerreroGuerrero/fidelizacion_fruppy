@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { RememberForm } from "@/app/_components/remember-form";
 import { SubmitButton } from "@/app/_components/submit-button";
+import { Turnstile } from "@/app/_components/turnstile";
 
 export const instant = false;
 
@@ -264,6 +265,7 @@ export default async function JoinPage({
           </p>
         </fieldset>
 
+        <Turnstile />
         <SubmitButton
           className="w-full rounded-2xl py-3.5 text-[15px] font-semibold text-white shadow-sm transition active:scale-[0.99]"
           style={{ backgroundColor: brand }}>

@@ -3,6 +3,8 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { actionIp } from "@/lib/ratelimit";
+import { ANTIBOT_MESSAGE, verifyAntiBot } from "@/lib/antibot";
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const MIN_PASSWORD = 8;
@@ -34,6 +36,8 @@ export async function signIn(formData: FormData) {
 }
 
 export async function signUp(formData: FormData) {
+  if (!(await verifyAntiBot(formData, await actionIp())).ok) fail("/signup", ANTIBOT_MESSAGE);
+
   const email = String(formData.get("email") ?? "")
     .trim()
     .toLowerCase();
@@ -132,6 +136,8 @@ export async function signInWithGoogle(formData: FormData) {
 // correo existe). El enlace del correo vuelve a /auth/callback (PKCE: debe
 // abrirse en el mismo navegador) y de ahí a /nueva-clave.
 export async function requestPasswordReset(formData: FormData) {
+  if (!(await verifyAntiBot(formData, await actionIp())).ok) fail("/recuperar", ANTIBOT_MESSAGE);
+
   const email = String(formData.get("email") ?? "")
     .trim()
     .toLowerCase();
