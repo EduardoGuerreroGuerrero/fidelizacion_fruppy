@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthUser } from "@/lib/supabase/server";
 import {
   IconChevron,
   IconPlus,
@@ -34,9 +34,10 @@ export default async function DashboardPage({
 }) {
   const { error, ok } = await searchParams;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
+  // Reclama invitaciones pendientes del email del usuario (idempotente)
+  // antes de listar: así una invitación aceptada aparece en el listado.
+  if (user) await supabase.rpc("claim_invites");
 
   // RLS permite ver a TODOS los miembros de mis orgs — hay que filtrar por
   // user_id o cada tarjeta se repite por cada miembro de la organización.

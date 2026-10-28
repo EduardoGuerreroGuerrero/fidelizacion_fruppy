@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthUser } from "@/lib/supabase/server";
 import { displayName } from "@/lib/format";
 import { visitSourceLabel } from "@/lib/labels";
 
@@ -9,9 +9,7 @@ export const instant = false;
 export default async function OrgPage({ params }: { params: Promise<{ org: string }> }) {
   const { org: slug } = await params;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) redirect("/login");
 
   // RLS: solo visible si el usuario es miembro activo.

@@ -1,5 +1,5 @@
 import { createOrganization } from "@/lib/organizations/actions";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthUser } from "@/lib/supabase/server";
 import {
   IconPlus,
   IconStore,
@@ -17,10 +17,7 @@ export default async function NewOrganizationPage({
   const { error, name } = await searchParams;
 
   // El signup pide el nombre del negocio: se aprovecha como valor inicial.
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   const business = String(
     (user?.user_metadata as Record<string, unknown> | undefined)?.business ?? "",
   ).trim();

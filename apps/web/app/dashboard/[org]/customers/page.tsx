@@ -1,10 +1,12 @@
+import Form from "next/form";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthUser } from "@/lib/supabase/server";
 import { displayName } from "@/lib/format";
 import { ImportCsvButton } from "../_components/import-csv";
 import { statusLabel } from "@/lib/labels";
 import { Badge } from "@/app/_components/badge";
+import { SubmitButton } from "@/app/_components/submit-button";
 
 export const instant = false;
 
@@ -28,9 +30,7 @@ export default async function CustomersPage({
   const { q = "", status = "active", consent = "" } = await searchParams;
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) redirect("/login");
 
   const { data: org } = await supabase
@@ -91,7 +91,8 @@ export default async function CustomersPage({
         </div>
       </div>
 
-      <form className="mb-4 flex flex-wrap gap-2" action="">
+      {/* next/form: navegación del cliente (sin recargar el documento). */}
+      <Form className="mb-4 flex flex-wrap gap-2" action={`/dashboard/${slug}/customers`}>
         <input
           type="search"
           name="q"
@@ -117,13 +118,13 @@ export default async function CustomersPage({
           <option value="marketing">Con marketing</option>
           <option value="push">Con push</option>
         </select>
-        <button
-          type="submit"
-          className="rounded-md border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-100"
+        <SubmitButton
+          pendingText="Buscando…"
+          className="rounded-md border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-100 disabled:opacity-60"
         >
           Buscar
-        </button>
-      </form>
+        </SubmitButton>
+      </Form>
 
       {customers && customers.length > 0 ? (
         <ul className="divide-y divide-neutral-200 rounded-lg border border-neutral-200">

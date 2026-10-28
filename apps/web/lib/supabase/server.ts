@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import { cache } from "react";
 import { connection } from "next/server";
 import { requireEnv } from "@/lib/env";
 
@@ -33,6 +34,17 @@ export async function createClient() {
     },
   );
 }
+
+// Usuario autenticado de la petición, verificado contra Supabase Auth
+// (getUser = ida y vuelta de red). cache(): layouts, página y helpers del
+// mismo render comparten UNA llamada en vez de repetirla por segmento.
+export const getAuthUser = cache(async () => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user;
+});
 
 // Service-role client: bypasses RLS. ONLY for trusted server code
 // (webhooks, jobs, wallet sync). Never import from client components and

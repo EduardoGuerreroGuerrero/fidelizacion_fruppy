@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { IconLogout } from "@/app/t/[token]/_components/icons";
+import { SubmitButton } from "@/app/_components/submit-button";
 
 // Chrome del nivel SaaS (marca PineappleLoyalty) para todo el panel.
 export function DashboardChrome({
@@ -29,14 +30,14 @@ export function DashboardChrome({
             {email}
           </span>
           <form action={signOut} className="shrink-0">
-            <button
-              type="submit"
+            <SubmitButton
+              pendingText={null}
               aria-label="Cerrar sesión"
               title="Cerrar sesión"
-              className="flex size-11 items-center justify-center rounded-2xl bg-accent-soft text-accent transition hover:bg-accent/20"
+              className="flex size-11 items-center justify-center rounded-2xl bg-accent-soft text-accent transition hover:bg-accent/20 disabled:opacity-60"
             >
               <IconLogout className="size-5" />
-            </button>
+            </SubmitButton>
           </form>
         </div>
       </header>

@@ -1,6 +1,11 @@
 {
+  "regions": [
+    "gru1"
+  ],
   "functions": {
-    "app/wallet-img/**/route.tsx": { "maxDuration": 10 }
+    "app/wallet-img/**/route.tsx": {
+      "maxDuration": 10
+    }
   },
   "crons": [
     {

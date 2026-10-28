@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthUser } from "@/lib/supabase/server";
 import { rotateJoinToken } from "@/lib/admin/actions";
 import { SubmitButton } from "@/app/_components/submit-button";
 import { PrintButton } from "@/app/_components/print-button";
@@ -18,9 +18,7 @@ export default async function JoinQrPage({
   const { org: slug } = await params;
   const { error, ok } = await searchParams;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) redirect("/login");
 
   const { data: org } = await supabase

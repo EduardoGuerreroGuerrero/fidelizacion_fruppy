@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createClient, supabaseAdmin } from "@/lib/supabase/server";
+import { createClient, getAuthUser, supabaseAdmin } from "@/lib/supabase/server";
 import { enqueueEmail, trySendOutbox } from "@/lib/email/outbox";
 import { logoToDataUri } from "@/lib/organizations/logo";
 import { processPushQueue, pushConfigured, saveWalletStats } from "@/lib/push/send";
@@ -17,28 +17,26 @@ import { STAMP_ICON_KEYS } from "@/app/t/[token]/_components/stamp-icons";
 
 async function requireMembership(orgSlug: string) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) redirect("/login");
 
-  const { data: org } = await supabase
-    .from("organizations")
-    .select("id")
-    .eq("slug", orgSlug)
-    .maybeSingle();
-  if (!org) redirect("/dashboard?error=" + encodeURIComponent("Sin acceso."));
-
+  // Org + membresía activa en UNA consulta (join por slug): antes eran dos
+  // idas y vueltas secuenciales a la BD en cada acción.
   const { data: membership } = await supabase
     .from("organization_members")
-    .select("role")
-    .eq("organization_id", org.id)
+    .select("role, organization_id, organizations!inner(slug)")
     .eq("user_id", user.id)
     .eq("status", "active")
+    .eq("organizations.slug", orgSlug)
     .maybeSingle();
   if (!membership) redirect("/dashboard?error=" + encodeURIComponent("Sin acceso."));
 
-  return { supabase, user, orgId: org.id, role: membership.role as string };
+  return {
+    supabase,
+    user,
+    orgId: membership.organization_id as string,
+    role: membership.role as string,
+  };
 }
 
 // Auditoría vía RPC write_audit_log: actor = auth.uid() (infalsificable),

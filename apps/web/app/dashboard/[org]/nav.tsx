@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { LinkPending } from "@/app/_components/link-pending";
 
 type Item = readonly [path: string, label: string];
 export type NavGroup = { label: string; items: readonly Item[] };
@@ -44,7 +45,7 @@ export function OrgNav({
   }, [openLabel]);
 
   const pill = (on: boolean) =>
-    `rounded-full px-4 py-1.5 text-sm font-medium transition ${
+    `inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition ${
       on
         ? "bg-brand-dark text-white shadow-sm"
         : "text-ink-soft hover:bg-neutral-100 hover:text-ink"
@@ -59,6 +60,7 @@ export function OrgNav({
       className={pill(isOn(path))}
     >
       {label}
+      <LinkPending />
     </Link>
   );
 

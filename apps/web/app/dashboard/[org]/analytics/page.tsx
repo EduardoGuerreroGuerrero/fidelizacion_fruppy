@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthUser } from "@/lib/supabase/server";
 
 export const instant = false;
 
@@ -70,9 +70,7 @@ export default async function AnalyticsPage({
   const granularity = GRANULARITIES.some((g) => g.value === granParam) ? granParam! : "day";
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) redirect("/login");
 
   const { data: org } = await supabase
