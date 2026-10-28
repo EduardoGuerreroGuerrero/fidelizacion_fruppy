@@ -31,9 +31,12 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // getClaims(): verifica la firma del JWT localmente (claves asimétricas
+  // ES256, JWKS cacheado) y refresca la sesión si expiró. getUser() hacía
+  // una ida y vuelta a Supabase Auth en CADA petición/navegación del panel.
+  // Es solo el chequeo optimista: layouts, actions y RLS siguen verificando.
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims?.sub ? data.claims : null;
 
   const path = request.nextUrl.pathname;
 

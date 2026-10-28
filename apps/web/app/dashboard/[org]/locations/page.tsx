@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthUser } from "@/lib/supabase/server";
 import { saveLocation, setLocationStatus, syncLocationsToWallet } from "@/lib/admin/actions";
 import { walletProvider } from "@/lib/wallet/passlet";
 import { MAX_WALLET_LOCATIONS, toWalletLocations, validCoords } from "@/lib/wallet/locations";
@@ -22,9 +22,7 @@ export default async function LocationsPage({
   const { org: slug } = await params;
   const { error, ok } = await searchParams;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) redirect("/login");
 
   const { data: org } = await supabase

@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createClient, supabaseAdmin } from "@/lib/supabase/server";
+import { createClient, getAuthUser, supabaseAdmin } from "@/lib/supabase/server";
 import { walletProvider } from "./passlet";
 import { passDataByToken } from "./pass-data";
 import { WalletNotConfiguredError } from "./provider";
@@ -14,9 +14,7 @@ type SyncResult = { ok: boolean; detail: string };
 
 export async function syncWalletPass(orgSlug: string, customerId: string): Promise<SyncResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) redirect("/login");
 
   const { data: org } = await supabase

@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthUser } from "@/lib/supabase/server";
 import { signOut } from "@/lib/auth/actions";
 import { OrgNav } from "./nav";
 import { OrgLogo } from "../org-logo";
 import { initials } from "@/lib/format";
+import { SubmitButton } from "@/app/_components/submit-button";
 
 export const instant = false;
 
@@ -59,21 +60,27 @@ export default async function OrgLayout({
   const { org } = await params;
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   let role: string | null = null;
   let orgName: string | null = null;
   let logoUrl: string | null = null;
   if (user) {
-    const { data: m } = await supabase
-      .from("organization_members")
-      .select("role, organizations!inner(slug, name, brand, status)")
-      .eq("user_id", user.id)
-      .eq("status", "active")
-      .eq("organizations.slug", org)
-      .maybeSingle();
+    const membership = () =>
+      supabase
+        .from("organization_members")
+        .select("role, organizations!inner(slug, name, brand, status)")
+        .eq("user_id", user.id)
+        .eq("status", "active")
+        .eq("organizations.slug", org)
+        .maybeSingle();
+    let { data: m } = await membership();
+    // Sin membresía: puede haber una invitación pendiente (enlace directo
+    // tras el login). Se reclama solo en este caso, no en cada render.
+    if (!m) {
+      await supabase.rpc("claim_invites");
+      ({ data: m } = await membership());
+    }
     role = m?.role ?? null;
     const o = m?.organizations as
       | { name?: string; status?: string; brand?: { logo_url?: string } }
@@ -123,12 +130,12 @@ export default async function OrgLayout({
         </OrgLogo>
         <span className="font-semibold text-ink">{orgName ?? org}</span>
         <form action={signOut} className="ml-auto">
-          <button
-            type="submit"
-            className="rounded-full bg-accent-soft px-4 py-1.5 text-sm font-medium text-accent transition hover:bg-accent/20"
+          <SubmitButton
+            pendingText="Saliendo…"
+            className="rounded-full bg-accent-soft px-4 py-1.5 text-sm font-medium text-accent transition hover:bg-accent/20 disabled:opacity-60"
           >
             Salir
-          </button>
+          </SubmitButton>
         </form>
       </div>
       <OrgNav base={`/dashboard/${org}`} items={NAV_BASE} groups={groups} />

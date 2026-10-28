@@ -2,7 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { after } from "next/server";
+import { createClient, getAuthUser } from "@/lib/supabase/server";
 import { displayName } from "@/lib/format";
 import { pushWalletUpdate } from "@/lib/wallet/push";
 
@@ -81,28 +82,26 @@ async function audit(
 // activo; null si no (RLS ya oculta la org, la query extra es por rol).
 async function requireMembership(orgSlug: string) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) redirect("/login");
 
-  const { data: org } = await supabase
-    .from("organizations")
-    .select("id")
-    .eq("slug", orgSlug)
-    .maybeSingle();
-  if (!org) redirect("/dashboard?error=" + encodeURIComponent("Sin acceso."));
-
+  // Org + membresía activa en UNA consulta (join por slug): antes eran dos
+  // idas y vueltas secuenciales a la BD en cada acción.
   const { data: membership } = await supabase
     .from("organization_members")
-    .select("role")
-    .eq("organization_id", org.id)
+    .select("role, organization_id, organizations!inner(slug)")
     .eq("user_id", user.id)
     .eq("status", "active")
+    .eq("organizations.slug", orgSlug)
     .maybeSingle();
   if (!membership) redirect("/dashboard?error=" + encodeURIComponent("Sin acceso."));
 
-  return { supabase, user, orgId: org.id, role: membership.role as string };
+  return {
+    supabase,
+    user,
+    orgId: membership.organization_id as string,
+    role: membership.role as string,
+  };
 }
 
 // Los filtros .or() de PostgREST se rompen con ,()". Para búsqueda exacta
@@ -356,10 +355,15 @@ export async function archiveCustomer(orgSlug: string, customerId: string) {
     redirect(back + "?error=" + encodeURIComponent("No se pudo eliminar el cliente."));
   }
 
-  for (const card of cards ?? []) {
-    await supabase.rpc("revoke_card", { p_card_id: card.id });
-    await pushWalletUpdate(card.id);
-  }
+  // La revocación sí se espera (seguridad); el push a Wallet va con after()
+  // para no retrasar la respuesta.
+  const revoked = cards ?? [];
+  await Promise.all(
+    revoked.map((card) => supabase.rpc("revoke_card", { p_card_id: card.id })),
+  );
+  after(async () => {
+    for (const card of revoked) await pushWalletUpdate(card.id);
+  });
 
   await audit(orgId, user.id, "customer.archived", "customer", customerId, {
     cards_revoked: (cards ?? []).length,

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { IconScan } from "@/app/t/[token]/_components/icons";
+import { SubmitButton } from "@/app/_components/submit-button";
 
 const READER_ID = "qr-reader";
 
@@ -163,12 +164,12 @@ export function ScanForm({
           </p>
         </div>
       )}
-      <button
-        type="submit"
-        className="w-full rounded-full bg-brand-dark px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper"
+      <SubmitButton
+        pendingText="Registrando…"
+        className="w-full rounded-full bg-brand-dark px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deeper disabled:opacity-70"
       >
         Registrar visita
-      </button>
+      </SubmitButton>
     </form>
   );
 }

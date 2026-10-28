@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthUser } from "@/lib/supabase/server";
 
 // Anti CSV-formula-injection: celdas que empiezan por =, +, -, @ o control
 // van prefijadas con comilla simple (OWASP CSV Injection).
@@ -13,9 +13,7 @@ function csvCell(v: unknown): string {
 export async function GET(_req: Request, ctx: { params: Promise<{ org: string }> }) {
   const { org: slug } = await ctx.params;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   // RLS + comprobación de membresía activa.

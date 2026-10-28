@@ -2,7 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { after } from "next/server";
+import { createClient, getAuthUser } from "@/lib/supabase/server";
 import { optionalEnv } from "@/lib/env";
 import { displayName } from "@/lib/format";
 import { normalizeCardToken } from "@/lib/loyalty/token";
@@ -35,28 +36,26 @@ async function audit(
 
 async function requireMembership(orgSlug: string) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) redirect("/login");
 
-  const { data: org } = await supabase
-    .from("organizations")
-    .select("id")
-    .eq("slug", orgSlug)
-    .maybeSingle();
-  if (!org) redirect("/dashboard?error=" + encodeURIComponent("Sin acceso."));
-
+  // Org + membresía activa en UNA consulta (join por slug): antes eran dos
+  // idas y vueltas secuenciales a la BD en cada acción.
   const { data: membership } = await supabase
     .from("organization_members")
-    .select("role")
-    .eq("organization_id", org.id)
+    .select("role, organization_id, organizations!inner(slug)")
     .eq("user_id", user.id)
     .eq("status", "active")
+    .eq("organizations.slug", orgSlug)
     .maybeSingle();
   if (!membership) redirect("/dashboard?error=" + encodeURIComponent("Sin acceso."));
 
-  return { supabase, user, orgId: org.id, role: membership.role as string };
+  return {
+    supabase,
+    user,
+    orgId: membership.organization_id as string,
+    role: membership.role as string,
+  };
 }
 
 // Emitir tarjeta: crea cuenta (si falta) + tarjeta con token. Idempotente.
@@ -101,7 +100,9 @@ export async function revokeCard(orgSlug: string, customerId: string, cardId: st
   await audit(orgId, user.id, "card.revoked", "customer", customerId, {
     card_id: cardId,
   });
-  await pushWalletUpdate(cardId);
+  // Push a Wallet tras responder: la llamada a Google Wallet ya no retrasa
+  // el redirect (best-effort, nunca afecta al saldo).
+  after(() => pushWalletUpdate(cardId));
   revalidatePath(back);
   redirect(back + "?ok=" + encodeURIComponent("Tarjeta revocada."));
 }
@@ -128,7 +129,9 @@ export async function reissueCard(orgSlug: string, customerId: string, cardId: s
   }
 
   await audit(orgId, user.id, "card.reissued", "customer", customerId, { card_id: cardId });
-  await pushWalletUpdate(cardId);
+  // Push a Wallet tras responder: la llamada a Google Wallet ya no retrasa
+  // el redirect (best-effort, nunca afecta al saldo).
+  after(() => pushWalletUpdate(cardId));
   revalidatePath(back);
   redirect(
     back +
@@ -151,7 +154,9 @@ export async function rotateCardToken(orgSlug: string, customerId: string, cardI
   await audit(orgId, user.id, "card.token_rotated", "customer", customerId, {
     card_id: cardId,
   });
-  await pushWalletUpdate(cardId);
+  // Push a Wallet tras responder: la llamada a Google Wallet ya no retrasa
+  // el redirect (best-effort, nunca afecta al saldo).
+  after(() => pushWalletUpdate(cardId));
   revalidatePath(back);
   redirect(back + "?ok=" + encodeURIComponent("QR regenerado."));
 }
@@ -211,12 +216,16 @@ export async function scanCard(orgSlug: string, formData: FormData): Promise<voi
   } | null;
   // Push Wallet best-effort: la RPC no devuelve card_id; lo resolvemos por
   // token con el cliente del miembro (RLS ya limita a su organización).
-  const { data: cardRow } = await supabase
-    .from("customer_cards")
-    .select("id")
-    .eq("token", token)
-    .maybeSingle();
-  if (cardRow) await pushWalletUpdate(cardRow.id);
+  // Se ejecuta con after(): la consulta + la llamada a Google Wallet ya no
+  // retrasan la respuesta al empleado.
+  after(async () => {
+    const { data: cardRow } = await supabase
+      .from("customer_cards")
+      .select("id")
+      .eq("token", token)
+      .maybeSingle();
+    if (cardRow) await pushWalletUpdate(cardRow.id);
+  });
   redirect(
     back +
       "?ok=" +
@@ -263,15 +272,17 @@ export async function redeemReward(
   await audit(orgId, user.id, "reward.redeemed", "customer", customerId, {
     reward_id: rewardId,
   });
-  const { data: cardRow } = await supabase
-    .from("customer_cards")
-    .select("id")
-    .eq("customer_id", customerId)
-    .eq("organization_id", orgId)
-    .eq("status", "active")
-    .limit(1)
-    .maybeSingle();
-  if (cardRow) await pushWalletUpdate(cardRow.id);
+  after(async () => {
+    const { data: cardRow } = await supabase
+      .from("customer_cards")
+      .select("id")
+      .eq("customer_id", customerId)
+      .eq("organization_id", orgId)
+      .eq("status", "active")
+      .limit(1)
+      .maybeSingle();
+    if (cardRow) await pushWalletUpdate(cardRow.id);
+  });
   revalidatePath(back);
   redirect(back + "?ok=" + encodeURIComponent("Canje registrado."));
 }

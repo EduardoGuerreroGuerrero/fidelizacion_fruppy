@@ -1,15 +1,13 @@
 import { notFound } from "next/navigation";
 import QRCode from "qrcode";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthUser } from "@/lib/supabase/server";
 
 // PNG del QR de autorregistro para imprimir. Requiere sesión (es una vista
 // del dashboard); el QR solo codifica la URL pública /join/{token}.
 export async function GET(_req: Request, ctx: { params: Promise<{ org: string }> }) {
   const { org: slug } = await ctx.params;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) notFound();
 
   const { data: org } = await supabase

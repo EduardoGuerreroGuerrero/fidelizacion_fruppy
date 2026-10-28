@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { LinkPending } from "@/app/_components/link-pending";
 import { IconCard, IconQr } from "./icons";
 
 // Barra inferior mínima: Mi tarjeta (saldo/progreso) y Mi QR (código para
@@ -23,11 +24,17 @@ export function TabBar({ base }: { base: string }) {
       <div className="mx-auto flex h-[64px] w-full max-w-md items-stretch px-6 pb-2">
         <Link href={base} className={item} aria-current={inicio ? "page" : undefined}>
           <IconCard className={icon(inicio)} />
-          <span className={label(inicio)}>Mi tarjeta</span>
+          <span className={`flex items-center gap-1 ${label(inicio)}`}>
+            Mi tarjeta
+            <LinkPending className="size-2.5" />
+          </span>
         </Link>
         <Link href={`${base}/escanear`} className={item} aria-current={qr ? "page" : undefined}>
           <IconQr className={icon(qr)} />
-          <span className={label(qr)}>Mi QR</span>
+          <span className={`flex items-center gap-1 ${label(qr)}`}>
+            Mi QR
+            <LinkPending className="size-2.5" />
+          </span>
         </Link>
       </div>
     </nav>

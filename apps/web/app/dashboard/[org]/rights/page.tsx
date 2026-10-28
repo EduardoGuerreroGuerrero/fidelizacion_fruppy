@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthUser } from "@/lib/supabase/server";
 import { updateRightsRequest } from "@/lib/admin/actions";
 import { rightsDeadline } from "@/lib/legal/deadlines";
 import { SubmitButton } from "@/app/_components/submit-button";
@@ -39,9 +39,7 @@ export default async function RightsPage({
   const { org: slug } = await params;
   const { error, ok } = await searchParams;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) redirect("/login");
 
   const { data: org } = await supabase

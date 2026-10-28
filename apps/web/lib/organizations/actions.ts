@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthUser } from "@/lib/supabase/server";
 import { logoToDataUri } from "./logo";
 
 const SLUG_RE = /^[a-z0-9][a-z0-9-]{1,62}$/;
@@ -61,9 +61,7 @@ export async function createOrganization(formData: FormData) {
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) redirect("/login");
 
   // Org + membresía owner en UNA transacción (RPC security definer): un
