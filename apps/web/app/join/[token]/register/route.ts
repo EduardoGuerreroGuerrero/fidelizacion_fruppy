@@ -2,6 +2,8 @@ import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 import { createClient, supabaseAdmin } from "@/lib/supabase/server";
 import { enqueueEmail, trySendOutbox } from "@/lib/email/outbox";
+import { ANTIBOT_MESSAGE, verifyAntiBot } from "@/lib/antibot";
+import { clientIp } from "@/lib/ratelimit";
 
 // Alta pública por QR. El token del URL resuelve el comercio EN SERVIDOR;
 // el cliente nunca puede elegir organization_id. El correo transaccional va
@@ -68,6 +70,11 @@ export async function POST(req: Request, ctx: { params: Promise<{ token: string 
       back + "?error=" + encodeURIComponent("Debes autorizar el tratamiento de datos."),
       303,
     );
+  }
+
+  // Anti-bot (Turnstile, solo si está configurado): antes de tocar la base.
+  if (!(await verifyAntiBot(form, clientIp(req.headers))).ok) {
+    return NextResponse.redirect(back + "?error=" + encodeURIComponent(ANTIBOT_MESSAGE), 303);
   }
 
   const firstName = String(form.get("first_name") ?? "").trim();
