@@ -33,8 +33,12 @@ function hashKey(scope: string, id: string): string {
   return `${scope}:${createHash("sha256").update(id).digest("hex").slice(0, 32)}`;
 }
 
-function ipOf(h: Headers): string {
+export function clientIp(h: Headers): string {
   return h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || "unknown";
+}
+
+export async function actionIp(): Promise<string> {
+  return clientIp(await headers());
 }
 
 // true = permitido. `useDb=false` para rutas de altísimo volumen (imágenes).
@@ -79,7 +83,7 @@ export async function limitRequest(
   windowSec: number,
   useDb = true,
 ): Promise<Response | null> {
-  const ok = await allow(scope, `${extraId}|${ipOf(req.headers)}`, limit, windowSec, useDb);
+  const ok = await allow(scope, `${extraId}|${clientIp(req.headers)}`, limit, windowSec, useDb);
   return ok ? null : tooMany(windowSec);
 }
 
@@ -89,5 +93,5 @@ export async function allowAction(
   limit: number,
   windowSec: number,
 ): Promise<boolean> {
-  return allow(scope, ipOf(await headers()), limit, windowSec);
+  return allow(scope, clientIp(await headers()), limit, windowSec);
 }

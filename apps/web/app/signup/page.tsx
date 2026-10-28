@@ -20,6 +20,7 @@ import { Leaf } from "../_landing/decorations";
 import PasswordInput from "./password-input";
 import { RememberForm } from "@/app/_components/remember-form";
 import { SubmitButton } from "@/app/_components/submit-button";
+import { Turnstile } from "@/app/_components/turnstile";
 
 export const instant = false;
 
@@ -280,6 +281,7 @@ export default async function SignupPage({
               </span>
             </label>
 
+            <Turnstile />
             <SubmitButton
               className="flex w-full items-center justify-center gap-2 rounded-full bg-pl-green-2 py-3.5 font-semibold text-white shadow-md shadow-pl-green-2/25 transition hover:bg-pl-green">
               Crear cuenta gratis

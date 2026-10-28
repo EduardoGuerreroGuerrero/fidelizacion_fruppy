@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requestPasswordReset } from "@/lib/auth/actions";
 import { SubmitButton } from "@/app/_components/submit-button";
+import { Turnstile } from "@/app/_components/turnstile";
 
 export const instant = false;
 
@@ -35,6 +36,7 @@ export default async function RecoverPage({
             className="rounded-xl bg-neutral-100 px-4 py-3 outline-none focus:ring-2 focus:ring-pl-green/50"
           />
         </label>
+        <Turnstile />
         <SubmitButton className="rounded-full bg-pl-green py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-pl-green/90">
           Enviar enlace
         </SubmitButton>
